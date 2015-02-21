@@ -1,0 +1,38 @@
+apply plugin: 'war'
+apply plugin: 'appengine'
+
+def appEmail = "tfr.didi@gmail.com"
+def appengineVersion = "1.9.17"
+
+buildscript { 
+  repositories { 
+     mavenCentral()
+  } 
+  
+  dependencies {
+    classpath "com.google.appengine:gradle-appengine-plugin:1.9.17"
+  }
+}
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+ appengineSdk "com.google.appengine:appengine-java-sdk:${appengineVersion}"
+ compile "javax.servlet:servlet-api:2.5"
+ compile "com.google.appengine:appengine-api-1.0-sdk:${appengineVersion}"
+ compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.1'
+ compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.1'
+}
+
+appengine {
+  httpPort = 8080
+  downloadSdk = true
+
+  appcfg {
+    email = "${appEmail}"
+    noCookies = true
+    oauth2 = false
+  }
+}

@@ -1,3 +1,7 @@
 /build
+/classes
 /web/data/photos
 /web/WEB-INF/classes
+.gradle
+.idea
+*.iml

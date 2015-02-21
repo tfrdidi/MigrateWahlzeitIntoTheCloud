@@ -24,7 +24,8 @@ import java.io.*;
 import java.sql.*;
 import java.text.*;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * Simple logging class; should be replaced with log4j or the like.
@@ -165,7 +166,7 @@ public class Log {
 	/**
 	 * 
 	 */
-	protected static Logger logger = Logger.getLogger(Log.class.getName());
+	protected static Logger logger = LogManager.getLogger(Log.class.getName());
 	
 	/**
 	 * 
