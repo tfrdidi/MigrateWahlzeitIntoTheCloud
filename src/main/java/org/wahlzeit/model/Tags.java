@@ -24,6 +24,8 @@ import java.util.*;
 
 import org.wahlzeit.utils.*;
 
+import java.io.Serializable;
+
 /**
  * A Tags instance represents a set of tags; each tag ist just a string. All
  * tags are maintained lowercase and without whitespace. I.e. "Captain America"
@@ -32,7 +34,7 @@ import org.wahlzeit.utils.*;
  * @author dirkriehle
  * 
  */
-public class Tags {
+public class Tags implements Serializable{
 
 	/**
 	 * 

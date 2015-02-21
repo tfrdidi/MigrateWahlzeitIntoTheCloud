@@ -24,12 +24,14 @@ import java.util.*;
 
 import org.wahlzeit.utils.StringUtil;
 
+import java.io.Serializable;
+
 /**
  * 
  * @author dirkriehle
  *
  */
-public class PhotoFilter {
+public class PhotoFilter implements Serializable{
 
 	/**
 	 * 

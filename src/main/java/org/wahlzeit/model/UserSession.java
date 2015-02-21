@@ -21,6 +21,7 @@
 package org.wahlzeit.model;
 
 import java.util.*;
+import java.io.Serializable;
 
 import org.wahlzeit.services.*;
 import org.wahlzeit.utils.*;
@@ -30,7 +31,7 @@ import org.wahlzeit.utils.*;
  * @author dirkriehle
  *
  */
-public class UserSession extends Session {
+public class UserSession extends Session implements Serializable{
 
 	/**
 	 * 
