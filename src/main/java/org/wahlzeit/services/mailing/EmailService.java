@@ -24,20 +24,21 @@ import org.wahlzeit.services.EmailAddress;
 
 /**
  * An EmailServer can send emails. Various implementations exist.
- *
  */
 public interface EmailService {
 
-	/**
-	 * 
-	 */
-	public void sendEmail(EmailAddress from, EmailAddress to, String subject, String body) throws MailingException;
-	public boolean sendEmailIgnoreException(EmailAddress from, EmailAddress to, String subject, String body);
+    /**
+     *
+     */
+    public void sendEmail(EmailAddress from, EmailAddress to, String subject, String body) throws MailingException;
 
-	/**
-	 * 
-	 */
-	public void sendEmail(EmailAddress from, EmailAddress to, EmailAddress bcc, String subject, String body) throws MailingException;
-	public boolean sendEmailIgnoreException(EmailAddress from, EmailAddress to, EmailAddress bcc, String subject, String body);
+    public boolean sendEmailIgnoreException(EmailAddress from, EmailAddress to, String subject, String body);
+
+    /**
+     *
+     */
+    public void sendEmail(EmailAddress from, EmailAddress to, EmailAddress bcc, String subject, String body) throws MailingException;
+
+    public boolean sendEmailIgnoreException(EmailAddress from, EmailAddress to, EmailAddress bcc, String subject, String body);
 
 }

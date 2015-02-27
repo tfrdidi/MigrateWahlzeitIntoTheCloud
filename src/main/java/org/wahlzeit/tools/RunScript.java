@@ -20,47 +20,41 @@
 
 package org.wahlzeit.tools;
 
-import java.io.*;
-
-import org.wahlzeit.utils.*;
-import org.wahlzeit.main.*;
-import org.wahlzeit.model.*;
+import org.wahlzeit.main.ScriptMain;
 
 /**
- * 
  * @author dirkriehle
- *
  */
 public class RunScript extends ScriptMain {
-	
-	/**
-	 * 
-	 */
-	public static void main(String[] argv) {
-		new RunScript().run(argv);
-	}
-	
-	/**
-	 * 
-	 */
-	protected String scriptName = "";
-	
-	/**
-	 * 
-	 */
-	protected int handleArg(String arg, int i, String argv[]) {
-		scriptName = arg;
-		
-		return i;
-	}
-	
-	/**
-	 * 
-	 */
-	protected void execute() throws Exception {
-		super.execute();
-		
-		runScript(scriptName);
-	}
-	
+
+    /**
+     *
+     */
+    public static void main(String[] argv) {
+        new RunScript().run(argv);
+    }
+
+    /**
+     *
+     */
+    protected String scriptName = "";
+
+    /**
+     *
+     */
+    protected int handleArg(String arg, int i, String argv[]) {
+        scriptName = arg;
+
+        return i;
+    }
+
+    /**
+     *
+     */
+    protected void execute() throws Exception {
+        super.execute();
+
+        runScript(scriptName);
+    }
+
 }

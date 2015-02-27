@@ -20,36 +20,34 @@
 
 package org.wahlzeit.servlets;
 
-import java.io.*;
-
-import javax.servlet.*;
-import javax.servlet.http.*;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 
 /**
- * 
  * @author dirkriehle
- *
  */
 public class NullServlet extends AbstractServlet {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 42L; // any one does; class never serialized
+    /**
+     *
+     */
+    private static final long serialVersionUID = 42L; // any one does; class never serialized
 
-	/**
-	 * 
-	 */
-	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		displayNullPage(request, response);
-	}
-	
-	/**
-	 * 
-	 */
-	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		displayNullPage(request, response);
-	}
+    /**
+     *
+     */
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        displayNullPage(request, response);
+    }
+
+    /**
+     *
+     */
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        displayNullPage(request, response);
+    }
 
 }

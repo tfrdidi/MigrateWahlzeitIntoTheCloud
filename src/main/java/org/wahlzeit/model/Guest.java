@@ -20,23 +20,22 @@
 
 package org.wahlzeit.model;
 
-import org.wahlzeit.services.*;
+import org.wahlzeit.services.EmailAddress;
 
 import java.io.Serializable;
 
 /**
  * A Guest is a client that is not logged in.
- * 
- * @author dirkriehle
  *
+ * @author dirkriehle
  */
-public class Guest extends Client implements Serializable{
+public class Guest extends Client implements Serializable {
 
-	/**
-	 * 
-	 */
-	public Guest() {
-		initialize(AccessRights.GUEST, EmailAddress.EMPTY);
-	}
+    /**
+     *
+     */
+    public Guest() {
+        initialize(AccessRights.GUEST, EmailAddress.EMPTY);
+    }
 
 }

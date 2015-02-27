@@ -20,45 +20,42 @@
 
 package org.wahlzeit.handlers;
 
-import java.util.*;
-
 import org.wahlzeit.model.AccessRights;
 import org.wahlzeit.model.UserSession;
 import org.wahlzeit.utils.StringUtil;
 import org.wahlzeit.webparts.WebPart;
 
+import java.util.Map;
 
 
 /**
- * 
  * @author dirkriehle
- *
  */
 public class ShowNotePageHandler extends AbstractWebPageHandler {
-		
-	/**
-	 *
-	 */
-	public ShowNotePageHandler() {
-		initialize(PartUtil.SHOW_NOTE_PAGE_FILE, AccessRights.GUEST);
-	}
-	
-	/**
-	 * 
-	 */
-	protected boolean isWellFormedGet(UserSession us, String link, Map args) {
-		return hasSavedMessage(us);
-	}
-	
-	/**
-	 * 
-	 */
-	protected void makeWebPageBody(UserSession us, WebPart page) {
-		String heading = us.getHeading();
-		heading = StringUtil.isNullOrEmptyString(heading) ? us.cfg().getThankYou() : heading;
-		page.addString("noteHeading", heading);
-		
-		page.addString("note", us.getMessage());
-	}
+
+    /**
+     *
+     */
+    public ShowNotePageHandler() {
+        initialize(PartUtil.SHOW_NOTE_PAGE_FILE, AccessRights.GUEST);
+    }
+
+    /**
+     *
+     */
+    protected boolean isWellFormedGet(UserSession us, String link, Map args) {
+        return hasSavedMessage(us);
+    }
+
+    /**
+     *
+     */
+    protected void makeWebPageBody(UserSession us, WebPart page) {
+        String heading = us.getHeading();
+        heading = StringUtil.isNullOrEmptyString(heading) ? us.cfg().getThankYou() : heading;
+        page.addString("noteHeading", heading);
+
+        page.addString("note", us.getMessage());
+    }
 
 }

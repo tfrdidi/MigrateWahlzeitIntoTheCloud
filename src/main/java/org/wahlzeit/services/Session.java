@@ -24,117 +24,116 @@ package org.wahlzeit.services;
 /**
  * A Session object maintains a DatabaseConnection and helps track processing time.
  * Typically, there is one for each working thread, be it a system thread or a web session.
- * 
- * @author dirkriehle
  *
+ * @author dirkriehle
  */
 public class Session {
 
-	/**
-	 * Session state
-	 */
-	protected String name = null;
+    /**
+     * Session state
+     */
+    protected String name = null;
 
-	/**
-	 * Database stuff
-	 */
-	protected DatabaseConnection databaseConnection = null;
-	
-	/**
-	 * processing time for requests
-	 */
-	protected long processingTime = 0;
-	
-	/**
-	 * 
-	 */
-	protected Session() {
-		// do nothing
-	}
-	
-	/**
-	 * 
-	 */
-	protected void initialize(String myName) {
-		name = myName;
-	}
-	
-	/**
-	 * 
-	 */
-	protected void finalize() throws Throwable {
-		try {
-			returnDatabaseConnection();
-		} finally {
-			super.finalize();
-		}
-	}
-	
-	/**
-	 * 
-	 */
-	public String getName() {
-		return name;
-	}
-	
-	/**
-	 * 
-	 */
-	public boolean hasDatabaseConnection() {
-		return databaseConnection != null;
-	}
-	
-	/**
-	 * 
-	 */
-	public DatabaseConnection ensureDatabaseConnection() {
-		if (databaseConnection == null) {
-			try {
-				databaseConnection = DatabaseConnection.ensureDatabaseConnection();
-			} catch (Throwable t) {
-				SysLog.logThrowable(t);
-			}
-		}
-		
-		return databaseConnection;
-	}
-	
-	/**
-	 * 
-	 */
-	public void returnDatabaseConnection() {
-		if (databaseConnection != null) {
-			DatabaseConnection.returnDatabaseConnection(databaseConnection);
-			databaseConnection = null;
-		}
-	}
-	
-	/**
-	 * 
-	 */
-	public String getClientName() {
-		return "system";
-	}
-	
-	/**
-	 * 
-	 */
-	public void resetProcessingTime() {
-		processingTime = 0;
-	}
-	
-	/**
-	 * 
-	 */
-	public void addProcessingTime(long time) {
-		processingTime += time;
-	}
-	
-	/**
-	 * 
-	 */
-	public long getProcessingTime() {
-		return processingTime;
-	}
-	
+    /**
+     * Database stuff
+     */
+    protected DatabaseConnection databaseConnection = null;
+
+    /**
+     * processing time for requests
+     */
+    protected long processingTime = 0;
+
+    /**
+     *
+     */
+    protected Session() {
+        // do nothing
+    }
+
+    /**
+     *
+     */
+    protected void initialize(String myName) {
+        name = myName;
+    }
+
+    /**
+     *
+     */
+    protected void finalize() throws Throwable {
+        try {
+            returnDatabaseConnection();
+        } finally {
+            super.finalize();
+        }
+    }
+
+    /**
+     *
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     *
+     */
+    public boolean hasDatabaseConnection() {
+        return databaseConnection != null;
+    }
+
+    /**
+     *
+     */
+    public DatabaseConnection ensureDatabaseConnection() {
+        if (databaseConnection == null) {
+            try {
+                databaseConnection = DatabaseConnection.ensureDatabaseConnection();
+            } catch (Throwable t) {
+                SysLog.logThrowable(t);
+            }
+        }
+
+        return databaseConnection;
+    }
+
+    /**
+     *
+     */
+    public void returnDatabaseConnection() {
+        if (databaseConnection != null) {
+            DatabaseConnection.returnDatabaseConnection(databaseConnection);
+            databaseConnection = null;
+        }
+    }
+
+    /**
+     *
+     */
+    public String getClientName() {
+        return "system";
+    }
+
+    /**
+     *
+     */
+    public void resetProcessingTime() {
+        processingTime = 0;
+    }
+
+    /**
+     *
+     */
+    public void addProcessingTime(long time) {
+        processingTime += time;
+    }
+
+    /**
+     *
+     */
+    public long getProcessingTime() {
+        return processingTime;
+    }
+
 }

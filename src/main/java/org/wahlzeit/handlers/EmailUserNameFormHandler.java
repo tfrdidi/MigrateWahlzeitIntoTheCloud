@@ -20,68 +20,71 @@
 
 package org.wahlzeit.handlers;
 
-import java.util.*;
-
-import org.wahlzeit.model.*;
-import org.wahlzeit.services.mailing.*;
+import org.wahlzeit.model.AccessRights;
+import org.wahlzeit.model.User;
+import org.wahlzeit.model.UserLog;
+import org.wahlzeit.model.UserManager;
+import org.wahlzeit.model.UserSession;
 import org.wahlzeit.services.EmailAddress;
+import org.wahlzeit.services.mailing.EmailService;
+import org.wahlzeit.services.mailing.EmailServiceManager;
 import org.wahlzeit.utils.StringUtil;
 import org.wahlzeit.webparts.WebPart;
 
+import java.util.Map;
+
 /**
- * 
  * @author dirkriehle
- *
  */
 public class EmailUserNameFormHandler extends AbstractWebFormHandler {
-	
-	/**
-	 *
-	 */
-	public EmailUserNameFormHandler() {
-		initialize(PartUtil.EMAIL_USER_NAME_FORM_FILE, AccessRights.GUEST);
-	}
 
-	/**
-	 * 
-	 */
-	protected void doMakeWebPart(UserSession us, WebPart part) {
-		Map<String, Object> savedArgs = us.getSavedArgs();
-		part.addStringFromArgs(savedArgs, UserSession.MESSAGE);
-		part.maskAndAddStringFromArgs(savedArgs, User.EMAIL_ADDRESS);
-	}
-	
-	/**
-	 * 
-	 */
-	protected String doHandlePost(UserSession us, Map args) {
-		String emailAddress = us.getAndSaveAsString(args, User.EMAIL_ADDRESS);
-		if (StringUtil.isNullOrEmptyString(emailAddress)) {
-			us.setMessage(us.cfg().getFieldIsMissing());
-			return PartUtil.EMAIL_PASSWORD_PAGE_NAME;
-		} else if (!StringUtil.isValidStrictEmailAddress(emailAddress)) {
-			us.setMessage(us.cfg().getEmailAddressIsInvalid());
-			return PartUtil.EMAIL_PASSWORD_PAGE_NAME;
-		}
+    /**
+     *
+     */
+    public EmailUserNameFormHandler() {
+        initialize(PartUtil.EMAIL_USER_NAME_FORM_FILE, AccessRights.GUEST);
+    }
 
-		UserManager userManager = UserManager.getInstance();	
-		User user = userManager.getUserByEmailAddress(emailAddress);
-		if (user == null) {
-			us.setMessage(us.cfg().getUnknownEmailAddress());
-			return PartUtil.EMAIL_PASSWORD_PAGE_NAME;
-		}
+    /**
+     *
+     */
+    protected void doMakeWebPart(UserSession us, WebPart part) {
+        Map<String, Object> savedArgs = us.getSavedArgs();
+        part.addStringFromArgs(savedArgs, UserSession.MESSAGE);
+        part.maskAndAddStringFromArgs(savedArgs, User.EMAIL_ADDRESS);
+    }
 
-		EmailService emailService = EmailServiceManager.getDefaultService();
-		
-		EmailAddress from = us.cfg().getModeratorEmailAddress();
-		EmailAddress to = user.getEmailAddress();
-		emailService.sendEmailIgnoreException(from, to, us.cfg().getAuditEmailAddress(), us.cfg().getSendUserNameEmailSubject(), user.getName());
+    /**
+     *
+     */
+    protected String doHandlePost(UserSession us, Map args) {
+        String emailAddress = us.getAndSaveAsString(args, User.EMAIL_ADDRESS);
+        if (StringUtil.isNullOrEmptyString(emailAddress)) {
+            us.setMessage(us.cfg().getFieldIsMissing());
+            return PartUtil.EMAIL_PASSWORD_PAGE_NAME;
+        } else if (!StringUtil.isValidStrictEmailAddress(emailAddress)) {
+            us.setMessage(us.cfg().getEmailAddressIsInvalid());
+            return PartUtil.EMAIL_PASSWORD_PAGE_NAME;
+        }
 
-		UserLog.logPerformedAction("EmailUserName");
+        UserManager userManager = UserManager.getInstance();
+        User user = userManager.getUserByEmailAddress(emailAddress);
+        if (user == null) {
+            us.setMessage(us.cfg().getUnknownEmailAddress());
+            return PartUtil.EMAIL_PASSWORD_PAGE_NAME;
+        }
 
-		us.setTwoLineMessage(us.cfg().getUserNameWasEmailed(), us.cfg().getContinueWithShowPhoto());
+        EmailService emailService = EmailServiceManager.getDefaultService();
 
-		return PartUtil.SHOW_NOTE_PAGE_NAME;
-	}
-	
+        EmailAddress from = us.cfg().getModeratorEmailAddress();
+        EmailAddress to = user.getEmailAddress();
+        emailService.sendEmailIgnoreException(from, to, us.cfg().getAuditEmailAddress(), us.cfg().getSendUserNameEmailSubject(), user.getName());
+
+        UserLog.logPerformedAction("EmailUserName");
+
+        us.setTwoLineMessage(us.cfg().getUserNameWasEmailed(), us.cfg().getContinueWithShowPhoto());
+
+        return PartUtil.SHOW_NOTE_PAGE_NAME;
+    }
+
 }

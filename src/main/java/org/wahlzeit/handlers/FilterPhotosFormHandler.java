@@ -20,55 +20,57 @@
 
 package org.wahlzeit.handlers;
 
-import java.util.*;
+import org.wahlzeit.model.AccessRights;
+import org.wahlzeit.model.PhotoFilter;
+import org.wahlzeit.model.Tags;
+import org.wahlzeit.model.UserLog;
+import org.wahlzeit.model.UserSession;
+import org.wahlzeit.utils.StringUtil;
+import org.wahlzeit.webparts.WebPart;
 
-import org.wahlzeit.model.*;
-import org.wahlzeit.utils.*;
-import org.wahlzeit.webparts.*;
+import java.util.Map;
 
 /**
- * 
  * @author dirkriehle
- *
  */
 public class FilterPhotosFormHandler extends AbstractWebFormHandler {
-	
-	/**
-	 * 
-	 */
-	public FilterPhotosFormHandler() {
-		initialize(PartUtil.FILTER_PHOTOS_FORM_FILE, AccessRights.GUEST);
-	}
-	
-	/**
-	 * 
-	 */
-	protected void doMakeWebPart(UserSession us, WebPart part) {
-		PhotoFilter filter = us.getPhotoFilter();
-			
-		part.maskAndAddString(PhotoFilter.USER_NAME, filter.getUserName());
-		part.maskAndAddString(PhotoFilter.TAGS, filter.getTags().asString());
-	}
-	
-	/**
-	 * 
-	 */
-	protected String doHandlePost(UserSession us, Map args) {
-		PhotoFilter filter = us.getPhotoFilter();
 
-		String un = us.getAsString(args, PhotoFilter.USER_NAME);
-		if (StringUtil.isLegalUserName(un)) {
-			filter.setUserName(un);
-		}
-		
-		String tags = us.getAsString(args, PhotoFilter.TAGS);
-		if (StringUtil.isLegalTagsString(tags)) {
-			filter.setTags(new Tags(tags));
-		}
-		
-		UserLog.logPerformedAction("FilterPhotos");
-		
-		return PartUtil.SHOW_PHOTO_PAGE_NAME;
-	}
-	
+    /**
+     *
+     */
+    public FilterPhotosFormHandler() {
+        initialize(PartUtil.FILTER_PHOTOS_FORM_FILE, AccessRights.GUEST);
+    }
+
+    /**
+     *
+     */
+    protected void doMakeWebPart(UserSession us, WebPart part) {
+        PhotoFilter filter = us.getPhotoFilter();
+
+        part.maskAndAddString(PhotoFilter.USER_NAME, filter.getUserName());
+        part.maskAndAddString(PhotoFilter.TAGS, filter.getTags().asString());
+    }
+
+    /**
+     *
+     */
+    protected String doHandlePost(UserSession us, Map args) {
+        PhotoFilter filter = us.getPhotoFilter();
+
+        String un = us.getAsString(args, PhotoFilter.USER_NAME);
+        if (StringUtil.isLegalUserName(un)) {
+            filter.setUserName(un);
+        }
+
+        String tags = us.getAsString(args, PhotoFilter.TAGS);
+        if (StringUtil.isLegalTagsString(tags)) {
+            filter.setTags(new Tags(tags));
+        }
+
+        UserLog.logPerformedAction("FilterPhotos");
+
+        return PartUtil.SHOW_PHOTO_PAGE_NAME;
+    }
+
 }

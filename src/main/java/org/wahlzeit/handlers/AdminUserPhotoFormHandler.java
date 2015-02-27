@@ -20,64 +20,68 @@
 
 package org.wahlzeit.handlers;
 
-import java.util.*;
+import org.wahlzeit.model.AccessRights;
+import org.wahlzeit.model.Photo;
+import org.wahlzeit.model.PhotoManager;
+import org.wahlzeit.model.PhotoStatus;
+import org.wahlzeit.model.Tags;
+import org.wahlzeit.model.UserLog;
+import org.wahlzeit.model.UserSession;
+import org.wahlzeit.webparts.WebPart;
 
-import org.wahlzeit.model.*;
-import org.wahlzeit.webparts.*;
+import java.util.Map;
 
 /**
- * 
  * @author dirkriehle
- *
  */
 public class AdminUserPhotoFormHandler extends AbstractWebFormHandler {
 
-	/**
-	 *
-	 */
-	public AdminUserPhotoFormHandler() {
-		initialize(PartUtil.ADMIN_USER_PHOTO_FORM_FILE, AccessRights.ADMINISTRATOR);
-	}
-	
-	/**
-	 * 
-	 */
-	protected void doMakeWebPart(UserSession us, WebPart part) {
-		Map<String, Object> args = us.getSavedArgs();
+    /**
+     *
+     */
+    public AdminUserPhotoFormHandler() {
+        initialize(PartUtil.ADMIN_USER_PHOTO_FORM_FILE, AccessRights.ADMINISTRATOR);
+    }
 
-		String photoId = us.getAndSaveAsString(args, "photoId");
+    /**
+     *
+     */
+    protected void doMakeWebPart(UserSession us, WebPart part) {
+        Map<String, Object> args = us.getSavedArgs();
 
-		Photo photo = PhotoManager.getPhoto(photoId);
-		part.addString(Photo.THUMB, getPhotoThumb(us, photo));
+        String photoId = us.getAndSaveAsString(args, "photoId");
 
-		part.addString("photoId", photoId);
-		part.addString(Photo.ID, photo.getId().asString());
-		part.addSelect(Photo.STATUS, PhotoStatus.class, (String) args.get(Photo.STATUS));
-		part.maskAndAddStringFromArgsWithDefault(args, Photo.TAGS, photo.getTags().asString());
-	}
-	
-	/**
-	 * 
-	 */
-	protected String doHandlePost(UserSession us, Map args) {
-		String id = us.getAndSaveAsString(args, "photoId");
-		Photo photo = PhotoManager.getPhoto(id);
-	
-		String tags = us.getAndSaveAsString(args, Photo.TAGS);
-		photo.setTags(new Tags(tags));
-		String status = us.getAndSaveAsString(args, Photo.STATUS);
-		photo.setStatus(PhotoStatus.getFromString(status));
+        Photo photo = PhotoManager.getPhoto(photoId);
+        part.addString(Photo.THUMB, getPhotoThumb(us, photo));
 
-		PhotoManager pm = PhotoManager.getInstance();
-		pm.savePhoto(photo);
-		
-		StringBuffer sb = UserLog.createActionEntry("AdminUserPhoto");
-		UserLog.addUpdatedObject(sb, "Photo", photo.getId().asString());
-		UserLog.log(sb);
-		
-		us.setMessage(us.cfg().getPhotoUpdateSucceeded());
+        part.addString("photoId", photoId);
+        part.addString(Photo.ID, photo.getId().asString());
+        part.addSelect(Photo.STATUS, PhotoStatus.class, (String) args.get(Photo.STATUS));
+        part.maskAndAddStringFromArgsWithDefault(args, Photo.TAGS, photo.getTags().asString());
+    }
 
-		return PartUtil.SHOW_ADMIN_PAGE_NAME;
-	}
-	
+    /**
+     *
+     */
+    protected String doHandlePost(UserSession us, Map args) {
+        String id = us.getAndSaveAsString(args, "photoId");
+        Photo photo = PhotoManager.getPhoto(id);
+
+        String tags = us.getAndSaveAsString(args, Photo.TAGS);
+        photo.setTags(new Tags(tags));
+        String status = us.getAndSaveAsString(args, Photo.STATUS);
+        photo.setStatus(PhotoStatus.getFromString(status));
+
+        PhotoManager pm = PhotoManager.getInstance();
+        pm.savePhoto(photo);
+
+        StringBuffer sb = UserLog.createActionEntry("AdminUserPhoto");
+        UserLog.addUpdatedObject(sb, "Photo", photo.getId().asString());
+        UserLog.log(sb);
+
+        us.setMessage(us.cfg().getPhotoUpdateSucceeded());
+
+        return PartUtil.SHOW_ADMIN_PAGE_NAME;
+    }
+
 }

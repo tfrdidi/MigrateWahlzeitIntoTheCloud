@@ -20,35 +20,34 @@
 
 package org.wahlzeit.model;
 
-import org.wahlzeit.services.*;
+import org.wahlzeit.services.EmailAddress;
 
 /**
  * A Moderator is a system user with moderator privileges.
- * 
- * @author dirkriehle
  *
+ * @author dirkriehle
  */
 public class Moderator extends User {
 
-	/**
-	 * 
-	 */
-	public Moderator(String myName, String myPassword, String myEmailAddress, long vc) {
-		this(myName, myPassword, EmailAddress.getFromString(myEmailAddress), vc);
-	}
-	
-	/**
-	 * 
-	 */
-	public Moderator(String myName, String myPassword, EmailAddress myEmailAddress, long vc) {
-		initialize(AccessRights.MODERATOR, myEmailAddress, myName, myPassword, vc);
-	}
-	
-	/**
-	 * 
-	 */
-	protected Moderator() {
-		// do nothing
-	}
-		
+    /**
+     *
+     */
+    public Moderator(String myName, String myPassword, String myEmailAddress, long vc) {
+        this(myName, myPassword, EmailAddress.getFromString(myEmailAddress), vc);
+    }
+
+    /**
+     *
+     */
+    public Moderator(String myName, String myPassword, EmailAddress myEmailAddress, long vc) {
+        initialize(AccessRights.MODERATOR, myEmailAddress, myName, myPassword, vc);
+    }
+
+    /**
+     *
+     */
+    protected Moderator() {
+        // do nothing
+    }
+
 }

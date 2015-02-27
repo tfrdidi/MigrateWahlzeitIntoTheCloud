@@ -23,48 +23,47 @@ package org.wahlzeit.services;
 /**
  * A simple abstract implementation of Persistent with write count and dirty bit.
  * Also defines (but does not use) the field "ID" for subclass use.
- * 
- * @author dirkriehle
  *
+ * @author dirkriehle
  */
 public abstract class DataObject implements Persistent {
-	
-	/**
-	 * Not used in the class but needed by broad array of subclasses
-	 */
-	public static final String ID = "id";
 
-	/**
-	 * 
-	 */
-	protected transient int writeCount = 0;
-	
-	/**
-	 * 
-	 */
-	public final boolean isDirty() {
-		return writeCount != 0;
-	}
-	
-	/**
-	 * 
-	 */
-	public final void resetWriteCount() {
-		writeCount = 0;
-	}
-	
-	/**
-	 * 
-	 */
-	public final void incWriteCount() {
-		writeCount++;
-	}
-	
-	/**
-	 * 
-	 */
-	public final void touch() {
-		incWriteCount();
-	}
+    /**
+     * Not used in the class but needed by broad array of subclasses
+     */
+    public static final String ID = "id";
+
+    /**
+     *
+     */
+    protected transient int writeCount = 0;
+
+    /**
+     *
+     */
+    public final boolean isDirty() {
+        return writeCount != 0;
+    }
+
+    /**
+     *
+     */
+    public final void resetWriteCount() {
+        writeCount = 0;
+    }
+
+    /**
+     *
+     */
+    public final void incWriteCount() {
+        writeCount++;
+    }
+
+    /**
+     *
+     */
+    public final void touch() {
+        incWriteCount();
+    }
 
 }

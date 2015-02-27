@@ -20,7 +20,8 @@
 
 package org.wahlzeit.services;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * An interface that manages a simple key/value store.
@@ -29,33 +30,32 @@ import java.io.*;
  * Hence, any access using an unknown key leads to an IllegalArgumentException.
  *
  * @author dirkriehle
- *
  */
 public interface Configuration {
 
-	/**
-	 * 
-	 */
-	public boolean hasKey(String key);
+    /**
+     *
+     */
+    public boolean hasKey(String key);
 
-	/**
-	 * 
-	 */
-	public String getValue(String key) throws IllegalArgumentException; 
-		
-	/**
-	 * 
-	 */
-	public void setValue(String key, String value) throws IllegalArgumentException;
-	
-	/**
-	 * 
-	 */
-	public void loadProperties(String fileName) throws IllegalArgumentException, IOException;	
+    /**
+     *
+     */
+    public String getValue(String key) throws IllegalArgumentException;
 
-	/**
-	 * 
-	 */
-	public void loadProperties(File file) throws IOException;	
+    /**
+     *
+     */
+    public void setValue(String key, String value) throws IllegalArgumentException;
+
+    /**
+     *
+     */
+    public void loadProperties(String fileName) throws IllegalArgumentException, IOException;
+
+    /**
+     *
+     */
+    public void loadProperties(File file) throws IOException;
 
 }

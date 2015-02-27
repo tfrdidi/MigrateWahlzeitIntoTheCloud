@@ -20,43 +20,42 @@
 
 package org.wahlzeit.tools;
 
-import java.io.File;
+import org.wahlzeit.main.ScriptMain;
+import org.wahlzeit.services.SysConfig;
 
-import org.wahlzeit.main.*;
-import org.wahlzeit.services.*;
+import java.io.File;
 
 /**
  * Sets up a fresh clean Wahlzeit Flowers application database.
- * 
- * @author dirkriehle
  *
+ * @author dirkriehle
  */
 public class SetUpFlowers extends ScriptMain {
 
-	/**
-	 * 
-	 */
-	public static void main(String[] argv) {
-		new SetUpFlowers().run(argv);
-	}
-	
-	/**
-	 * 
-	 */
-	public void startUp(String rootDir) throws Exception {
-		super.startUp(rootDir);
+    /**
+     *
+     */
+    public static void main(String[] argv) {
+        new SetUpFlowers().run(argv);
+    }
 
-		tearDownDatabase();
-		setUpDatabase();
-		loadGlobals();
-	}
-	
-	/**
-	 * 
-	 */
-	public void execute() throws Exception {
-		String photoDir = SysConfig.getRootDirAsString() + File.separator + "config" + File.separator + "flowers";
-		createUser("testuser", "testuser", "info@wahlzeit.org", photoDir);
-	}
+    /**
+     *
+     */
+    public void startUp(String rootDir) throws Exception {
+        super.startUp(rootDir);
+
+        tearDownDatabase();
+        setUpDatabase();
+        loadGlobals();
+    }
+
+    /**
+     *
+     */
+    public void execute() throws Exception {
+        String photoDir = SysConfig.getRootDirAsString() + File.separator + "config" + File.separator + "flowers";
+        createUser("testuser", "testuser", "info@wahlzeit.org", photoDir);
+    }
 
 }

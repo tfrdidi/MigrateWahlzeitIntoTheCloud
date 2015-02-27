@@ -20,219 +20,226 @@
 
 package org.wahlzeit.handlers;
 
-import java.util.*;
+import org.wahlzeit.model.AccessRights;
+import org.wahlzeit.model.Client;
+import org.wahlzeit.model.Photo;
+import org.wahlzeit.model.PhotoFilter;
+import org.wahlzeit.model.PhotoManager;
+import org.wahlzeit.model.PhotoSize;
+import org.wahlzeit.model.Tags;
+import org.wahlzeit.model.UserSession;
+import org.wahlzeit.utils.HtmlUtil;
+import org.wahlzeit.utils.StringUtil;
+import org.wahlzeit.webparts.WebPart;
+import org.wahlzeit.webparts.Writable;
+import org.wahlzeit.webparts.WritableList;
 
-import org.wahlzeit.model.*;
-import org.wahlzeit.services.*;
-import org.wahlzeit.utils.*;
-import org.wahlzeit.webparts.*;
+import java.util.Map;
 
 /**
- * 
  * @author dirkriehle
- *
  */
 public class ShowPhotoPageHandler extends AbstractWebPageHandler implements WebFormHandler {
-	
-	/**
-	 * 
-	 */
-	public ShowPhotoPageHandler() {
-		initialize(PartUtil.SHOW_PHOTO_PAGE_FILE, AccessRights.GUEST);
-	}
-	
-	/**
-	 * 
-	 */
-	protected String doHandleGet(UserSession us, String link, Map args) {
-		Photo photo = null;
-		
-		String arg = us.getAsString(args, "prior");
-		if (!StringUtil.isNullOrEmptyString(arg)) {
-			us.setPriorPhoto(PhotoManager.getPhoto(arg));
-		}
-		
-		if (!link.equals(PartUtil.SHOW_PHOTO_PAGE_NAME)) {
-			photo = PhotoManager.getPhoto(link);
-		}
-		
-		if (photo == null) {
-			PhotoManager photoManager = PhotoManager.getInstance();
-			PhotoFilter filter = us.getPhotoFilter();
-			photo = photoManager.getVisiblePhoto(filter);
-			if (photo != null) {
-				link = photo.getId().asString();
-			}
-		}
 
-		us.setPhoto(photo);
-		
-		return link;
-	}
-	
-	/**
-	 * 
-	 */
-	protected boolean isToShowAds(UserSession us) {
-		return us.getPriorPhoto() != null;
-	}
+    /**
+     *
+     */
+    public ShowPhotoPageHandler() {
+        initialize(PartUtil.SHOW_PHOTO_PAGE_FILE, AccessRights.GUEST);
+    }
 
-	/**
-	 * 
-	 */
-	protected void makeWebPageBody(UserSession us, WebPart page) {
-		Photo photo = us.getPhoto();
+    /**
+     *
+     */
+    protected String doHandleGet(UserSession us, String link, Map args) {
+        Photo photo = null;
 
-		makeLeftSidebar(us, page);
+        String arg = us.getAsString(args, "prior");
+        if (!StringUtil.isNullOrEmptyString(arg)) {
+            us.setPriorPhoto(PhotoManager.getPhoto(arg));
+        }
 
-		makePhoto(us, page);
-		
-		if (photo != null && photo.isVisible()) {
-			makePhotoCaption(us, page);
-			makeEngageGuest(us, page);
+        if (!link.equals(PartUtil.SHOW_PHOTO_PAGE_NAME)) {
+            photo = PhotoManager.getPhoto(link);
+        }
 
-			String photoId = photo.getId().asString();
-			page.addString(Photo.ID, photoId);
+        if (photo == null) {
+            PhotoManager photoManager = PhotoManager.getInstance();
+            PhotoFilter filter = us.getPhotoFilter();
+            photo = photoManager.getVisiblePhoto(filter);
+            if (photo != null) {
+                link = photo.getId().asString();
+            }
+        }
 
-			Tags tags = photo.getTags();
-			page.addString(Photo.DESCRIPTION, getPhotoSummary(us, photo));
-			page.addString(Photo.KEYWORDS, tags.asString(false, ','));
+        us.setPhoto(photo);
 
-			us.addDisplayedPhoto(photo);
-		}
-		
-		makeRightSidebar(us, page);
-	}
-	
-	/**
-	 * 
-	 */
-	protected void makeLeftSidebar(UserSession us, WebPart page) {
-		WritableList parts = new WritableList();
-		
-		Photo photo = us.getPriorPhoto();
-		if (photo != null) {
-			parts.append(makePriorPhotoInfo(us));
-		} else {
-			parts.append(createWebPart(us, PartUtil.BLURP_INFO_FILE));
-		}
+        return link;
+    }
 
-		WebFormHandler handler = getFormHandler(PartUtil.FILTER_PHOTOS_FORM_NAME);
-		Writable filterPhotos = handler.makeWebPart(us);
-		parts.append(filterPhotos);
+    /**
+     *
+     */
+    protected boolean isToShowAds(UserSession us) {
+        return us.getPriorPhoto() != null;
+    }
 
-		parts.append(createWebPart(us, PartUtil.LINKS_INFO_FILE));
-		
-		page.addWritable("sidebar", parts);
-	}
-	
-	/**
-	 * 
-	 */
-	protected void makePhoto(UserSession us, WebPart page) {
-		PhotoSize pagePhotoSize = us.getPhotoSize();
+    /**
+     *
+     */
+    protected void makeWebPageBody(UserSession us, WebPart page) {
+        Photo photo = us.getPhoto();
 
-		Photo photo = us.getPhoto();
-		if (photo == null) {
-			page.addString("mainWidth", String.valueOf(pagePhotoSize.getMaxPhotoWidth()));
-			WebPart done = createWebPart(us, PartUtil.DONE_INFO_FILE);
-			page.addWritable(Photo.IMAGE, done);
-			return;
-		}
-		
-		Client client = us.getClient();
-		if (!photo.isVisible() && !client.hasModeratorRights() && !us.isPhotoOwner(photo)) {
-			page.addString("mainWidth", String.valueOf(pagePhotoSize.getMaxPhotoWidth()));
-			WebPart done = createWebPart(us, PartUtil.HIDDEN_INFO_FILE);
-			page.addWritable(Photo.IMAGE, done);
-			return;
-		}
-		
-		PhotoSize maxPhotoSize = photo.getMaxPhotoSize();
-		PhotoSize photoSize = (maxPhotoSize.isSmaller(pagePhotoSize)) ? maxPhotoSize : pagePhotoSize;
-		String imageLink = getPhotoAsRelativeResourcePathString(photo, photoSize);
-		page.addString(Photo.IMAGE, HtmlUtil.asImg(HtmlUtil.asPath(imageLink)));
-	}
-	
-	/**
-	 * 
-	 */
-	protected void makePhotoCaption(UserSession us, WebPart page) {
-		Photo photo = us.getPhoto();
-		// String photoId = photo.getId().asString();
-			
-		WebPart caption = createWebPart(us, PartUtil.CAPTION_INFO_FILE);
-		caption.addString(Photo.CAPTION, getPhotoCaption(us, photo));
-		page.addWritable(Photo.CAPTION, caption);
-	}
+        makeLeftSidebar(us, page);
 
-	/**
-	 * 
-	 */
-	protected void makeEngageGuest(UserSession us, WebPart page) {
-		Photo photo = us.getPhoto();
-		String photoId = photo.getId().asString();
+        makePhoto(us, page);
 
-		WebPart engageGuest = createWebPart(us, PartUtil.ENGAGE_GUEST_FORM_FILE);
-		engageGuest.addString(Photo.LINK, HtmlUtil.asHref(getResourceAsRelativeHtmlPathString(photoId)));
-		engageGuest.addString(Photo.ID, photoId);
+        if (photo != null && photo.isVisible()) {
+            makePhotoCaption(us, page);
+            makeEngageGuest(us, page);
 
-		page.addWritable("engageGuest", engageGuest);
-	}
-	
-	/**
-	 * 
-	 */
-	protected void makeRightSidebar(UserSession us, WebPart page) {
-		String handlerName = PartUtil.NULL_FORM_NAME;
-		Photo photo = us.getPhoto();
-		if (photo != null) {
-			handlerName = PartUtil.PRAISE_PHOTO_FORM_NAME;
-		}
+            String photoId = photo.getId().asString();
+            page.addString(Photo.ID, photoId);
 
-		WebFormHandler handler = getFormHandler(handlerName);
-		Writable praisePhotoForm = handler.makeWebPart(us);
-		page.addWritable("praisePhoto", praisePhotoForm);
-	}
+            Tags tags = photo.getTags();
+            page.addString(Photo.DESCRIPTION, getPhotoSummary(us, photo));
+            page.addString(Photo.KEYWORDS, tags.asString(false, ','));
 
-	
-	/**
-	 * 
-	 */
-	protected WebPart makePriorPhotoInfo(UserSession us) {
-		WebPart result = createWebPart(us, PartUtil.PHOTO_INFO_FILE);
+            us.addDisplayedPhoto(photo);
+        }
 
-		Photo photo = us.getPriorPhoto();
-		// String id = photo.getId().asString();
+        makeRightSidebar(us, page);
+    }
 
-		result.addString(Photo.PRAISE, photo.getPraiseAsString(us.cfg()));
-		result.addString(Photo.THUMB, getPhotoThumb(us, photo));
-		result.addString(Photo.CAPTION, getPhotoCaption(us, photo));
-			
-		us.setPriorPhoto(null); // reset so you don't get repeats
+    /**
+     *
+     */
+    protected void makeLeftSidebar(UserSession us, WebPart page) {
+        WritableList parts = new WritableList();
 
-		return result;
-	}
+        Photo photo = us.getPriorPhoto();
+        if (photo != null) {
+            parts.append(makePriorPhotoInfo(us));
+        } else {
+            parts.append(createWebPart(us, PartUtil.BLURP_INFO_FILE));
+        }
 
-	/**
-	 * 
-	 */
-	public String handlePost(UserSession us, Map args) {
-		String result = PartUtil.DEFAULT_PAGE_NAME;
-		
-		String id = us.getAndSaveAsString(args, Photo.ID);
-		Photo photo = PhotoManager.getPhoto(id);
-		if (photo != null) {
-			if (us.isFormType(args, "flagPhotoLink")) {
-				result = PartUtil.FLAG_PHOTO_PAGE_NAME;
-			} else if (us.isFormType(args, "tellFriendLink")) {
-				result = PartUtil.TELL_FRIEND_PAGE_NAME;
-			} else if (us.isFormType(args, "sendEmailLink")) {
-				result = PartUtil.SEND_EMAIL_PAGE_NAME;
-			}
-		}
+        WebFormHandler handler = getFormHandler(PartUtil.FILTER_PHOTOS_FORM_NAME);
+        Writable filterPhotos = handler.makeWebPart(us);
+        parts.append(filterPhotos);
 
-		return result;
-	}
-	
+        parts.append(createWebPart(us, PartUtil.LINKS_INFO_FILE));
+
+        page.addWritable("sidebar", parts);
+    }
+
+    /**
+     *
+     */
+    protected void makePhoto(UserSession us, WebPart page) {
+        PhotoSize pagePhotoSize = us.getPhotoSize();
+
+        Photo photo = us.getPhoto();
+        if (photo == null) {
+            page.addString("mainWidth", String.valueOf(pagePhotoSize.getMaxPhotoWidth()));
+            WebPart done = createWebPart(us, PartUtil.DONE_INFO_FILE);
+            page.addWritable(Photo.IMAGE, done);
+            return;
+        }
+
+        Client client = us.getClient();
+        if (!photo.isVisible() && !client.hasModeratorRights() && !us.isPhotoOwner(photo)) {
+            page.addString("mainWidth", String.valueOf(pagePhotoSize.getMaxPhotoWidth()));
+            WebPart done = createWebPart(us, PartUtil.HIDDEN_INFO_FILE);
+            page.addWritable(Photo.IMAGE, done);
+            return;
+        }
+
+        PhotoSize maxPhotoSize = photo.getMaxPhotoSize();
+        PhotoSize photoSize = (maxPhotoSize.isSmaller(pagePhotoSize)) ? maxPhotoSize : pagePhotoSize;
+        String imageLink = getPhotoAsRelativeResourcePathString(photo, photoSize);
+        page.addString(Photo.IMAGE, HtmlUtil.asImg(HtmlUtil.asPath(imageLink)));
+    }
+
+    /**
+     *
+     */
+    protected void makePhotoCaption(UserSession us, WebPart page) {
+        Photo photo = us.getPhoto();
+        // String photoId = photo.getId().asString();
+
+        WebPart caption = createWebPart(us, PartUtil.CAPTION_INFO_FILE);
+        caption.addString(Photo.CAPTION, getPhotoCaption(us, photo));
+        page.addWritable(Photo.CAPTION, caption);
+    }
+
+    /**
+     *
+     */
+    protected void makeEngageGuest(UserSession us, WebPart page) {
+        Photo photo = us.getPhoto();
+        String photoId = photo.getId().asString();
+
+        WebPart engageGuest = createWebPart(us, PartUtil.ENGAGE_GUEST_FORM_FILE);
+        engageGuest.addString(Photo.LINK, HtmlUtil.asHref(getResourceAsRelativeHtmlPathString(photoId)));
+        engageGuest.addString(Photo.ID, photoId);
+
+        page.addWritable("engageGuest", engageGuest);
+    }
+
+    /**
+     *
+     */
+    protected void makeRightSidebar(UserSession us, WebPart page) {
+        String handlerName = PartUtil.NULL_FORM_NAME;
+        Photo photo = us.getPhoto();
+        if (photo != null) {
+            handlerName = PartUtil.PRAISE_PHOTO_FORM_NAME;
+        }
+
+        WebFormHandler handler = getFormHandler(handlerName);
+        Writable praisePhotoForm = handler.makeWebPart(us);
+        page.addWritable("praisePhoto", praisePhotoForm);
+    }
+
+
+    /**
+     *
+     */
+    protected WebPart makePriorPhotoInfo(UserSession us) {
+        WebPart result = createWebPart(us, PartUtil.PHOTO_INFO_FILE);
+
+        Photo photo = us.getPriorPhoto();
+        // String id = photo.getId().asString();
+
+        result.addString(Photo.PRAISE, photo.getPraiseAsString(us.cfg()));
+        result.addString(Photo.THUMB, getPhotoThumb(us, photo));
+        result.addString(Photo.CAPTION, getPhotoCaption(us, photo));
+
+        us.setPriorPhoto(null); // reset so you don't get repeats
+
+        return result;
+    }
+
+    /**
+     *
+     */
+    public String handlePost(UserSession us, Map args) {
+        String result = PartUtil.DEFAULT_PAGE_NAME;
+
+        String id = us.getAndSaveAsString(args, Photo.ID);
+        Photo photo = PhotoManager.getPhoto(id);
+        if (photo != null) {
+            if (us.isFormType(args, "flagPhotoLink")) {
+                result = PartUtil.FLAG_PHOTO_PAGE_NAME;
+            } else if (us.isFormType(args, "tellFriendLink")) {
+                result = PartUtil.TELL_FRIEND_PAGE_NAME;
+            } else if (us.isFormType(args, "sendEmailLink")) {
+                result = PartUtil.SEND_EMAIL_PAGE_NAME;
+            }
+        }
+
+        return result;
+    }
+
 }

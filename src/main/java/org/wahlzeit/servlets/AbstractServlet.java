@@ -20,208 +20,214 @@
 
 package org.wahlzeit.servlets;
 
-import java.io.*;
-import java.util.*;
-import java.net.*;
-
-import javax.servlet.*;
-import javax.servlet.http.*;
-
 import org.wahlzeit.main.ServiceMain;
-import org.wahlzeit.model.*;
-import org.wahlzeit.services.*;
-import org.wahlzeit.utils.*;
-import org.wahlzeit.webparts.*;
+import org.wahlzeit.model.LanguageConfigs;
+import org.wahlzeit.model.UserSession;
+import org.wahlzeit.services.Language;
+import org.wahlzeit.services.Session;
+import org.wahlzeit.services.SessionManager;
+import org.wahlzeit.services.SysLog;
+import org.wahlzeit.utils.StringUtil;
+import org.wahlzeit.webparts.WebPart;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
- * 
  * @author dirkriehle
- *
  */
 public abstract class AbstractServlet extends HttpServlet {
-	
-	/**
-	 * 
-	 */
-	protected static int lastSessionId = 0; // system and agent are named differently
-	private static final long serialVersionUID = 42L; // any does; class never serialized
-	
-	/**
-	 * 
-	 */
-	public static synchronized int getLastSessionId() {
-		return lastSessionId;
-	}
-	
-	/**
-	 * 
-	 */
-	public static void setLastSessionId(int newSessionId) {
-		lastSessionId = newSessionId;
-	}
-	
-	/**
-	 * 
-	 */
-	public static synchronized int getNextSessionId() {
-		return ++lastSessionId;
-	}
-	
-	/**
-	 * 
-	 */
-	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		UserSession us = ensureUserSession(request);	
-		SessionManager.setThreadLocalSession(us);
-		
-		if (ServiceMain.getInstance().isShuttingDown() || (us == null)) {
-			displayNullPage(request, response);
-		} else {
-			myGet(request, response);
-			us.returnDatabaseConnection();
-		}
 
-		SessionManager.dropThreadLocalSession();
-	}
-	
-	/**
-	 * 
-	 */
-	protected void myGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// do nothing
-	}
-		
-	/**
-	 * 
-	 */
-	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		UserSession us = ensureUserSession(request);	
-		SessionManager.setThreadLocalSession(us);
-		
-		if (ServiceMain.getInstance().isShuttingDown() || (us == null)) {
-			displayNullPage(request, response);
-		} else {
-			myPost(request, response);
-			us.returnDatabaseConnection();
-		}
+    /**
+     *
+     */
+    protected static int lastSessionId = 0; // system and agent are named differently
+    private static final long serialVersionUID = 42L; // any does; class never serialized
 
-		SessionManager.dropThreadLocalSession();
-	}
-	
-	/**
-	 * 
-	 */
-	protected void myPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// do nothing
-	}
+    /**
+     *
+     */
+    public static synchronized int getLastSessionId() {
+        return lastSessionId;
+    }
 
-	/**
-	 * 
-	 */
-	protected UserSession ensureUserSession(HttpServletRequest request) {
-		HttpSession httpSession = request.getSession();
-		UserSession result = (UserSession) httpSession.getAttribute("session");
-		if (result == null) {
-			try {
-				String sessionName = "session" + getNextSessionId();
-				String siteUrl = getSiteUrl(request); // @TODO Application
-				result = new UserSession(sessionName, siteUrl);
-				SysLog.logCreatedObject("UserSession", sessionName);
+    /**
+     *
+     */
+    public static void setLastSessionId(int newSessionId) {
+        lastSessionId = newSessionId;
+    }
 
-				// yes, "Referer"; typo in original standard documentation
-				String referrer = request.getHeader("Referer");
-				SysLog.logSysInfo("request referrer: " + referrer);
+    /**
+     *
+     */
+    public static synchronized int getNextSessionId() {
+        return ++lastSessionId;
+    }
 
-				if (request.getLocale().getLanguage().equals("de")) { // @FIXME
-					result.setConfiguration(LanguageConfigs.get(Language.GERMAN));
-				}
-			} catch (Exception ex) {
-				SysLog.logThrowable(ex);
-			}
-			
-			httpSession.setAttribute("session", result);
-			httpSession.setMaxInactiveInterval(24 * 60 * 60); // time out after 24h
-		}
-		
-		return result;
-	}
+    /**
+     *
+     */
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        UserSession us = ensureUserSession(request);
+        SessionManager.setThreadLocalSession(us);
 
-	/**
-	 * 
-	 */
-	protected void displayNullPage(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		response.setContentType("text/html");
+        if (ServiceMain.getInstance().isShuttingDown() || (us == null)) {
+            displayNullPage(request, response);
+        } else {
+            myGet(request, response);
+            us.returnDatabaseConnection();
+        }
 
-		PrintWriter out = response.getWriter();
-		out.print("The system is undergoing maintenance and will be back in a minute. Thank you for your patience!");
-		out.close();
+        SessionManager.dropThreadLocalSession();
+    }
 
-		response.setStatus(HttpServletResponse.SC_OK);
-	}
-	
-	/**
-	 * 
-	 */
-	protected void redirectRequest(HttpServletResponse response, String link) throws IOException {
-		response.setContentType("text/html");
-		response.sendRedirect(link + ".html");
-		response.setStatus(HttpServletResponse.SC_OK);
-	}
-	
-	/**
-	 * 
-	 */
-	protected void configureResponse(Session ctx, HttpServletResponse response, WebPart result) throws IOException {
-		long processingTime = ctx.getProcessingTime();
-		result.addString("processingTime", StringUtil.asStringInSeconds((processingTime == 0) ? 1 : processingTime));
-		SysLog.logSysInfo("proctime", String.valueOf(processingTime));
-		
-		response.setContentType("text/html");
+    /**
+     *
+     */
+    protected void myGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // do nothing
+    }
 
-		PrintWriter out = response.getWriter();
-		result.writeOn(out);
-		out.close();
+    /**
+     *
+     */
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        UserSession us = ensureUserSession(request);
+        SessionManager.setThreadLocalSession(us);
 
-		response.setStatus(HttpServletResponse.SC_OK);
-	}
-	
-	/**
-	 * 
-	 */
-	protected String getSiteUrl(HttpServletRequest request) {
-		String result = request.getRequestURL().toString();
-		int lastIndex = result.lastIndexOf('/') + 1;
-		return result.substring(0, lastIndex);
-	}
-	
-	/**
-	 * 
-	 */
-	protected boolean isLocalHost(HttpServletRequest request) {
-		String remoteHost = request.getRemoteHost();
-		String localHost = null;
-		try {
-			localHost = InetAddress.getLocalHost().getHostAddress();
-		} catch (Exception ex) {
-			// ignore
-		}
-		return remoteHost.equals(localHost) || remoteHost.equals("localhost");
-	}
-	
-	/**
-	 * 
-	 */
-	protected String getRequestArgsAsString(UserSession us, Map args) {
-		StringBuffer result = new StringBuffer(96);
-		for (Iterator i = args.keySet().iterator(); i.hasNext(); ) {
-			String key = i.next().toString();
-			String value = us.getAsString(args, key);
-			result.append(key + "=" + value);
-			if (i.hasNext()) {
-				 result.append("; ");
-			}
-		}
-		return "[" + result.toString() + "]";
-	}
+        if (ServiceMain.getInstance().isShuttingDown() || (us == null)) {
+            displayNullPage(request, response);
+        } else {
+            myPost(request, response);
+            us.returnDatabaseConnection();
+        }
+
+        SessionManager.dropThreadLocalSession();
+    }
+
+    /**
+     *
+     */
+    protected void myPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // do nothing
+    }
+
+    /**
+     *
+     */
+    protected UserSession ensureUserSession(HttpServletRequest request) {
+        HttpSession httpSession = request.getSession();
+        UserSession result = (UserSession) httpSession.getAttribute("session");
+        if (result == null) {
+            try {
+                String sessionName = "session" + getNextSessionId();
+                String siteUrl = getSiteUrl(request); // @TODO Application
+                result = new UserSession(sessionName, siteUrl);
+                SysLog.logCreatedObject("UserSession", sessionName);
+
+                // yes, "Referer"; typo in original standard documentation
+                String referrer = request.getHeader("Referer");
+                SysLog.logSysInfo("request referrer: " + referrer);
+
+                if (request.getLocale().getLanguage().equals("de")) { // @FIXME
+                    result.setConfiguration(LanguageConfigs.get(Language.GERMAN));
+                }
+            } catch (Exception ex) {
+                SysLog.logThrowable(ex);
+            }
+
+            httpSession.setAttribute("session", result);
+            httpSession.setMaxInactiveInterval(24 * 60 * 60); // time out after 24h
+        }
+
+        return result;
+    }
+
+    /**
+     *
+     */
+    protected void displayNullPage(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setContentType("text/html");
+
+        PrintWriter out = response.getWriter();
+        out.print("The system is undergoing maintenance and will be back in a minute. Thank you for your patience!");
+        out.close();
+
+        response.setStatus(HttpServletResponse.SC_OK);
+    }
+
+    /**
+     *
+     */
+    protected void redirectRequest(HttpServletResponse response, String link) throws IOException {
+        response.setContentType("text/html");
+        response.sendRedirect(link + ".html");
+        response.setStatus(HttpServletResponse.SC_OK);
+    }
+
+    /**
+     *
+     */
+    protected void configureResponse(Session ctx, HttpServletResponse response, WebPart result) throws IOException {
+        long processingTime = ctx.getProcessingTime();
+        result.addString("processingTime", StringUtil.asStringInSeconds((processingTime == 0) ? 1 : processingTime));
+        SysLog.logSysInfo("proctime", String.valueOf(processingTime));
+
+        response.setContentType("text/html");
+
+        PrintWriter out = response.getWriter();
+        result.writeOn(out);
+        out.close();
+
+        response.setStatus(HttpServletResponse.SC_OK);
+    }
+
+    /**
+     *
+     */
+    protected String getSiteUrl(HttpServletRequest request) {
+        String result = request.getRequestURL().toString();
+        int lastIndex = result.lastIndexOf('/') + 1;
+        return result.substring(0, lastIndex);
+    }
+
+    /**
+     *
+     */
+    protected boolean isLocalHost(HttpServletRequest request) {
+        String remoteHost = request.getRemoteHost();
+        String localHost = null;
+        try {
+            localHost = InetAddress.getLocalHost().getHostAddress();
+        } catch (Exception ex) {
+            // ignore
+        }
+        return remoteHost.equals(localHost) || remoteHost.equals("localhost");
+    }
+
+    /**
+     *
+     */
+    protected String getRequestArgsAsString(UserSession us, Map args) {
+        StringBuffer result = new StringBuffer(96);
+        for (Iterator i = args.keySet().iterator(); i.hasNext(); ) {
+            String key = i.next().toString();
+            String value = us.getAsString(args, key);
+            result.append(key + "=" + value);
+            if (i.hasNext()) {
+                result.append("; ");
+            }
+        }
+        return "[" + result.toString() + "]";
+    }
 
 }

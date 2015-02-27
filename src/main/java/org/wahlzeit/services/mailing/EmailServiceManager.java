@@ -17,75 +17,74 @@
  * License along with this program. If not, see
  * <http://www.gnu.org/licenses/>.
  */
- 
+
 package org.wahlzeit.services.mailing;
 
 import org.wahlzeit.main.ServiceMain;
-import org.wahlzeit.services.SysLog;
 
 /**
- * 
+ *
  */
 public class EmailServiceManager {
-	
-	/**
-	 * 
-	 */
-	protected static EmailServiceManager instance = null;
-	
-	/**
-	 * 
-	 */
-	protected static synchronized EmailServiceManager getInstance() {
-		if (instance == null) {
-			setInstance(new EmailServiceManager());
-		}
-		return instance;
-	}
-	
-	/**
-	 * 
-	 */
-	protected static void setInstance(EmailServiceManager manager) {
-		instance = manager;
-	}
 
-	/**
-	 * 
-	 */
-	public static EmailService getDefaultService() {
-		return getInstance().doGetDefaultService();
-	}
-	
-	/**
-	 * 
-	 */
-	protected EmailService defaultService = null;
-	
-	/**
-	 * 
-	 */
-	protected EmailServiceManager() {
-		initDefaultService();
-	}
-	
-	/**
-	 * 
-	 */
-	protected void initDefaultService() {
-		boolean isInProduction = ServiceMain.getInstance().isInProduction();
-		if (isInProduction) {
-			defaultService = new SmtpEmailService();
-		} else {
-			defaultService = new LoggingEmailService(new MockEmailService());
-		}
-	}
-	
-	/**
-	 * 
-	 */
-	protected EmailService doGetDefaultService() {
-		return defaultService;
-	}
+    /**
+     *
+     */
+    protected static EmailServiceManager instance = null;
+
+    /**
+     *
+     */
+    protected static synchronized EmailServiceManager getInstance() {
+        if (instance == null) {
+            setInstance(new EmailServiceManager());
+        }
+        return instance;
+    }
+
+    /**
+     *
+     */
+    protected static void setInstance(EmailServiceManager manager) {
+        instance = manager;
+    }
+
+    /**
+     *
+     */
+    public static EmailService getDefaultService() {
+        return getInstance().doGetDefaultService();
+    }
+
+    /**
+     *
+     */
+    protected EmailService defaultService = null;
+
+    /**
+     *
+     */
+    protected EmailServiceManager() {
+        initDefaultService();
+    }
+
+    /**
+     *
+     */
+    protected void initDefaultService() {
+        boolean isInProduction = ServiceMain.getInstance().isInProduction();
+        if (isInProduction) {
+            defaultService = new SmtpEmailService();
+        } else {
+            defaultService = new LoggingEmailService(new MockEmailService());
+        }
+    }
+
+    /**
+     *
+     */
+    protected EmailService doGetDefaultService() {
+        return defaultService;
+    }
 
 }

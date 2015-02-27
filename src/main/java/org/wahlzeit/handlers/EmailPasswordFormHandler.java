@@ -20,65 +20,68 @@
 
 package org.wahlzeit.handlers;
 
-import java.util.*;
-
-import org.wahlzeit.model.*;
-import org.wahlzeit.services.*;
-import org.wahlzeit.services.mailing.*;
+import org.wahlzeit.model.AccessRights;
+import org.wahlzeit.model.User;
+import org.wahlzeit.model.UserLog;
+import org.wahlzeit.model.UserManager;
+import org.wahlzeit.model.UserSession;
+import org.wahlzeit.services.EmailAddress;
+import org.wahlzeit.services.mailing.EmailService;
+import org.wahlzeit.services.mailing.EmailServiceManager;
 import org.wahlzeit.utils.StringUtil;
 import org.wahlzeit.webparts.WebPart;
 
+import java.util.Map;
+
 /**
- * 
  * @author dirkriehle
- *
  */
 public class EmailPasswordFormHandler extends AbstractWebFormHandler {
-	
-	/**
-	 *
-	 */
-	public EmailPasswordFormHandler() {
-		initialize(PartUtil.EMAIL_PASSWORD_FORM_FILE, AccessRights.GUEST);
-	}
 
-	/**
-	 * 
-	 */
-	protected void doMakeWebPart(UserSession us, WebPart part) {
-		Map<String, Object> savedArgs = us.getSavedArgs();
-		part.addStringFromArgs(savedArgs, UserSession.MESSAGE);
-		part.maskAndAddStringFromArgs(savedArgs, User.NAME);
-	}
-	
-	/**
-	 * 
-	 */
-	protected String doHandlePost(UserSession us, Map args) {
-		UserManager userManager = UserManager.getInstance();	
+    /**
+     *
+     */
+    public EmailPasswordFormHandler() {
+        initialize(PartUtil.EMAIL_PASSWORD_FORM_FILE, AccessRights.GUEST);
+    }
 
-		String userName = us.getAndSaveAsString(args, User.NAME);
-		if (StringUtil.isNullOrEmptyString(userName)) {
-			us.setMessage(us.cfg().getFieldIsMissing());
-			return PartUtil.EMAIL_PASSWORD_PAGE_NAME;
-		} else if (!userManager.hasUserByName(userName)) {
-			us.setMessage(us.cfg().getUserNameIsUnknown());
-			return PartUtil.EMAIL_PASSWORD_PAGE_NAME;
-		}
-		
-		User user = userManager.getUserByName(userName);
-		
-		EmailAddress from = us.cfg().getModeratorEmailAddress();
-		EmailAddress to = user.getEmailAddress();
+    /**
+     *
+     */
+    protected void doMakeWebPart(UserSession us, WebPart part) {
+        Map<String, Object> savedArgs = us.getSavedArgs();
+        part.addStringFromArgs(savedArgs, UserSession.MESSAGE);
+        part.maskAndAddStringFromArgs(savedArgs, User.NAME);
+    }
 
-		EmailService emailService = EmailServiceManager.getDefaultService();
-		emailService.sendEmailIgnoreException(from, to, us.cfg().getAuditEmailAddress(), us.cfg().getSendPasswordEmailSubject(), user.getPassword());
+    /**
+     *
+     */
+    protected String doHandlePost(UserSession us, Map args) {
+        UserManager userManager = UserManager.getInstance();
 
-		UserLog.logPerformedAction("EmailPassword");
-		
-		us.setTwoLineMessage(us.cfg().getPasswordWasEmailed(), us.cfg().getContinueWithShowPhoto());
+        String userName = us.getAndSaveAsString(args, User.NAME);
+        if (StringUtil.isNullOrEmptyString(userName)) {
+            us.setMessage(us.cfg().getFieldIsMissing());
+            return PartUtil.EMAIL_PASSWORD_PAGE_NAME;
+        } else if (!userManager.hasUserByName(userName)) {
+            us.setMessage(us.cfg().getUserNameIsUnknown());
+            return PartUtil.EMAIL_PASSWORD_PAGE_NAME;
+        }
 
-		return PartUtil.SHOW_NOTE_PAGE_NAME;
-	}
+        User user = userManager.getUserByName(userName);
+
+        EmailAddress from = us.cfg().getModeratorEmailAddress();
+        EmailAddress to = user.getEmailAddress();
+
+        EmailService emailService = EmailServiceManager.getDefaultService();
+        emailService.sendEmailIgnoreException(from, to, us.cfg().getAuditEmailAddress(), us.cfg().getSendPasswordEmailSubject(), user.getPassword());
+
+        UserLog.logPerformedAction("EmailPassword");
+
+        us.setTwoLineMessage(us.cfg().getPasswordWasEmailed(), us.cfg().getContinueWithShowPhoto());
+
+        return PartUtil.SHOW_NOTE_PAGE_NAME;
+    }
 
 }

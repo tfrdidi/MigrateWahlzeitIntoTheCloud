@@ -20,205 +20,206 @@
 
 package org.wahlzeit.main;
 
-import java.io.*;
-import javax.servlet.*;
-
 import org.wahlzeit.agents.AgentManager;
 import org.wahlzeit.handlers.*;
-import org.wahlzeit.model.*;
-import org.wahlzeit.webparts.*;
-import org.wahlzeit.services.*;
+import org.wahlzeit.model.AccessRights;
+import org.wahlzeit.model.EnglishModelConfig;
+import org.wahlzeit.model.GermanModelConfig;
+import org.wahlzeit.model.LanguageConfigs;
+import org.wahlzeit.services.ConfigDir;
+import org.wahlzeit.services.Language;
+import org.wahlzeit.services.SysConfig;
+import org.wahlzeit.webparts.WebPartTemplateService;
 
 /**
  * A Main class that runs a Wahlzeit web server.
- * 
- * @author dirkriehle
  *
+ * @author dirkriehle
  */
 public class ServiceMain extends ModelMain {
-	
-	/**
-	 * 
-	 */
-	protected static ServiceMain instance = new ServiceMain();
 
-	/**
-	 * 
-	 */
-	protected boolean isToStop = false;
+    /**
+     *
+     */
+    protected static ServiceMain instance = new ServiceMain();
 
-	/**
-	 * 
-	 */
-	protected boolean isInProduction = false;
-	
-	/**
-	 * 
-	 */
-	public static ServiceMain getInstance() {
-		return instance;
-	}
-	
-	/**
-	 * 
-	 */
-	public void requestStop() {
-		synchronized(instance) {
-			instance.isToStop = true;
-		}
-	}
-	
-	/**
-	 * 
-	 */
-	public boolean isShuttingDown() {
-		return instance.isToStop;
-	}
-		
-	/**
-	 * 
-	 */
-	public boolean isInProduction() {
-		return instance.isInProduction;
-	}
-	
-	/**
-	 * 
-	 */
-	public void startUp(boolean inProduction, String rootDir) throws Exception {
-		isInProduction = inProduction;
-		
-		super.startUp(rootDir);
+    /**
+     *
+     */
+    protected boolean isToStop = false;
 
-		configureWebPartTemplateService();
-		configureWebPartHandlers();
-		configureLanguageModels();
+    /**
+     *
+     */
+    protected boolean isInProduction = false;
 
-		AgentManager am = AgentManager.getInstance();
-		am.startAllThreads();
-	}
-	
-	/**
-	 * 
-	 */
-	public void shutDown() throws Exception {
-		AgentManager am = AgentManager.getInstance();
-		am.stopAllThreads();
-				
-		super.shutDown();
-	}
-	
-	/**
-	 * 
-	 */
-	public void configureWebPartTemplateService() {
-		ConfigDir templatesDir = SysConfig.getTemplatesDir();
-		WebPartTemplateService.getInstance().setTemplatesDir(templatesDir);
-	}
-	
-	/**
-	 * 
-	 */
-	public void configureWebPartHandlers() {
-		WebPartHandler temp = null;
-		WebPartHandlerManager manager = WebPartHandlerManager.getInstance();
-		
-		// NullInfo and NullForm
-		manager.addWebPartHandler(PartUtil.NULL_FORM_NAME, new NullFormHandler());
-		
-		// Note page
-		manager.addWebPartHandler(PartUtil.SHOW_NOTE_PAGE_NAME, new ShowNotePageHandler());
+    /**
+     *
+     */
+    public static ServiceMain getInstance() {
+        return instance;
+    }
 
-		// ShowPhoto page
-		manager.addWebPartHandler(PartUtil.FILTER_PHOTOS_FORM_NAME, new FilterPhotosFormHandler());
-		manager.addWebPartHandler(PartUtil.PRAISE_PHOTO_FORM_NAME, new PraisePhotoFormHandler());
+    /**
+     *
+     */
+    public void requestStop() {
+        synchronized (instance) {
+            instance.isToStop = true;
+        }
+    }
 
-		temp = new ShowPhotoPageHandler();
-		manager.addWebPartHandler(PartUtil.SHOW_PHOTO_PAGE_NAME, temp);
-		manager.addWebPartHandler(PartUtil.ENGAGE_GUEST_FORM_NAME, temp);
-		
-		manager.addWebPartHandler(PartUtil.FILTER_PHOTOS_PAGE_NAME, new FilterPhotosPageHandler());
+    /**
+     *
+     */
+    public boolean isShuttingDown() {
+        return instance.isToStop;
+    }
 
-		manager.addWebPartHandler(PartUtil.RESET_SESSION_PAGE_NAME, new ResetSessionPageHandler());
-		
-		// About and Terms pages
-		manager.addWebPartHandler(PartUtil.ABOUT_PAGE_NAME, new ShowInfoPageHandler(AccessRights.GUEST, PartUtil.ABOUT_INFO_FILE));
-		manager.addWebPartHandler(PartUtil.CONTACT_PAGE_NAME, new ShowInfoPageHandler(AccessRights.GUEST, PartUtil.CONTACT_INFO_FILE));
-		manager.addWebPartHandler(PartUtil.IMPRINT_PAGE_NAME, new ShowInfoPageHandler(AccessRights.GUEST, PartUtil.IMPRINT_INFO_FILE));
-		manager.addWebPartHandler(PartUtil.TERMS_PAGE_NAME, new ShowInfoPageHandler(AccessRights.GUEST, PartUtil.TERMS_INFO_FILE));
+    /**
+     *
+     */
+    public boolean isInProduction() {
+        return instance.isInProduction;
+    }
 
-		// Flag, Send, Tell, and Options pages
-		temp = manager.addWebPartHandler(PartUtil.FLAG_PHOTO_FORM_NAME, new FlagPhotoFormHandler());
-		manager.addWebPartHandler(PartUtil.FLAG_PHOTO_PAGE_NAME, new ShowPartPageHandler(AccessRights.GUEST, temp));
-		temp = manager.addWebPartHandler(PartUtil.SEND_EMAIL_FORM_NAME, new SendEmailFormHandler());
-		manager.addWebPartHandler(PartUtil.SEND_EMAIL_PAGE_NAME, new ShowPartPageHandler(AccessRights.GUEST, temp));
-		temp = manager.addWebPartHandler(PartUtil.TELL_FRIEND_FORM_NAME, new TellFriendFormHandler());
-		manager.addWebPartHandler(PartUtil.TELL_FRIEND_PAGE_NAME, new ShowPartPageHandler(AccessRights.GUEST, temp));
-		temp = manager.addWebPartHandler(PartUtil.SET_OPTIONS_FORM_NAME, new SetOptionsFormHandler());
-		manager.addWebPartHandler(PartUtil.SET_OPTIONS_PAGE_NAME, new ShowPartPageHandler(AccessRights.GUEST, temp));
-		
-		// Signup, Login, EmailUserName/Password, and Logout pages
-		temp = manager.addWebPartHandler(PartUtil.SIGNUP_FORM_NAME, new SignupFormHandler());
-		manager.addWebPartHandler(PartUtil.SIGNUP_PAGE_NAME, new ShowPartPageHandler(AccessRights.GUEST, temp));
+    /**
+     *
+     */
+    public void startUp(boolean inProduction, String rootDir) throws Exception {
+        isInProduction = inProduction;
 
-		manager.addWebPartHandler(PartUtil.CONFIRM_ACCOUNT_PAGE_NAME, new ConfirmAccountPageHandler());
+        super.startUp(rootDir);
 
-		temp = manager.addWebPartHandler(PartUtil.LOGIN_FORM_NAME, new LoginFormHandler());
-		manager.addWebPartHandler(PartUtil.LOGIN_PAGE_NAME, new ShowPartPageHandler(AccessRights.GUEST, temp));
-		temp = manager.addWebPartHandler(PartUtil.EMAIL_USER_NAME_FORM_NAME, new EmailUserNameFormHandler());
-		manager.addWebPartHandler(PartUtil.EMAIL_USER_NAME_PAGE_NAME, new ShowPartPageHandler(AccessRights.GUEST, temp));
-		temp = manager.addWebPartHandler(PartUtil.EMAIL_PASSWORD_FORM_NAME, new EmailPasswordFormHandler());
-		manager.addWebPartHandler(PartUtil.EMAIL_PASSWORD_PAGE_NAME, new ShowPartPageHandler(AccessRights.GUEST, temp));
+        configureWebPartTemplateService();
+        configureWebPartHandlers();
+        configureLanguageModels();
 
-		manager.addWebPartHandler(PartUtil.LOGOUT_PAGE_NAME, new LogoutPageHandler());
-		
-		// SetLanguage pages
-		temp = new SetLanguagePageHandler();
-		manager.addWebPartHandler(PartUtil.SET_ENGLISH_LANGUAGE_PAGE_NAME, temp);
-		manager.addWebPartHandler(PartUtil.SET_GERMAN_LANGUAGE_PAGE_NAME, temp);
-		manager.addWebPartHandler(PartUtil.SET_SPANISH_LANGUAGE_PAGE_NAME, temp);
-		manager.addWebPartHandler(PartUtil.SET_JAPANESE_LANGUAGE_PAGE_NAME, temp);
+        AgentManager am = AgentManager.getInstance();
+        am.startAllThreads();
+    }
 
-		// SetPhotoSize pages
-		temp = new SetPhotoSizePageHandler();
-		manager.addWebPartHandler(PartUtil.SET_EXTRA_SMALL_PHOTO_SIZE_PAGE_NAME, temp);
-		manager.addWebPartHandler(PartUtil.SET_SMALL_PHOTO_SIZE_PAGE_NAME, temp);
-		manager.addWebPartHandler(PartUtil.SET_MEDIUM_PHOTO_SIZE_PAGE_NAME, temp);
-		manager.addWebPartHandler(PartUtil.SET_LARGE_PHOTO_SIZE_PAGE_NAME, temp);
-		manager.addWebPartHandler(PartUtil.SET_EXTRA_LARGE_PHOTO_SIZE_PAGE_NAME, temp);
+    /**
+     *
+     */
+    public void shutDown() throws Exception {
+        AgentManager am = AgentManager.getInstance();
+        am.stopAllThreads();
 
-		// ShowHome page
-		manager.addWebPartHandler(PartUtil.SHOW_USER_PROFILE_FORM_NAME, new ShowUserProfileFormHandler());
-		manager.addWebPartHandler(PartUtil.SHOW_USER_PHOTO_FORM_NAME, new ShowUserPhotoFormHandler());
-		manager.addWebPartHandler(PartUtil.SHOW_USER_HOME_PAGE_NAME, new ShowUserHomePageHandler());
-		
-		// EditProfile, ChangePassword, EditPhoto, and UploadPhoto pages
-		temp = manager.addWebPartHandler(PartUtil.EDIT_USER_PROFILE_FORM_NAME, new EditUserProfileFormHandler());
-		manager.addWebPartHandler(PartUtil.EDIT_USER_PROFILE_PAGE_NAME, new ShowPartPageHandler(AccessRights.USER, temp));
-		temp = manager.addWebPartHandler(PartUtil.CHANGE_PASSWORD_FORM_NAME, new ChangePasswordFormHandler());
-		manager.addWebPartHandler(PartUtil.CHANGE_PASSWORD_PAGE_NAME, new ShowPartPageHandler(AccessRights.USER, temp));
-		temp = manager.addWebPartHandler(PartUtil.EDIT_USER_PHOTO_FORM_NAME, new EditUserPhotoFormHandler());
-		manager.addWebPartHandler(PartUtil.EDIT_USER_PHOTO_PAGE_NAME, new ShowPartPageHandler(AccessRights.USER, temp));
-		temp = manager.addWebPartHandler(PartUtil.UPLOAD_PHOTO_FORM_NAME, new UploadPhotoFormHandler());
-		manager.addWebPartHandler(PartUtil.UPLOAD_PHOTO_PAGE_NAME, new ShowPartPageHandler(AccessRights.USER, temp));
-		
-		manager.addWebPartHandler(PartUtil.EDIT_PHOTO_CASE_FORM_NAME, new EditPhotoCaseFormHandler());
-		manager.addWebPartHandler(PartUtil.SHOW_PHOTO_CASES_PAGE_NAME, new ShowPhotoCasesPageHandler());
+        super.shutDown();
+    }
 
-		// Admin page incl. AdminUserProfile and AdminUserPhoto
-		temp = new ShowAdminPageHandler();
-		manager.addWebPartHandler(PartUtil.SHOW_ADMIN_PAGE_NAME, temp);
-		manager.addWebPartHandler(PartUtil.SHOW_ADMIN_MENU_FORM_NAME, temp);
-		manager.addWebPartHandler(PartUtil.ADMIN_USER_PROFILE_FORM_NAME, new AdminUserProfileFormHandler());
-		manager.addWebPartHandler(PartUtil.ADMIN_USER_PHOTO_FORM_NAME, new AdminUserPhotoFormHandler());
-	}
-	
-	/**
-	 * 
-	 */
-	public void configureLanguageModels() {
-		LanguageConfigs.put(Language.ENGLISH, new EnglishModelConfig());
-		LanguageConfigs.put(Language.GERMAN, new GermanModelConfig());
-	}
-		
+    /**
+     *
+     */
+    public void configureWebPartTemplateService() {
+        ConfigDir templatesDir = SysConfig.getTemplatesDir();
+        WebPartTemplateService.getInstance().setTemplatesDir(templatesDir);
+    }
+
+    /**
+     *
+     */
+    public void configureWebPartHandlers() {
+        WebPartHandler temp = null;
+        WebPartHandlerManager manager = WebPartHandlerManager.getInstance();
+
+        // NullInfo and NullForm
+        manager.addWebPartHandler(PartUtil.NULL_FORM_NAME, new NullFormHandler());
+
+        // Note page
+        manager.addWebPartHandler(PartUtil.SHOW_NOTE_PAGE_NAME, new ShowNotePageHandler());
+
+        // ShowPhoto page
+        manager.addWebPartHandler(PartUtil.FILTER_PHOTOS_FORM_NAME, new FilterPhotosFormHandler());
+        manager.addWebPartHandler(PartUtil.PRAISE_PHOTO_FORM_NAME, new PraisePhotoFormHandler());
+
+        temp = new ShowPhotoPageHandler();
+        manager.addWebPartHandler(PartUtil.SHOW_PHOTO_PAGE_NAME, temp);
+        manager.addWebPartHandler(PartUtil.ENGAGE_GUEST_FORM_NAME, temp);
+
+        manager.addWebPartHandler(PartUtil.FILTER_PHOTOS_PAGE_NAME, new FilterPhotosPageHandler());
+
+        manager.addWebPartHandler(PartUtil.RESET_SESSION_PAGE_NAME, new ResetSessionPageHandler());
+
+        // About and Terms pages
+        manager.addWebPartHandler(PartUtil.ABOUT_PAGE_NAME, new ShowInfoPageHandler(AccessRights.GUEST, PartUtil.ABOUT_INFO_FILE));
+        manager.addWebPartHandler(PartUtil.CONTACT_PAGE_NAME, new ShowInfoPageHandler(AccessRights.GUEST, PartUtil.CONTACT_INFO_FILE));
+        manager.addWebPartHandler(PartUtil.IMPRINT_PAGE_NAME, new ShowInfoPageHandler(AccessRights.GUEST, PartUtil.IMPRINT_INFO_FILE));
+        manager.addWebPartHandler(PartUtil.TERMS_PAGE_NAME, new ShowInfoPageHandler(AccessRights.GUEST, PartUtil.TERMS_INFO_FILE));
+
+        // Flag, Send, Tell, and Options pages
+        temp = manager.addWebPartHandler(PartUtil.FLAG_PHOTO_FORM_NAME, new FlagPhotoFormHandler());
+        manager.addWebPartHandler(PartUtil.FLAG_PHOTO_PAGE_NAME, new ShowPartPageHandler(AccessRights.GUEST, temp));
+        temp = manager.addWebPartHandler(PartUtil.SEND_EMAIL_FORM_NAME, new SendEmailFormHandler());
+        manager.addWebPartHandler(PartUtil.SEND_EMAIL_PAGE_NAME, new ShowPartPageHandler(AccessRights.GUEST, temp));
+        temp = manager.addWebPartHandler(PartUtil.TELL_FRIEND_FORM_NAME, new TellFriendFormHandler());
+        manager.addWebPartHandler(PartUtil.TELL_FRIEND_PAGE_NAME, new ShowPartPageHandler(AccessRights.GUEST, temp));
+        temp = manager.addWebPartHandler(PartUtil.SET_OPTIONS_FORM_NAME, new SetOptionsFormHandler());
+        manager.addWebPartHandler(PartUtil.SET_OPTIONS_PAGE_NAME, new ShowPartPageHandler(AccessRights.GUEST, temp));
+
+        // Signup, Login, EmailUserName/Password, and Logout pages
+        temp = manager.addWebPartHandler(PartUtil.SIGNUP_FORM_NAME, new SignupFormHandler());
+        manager.addWebPartHandler(PartUtil.SIGNUP_PAGE_NAME, new ShowPartPageHandler(AccessRights.GUEST, temp));
+
+        manager.addWebPartHandler(PartUtil.CONFIRM_ACCOUNT_PAGE_NAME, new ConfirmAccountPageHandler());
+
+        temp = manager.addWebPartHandler(PartUtil.LOGIN_FORM_NAME, new LoginFormHandler());
+        manager.addWebPartHandler(PartUtil.LOGIN_PAGE_NAME, new ShowPartPageHandler(AccessRights.GUEST, temp));
+        temp = manager.addWebPartHandler(PartUtil.EMAIL_USER_NAME_FORM_NAME, new EmailUserNameFormHandler());
+        manager.addWebPartHandler(PartUtil.EMAIL_USER_NAME_PAGE_NAME, new ShowPartPageHandler(AccessRights.GUEST, temp));
+        temp = manager.addWebPartHandler(PartUtil.EMAIL_PASSWORD_FORM_NAME, new EmailPasswordFormHandler());
+        manager.addWebPartHandler(PartUtil.EMAIL_PASSWORD_PAGE_NAME, new ShowPartPageHandler(AccessRights.GUEST, temp));
+
+        manager.addWebPartHandler(PartUtil.LOGOUT_PAGE_NAME, new LogoutPageHandler());
+
+        // SetLanguage pages
+        temp = new SetLanguagePageHandler();
+        manager.addWebPartHandler(PartUtil.SET_ENGLISH_LANGUAGE_PAGE_NAME, temp);
+        manager.addWebPartHandler(PartUtil.SET_GERMAN_LANGUAGE_PAGE_NAME, temp);
+        manager.addWebPartHandler(PartUtil.SET_SPANISH_LANGUAGE_PAGE_NAME, temp);
+        manager.addWebPartHandler(PartUtil.SET_JAPANESE_LANGUAGE_PAGE_NAME, temp);
+
+        // SetPhotoSize pages
+        temp = new SetPhotoSizePageHandler();
+        manager.addWebPartHandler(PartUtil.SET_EXTRA_SMALL_PHOTO_SIZE_PAGE_NAME, temp);
+        manager.addWebPartHandler(PartUtil.SET_SMALL_PHOTO_SIZE_PAGE_NAME, temp);
+        manager.addWebPartHandler(PartUtil.SET_MEDIUM_PHOTO_SIZE_PAGE_NAME, temp);
+        manager.addWebPartHandler(PartUtil.SET_LARGE_PHOTO_SIZE_PAGE_NAME, temp);
+        manager.addWebPartHandler(PartUtil.SET_EXTRA_LARGE_PHOTO_SIZE_PAGE_NAME, temp);
+
+        // ShowHome page
+        manager.addWebPartHandler(PartUtil.SHOW_USER_PROFILE_FORM_NAME, new ShowUserProfileFormHandler());
+        manager.addWebPartHandler(PartUtil.SHOW_USER_PHOTO_FORM_NAME, new ShowUserPhotoFormHandler());
+        manager.addWebPartHandler(PartUtil.SHOW_USER_HOME_PAGE_NAME, new ShowUserHomePageHandler());
+
+        // EditProfile, ChangePassword, EditPhoto, and UploadPhoto pages
+        temp = manager.addWebPartHandler(PartUtil.EDIT_USER_PROFILE_FORM_NAME, new EditUserProfileFormHandler());
+        manager.addWebPartHandler(PartUtil.EDIT_USER_PROFILE_PAGE_NAME, new ShowPartPageHandler(AccessRights.USER, temp));
+        temp = manager.addWebPartHandler(PartUtil.CHANGE_PASSWORD_FORM_NAME, new ChangePasswordFormHandler());
+        manager.addWebPartHandler(PartUtil.CHANGE_PASSWORD_PAGE_NAME, new ShowPartPageHandler(AccessRights.USER, temp));
+        temp = manager.addWebPartHandler(PartUtil.EDIT_USER_PHOTO_FORM_NAME, new EditUserPhotoFormHandler());
+        manager.addWebPartHandler(PartUtil.EDIT_USER_PHOTO_PAGE_NAME, new ShowPartPageHandler(AccessRights.USER, temp));
+        temp = manager.addWebPartHandler(PartUtil.UPLOAD_PHOTO_FORM_NAME, new UploadPhotoFormHandler());
+        manager.addWebPartHandler(PartUtil.UPLOAD_PHOTO_PAGE_NAME, new ShowPartPageHandler(AccessRights.USER, temp));
+
+        manager.addWebPartHandler(PartUtil.EDIT_PHOTO_CASE_FORM_NAME, new EditPhotoCaseFormHandler());
+        manager.addWebPartHandler(PartUtil.SHOW_PHOTO_CASES_PAGE_NAME, new ShowPhotoCasesPageHandler());
+
+        // Admin page incl. AdminUserProfile and AdminUserPhoto
+        temp = new ShowAdminPageHandler();
+        manager.addWebPartHandler(PartUtil.SHOW_ADMIN_PAGE_NAME, temp);
+        manager.addWebPartHandler(PartUtil.SHOW_ADMIN_MENU_FORM_NAME, temp);
+        manager.addWebPartHandler(PartUtil.ADMIN_USER_PROFILE_FORM_NAME, new AdminUserProfileFormHandler());
+        manager.addWebPartHandler(PartUtil.ADMIN_USER_PHOTO_FORM_NAME, new AdminUserPhotoFormHandler());
+    }
+
+    /**
+     *
+     */
+    public void configureLanguageModels() {
+        LanguageConfigs.put(Language.ENGLISH, new EnglishModelConfig());
+        LanguageConfigs.put(Language.GERMAN, new GermanModelConfig());
+    }
+
 }

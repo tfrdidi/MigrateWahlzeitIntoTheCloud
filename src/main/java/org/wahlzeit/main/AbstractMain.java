@@ -20,64 +20,63 @@
 
 package org.wahlzeit.main;
 
-import javax.servlet.http.*;
-
-import org.wahlzeit.services.*;
+import org.wahlzeit.services.SessionManager;
+import org.wahlzeit.services.SysConfig;
+import org.wahlzeit.services.SysSession;
 
 /**
- * 
  * @author dirkriehle
- *
  */
 public abstract class AbstractMain {
-	
-	/**
-	 * 
-	 */
-	protected SysSession mainSession = null;
-	
-	/**
-	 * 
-	 */
-	protected AbstractMain() {
-		// do nothing
-	}
-	
-	/**
-	 * 
-	 */
-	protected void startUp(String rootDir) throws Exception {
-		SysConfig.setInstance(createSysConfig(rootDir));
-		
-		mainSession = new SysSession("system");
-		SessionManager.setThreadLocalSession(mainSession);
-	}
-	
-	/**
-	 * 
-	 */
-	protected SysConfig createSysConfig(String rootDir) {
-		return createDevSysConfig(rootDir);
-	}
-	/**
-	 * 
-	 */
-	protected SysConfig createProdSysConfig(String rootDir) {
-		return new SysConfig(rootDir); 
-	}
-	
-	/**
-	 * 
-	 */
-	protected SysConfig createDevSysConfig(String rootDir) {
-		return new SysConfig(rootDir);
-	}
-	
-	/**
-	 * 
-	 */
-	protected void shutDown() throws Exception {
-		SysConfig.dropInstance();
-	}
-	
+
+    /**
+     *
+     */
+    protected SysSession mainSession = null;
+
+    /**
+     *
+     */
+    protected AbstractMain() {
+        // do nothing
+    }
+
+    /**
+     *
+     */
+    protected void startUp(String rootDir) throws Exception {
+        SysConfig.setInstance(createSysConfig(rootDir));
+
+        mainSession = new SysSession("system");
+        SessionManager.setThreadLocalSession(mainSession);
+    }
+
+    /**
+     *
+     */
+    protected SysConfig createSysConfig(String rootDir) {
+        return createDevSysConfig(rootDir);
+    }
+
+    /**
+     *
+     */
+    protected SysConfig createProdSysConfig(String rootDir) {
+        return new SysConfig(rootDir);
+    }
+
+    /**
+     *
+     */
+    protected SysConfig createDevSysConfig(String rootDir) {
+        return new SysConfig(rootDir);
+    }
+
+    /**
+     *
+     */
+    protected void shutDown() throws Exception {
+        SysConfig.dropInstance();
+    }
+
 }

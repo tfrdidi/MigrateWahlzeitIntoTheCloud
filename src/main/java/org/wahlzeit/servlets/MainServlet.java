@@ -20,134 +20,139 @@
 
 package org.wahlzeit.servlets;
 
-import java.io.*;
-import java.util.*;
+import org.wahlzeit.handlers.PartUtil;
+import org.wahlzeit.handlers.WebFormHandler;
+import org.wahlzeit.handlers.WebPageHandler;
+import org.wahlzeit.handlers.WebPartHandlerManager;
+import org.wahlzeit.model.UserLog;
+import org.wahlzeit.model.UserSession;
+import org.wahlzeit.services.SysConfig;
+import org.wahlzeit.services.SysLog;
+import org.wahlzeit.webparts.WebPart;
 
-import javax.servlet.*;
-import javax.servlet.http.*;
+import javax.servlet.ServletException;
 import javax.servlet.annotation.*;
-
-import org.wahlzeit.handlers.*;
-import org.wahlzeit.model.*;
-import org.wahlzeit.services.*;
-import org.wahlzeit.webparts.*;
-
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 
 /**
- * 
  * @author dirkriehle
- *
  */
 @MultipartConfig // Servlet 3.0 support for file upload
 public class MainServlet extends AbstractServlet {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 42L; // any one does; class never serialized
+    /**
+     *
+     */
+    private static final long serialVersionUID = 42L; // any one does; class never serialized
 
-	/**
-	 * 
-	 */
-	public void myGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		long startTime = System.currentTimeMillis();
-		UserSession us = ensureUserSession(request);
-		
-		String link = request.getRequestURI();
-		int linkStart = link.lastIndexOf("/") + 1;
-		int linkEnd = link.indexOf(".html");
-		if (linkEnd == -1) {
-			linkEnd = link.length();
-		}
-		
-		link = link.substring(linkStart, linkEnd);
-		UserLog.logUserInfo("requested", link);
+    /**
+     *
+     */
+    public void myGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        long startTime = System.currentTimeMillis();
+        UserSession us = ensureUserSession(request);
 
-		WebPageHandler handler = WebPartHandlerManager.getWebPageHandler(link);
-		String newLink = PartUtil.DEFAULT_PAGE_NAME;
-		if (handler != null) {
-			Map args = getRequestArgs(request);
-			SysLog.logSysInfo("GET arguments: " + getRequestArgsAsString(us, args));
-			newLink = handler.handleGet(us, link, args);
-		}
+        String link = request.getRequestURI();
+        int linkStart = link.lastIndexOf("/") + 1;
+        int linkEnd = link.indexOf(".html");
+        if (linkEnd == -1) {
+            linkEnd = link.length();
+        }
 
-		if (newLink.equals(link)) { // no redirect necessary
-			WebPart result = handler.makeWebPart(us);
-			us.addProcessingTime(System.currentTimeMillis() - startTime);
-			configureResponse(us, response, result);
-			us.clearSavedArgs(); // saved args go from post to next get
-			us.resetProcessingTime();
-		} else {
-			SysLog.logSysInfo("redirect", newLink);
-			redirectRequest(response, newLink);
-			us.addProcessingTime(System.currentTimeMillis() - startTime);
-		}
-	}
-	
-	/**
-	 * 
-	 */
-	public void myPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		long startTime = System.currentTimeMillis();
-		UserSession us = ensureUserSession(request);
-		
-		String link = request.getRequestURI();
-		int linkStart = link.lastIndexOf("/") + 1;
-		int linkEnd = link.indexOf(".form");
-		if (linkEnd != -1) {
-			link = link.substring(linkStart, linkEnd);
-		} else {
-			link = PartUtil.NULL_FORM_NAME;
-		}
-		UserLog.logUserInfo("postedto", link);
-			
-		Map args = getRequestArgs(request);
-		SysLog.logSysInfo("POST arguments: " + getRequestArgsAsString(us, args));
-		
-		WebFormHandler formHandler = WebPartHandlerManager.getWebFormHandler(link);
-		link = PartUtil.DEFAULT_PAGE_NAME;
-		if (formHandler != null) {
-			link = formHandler.handlePost(us, args);
-		}
+        link = link.substring(linkStart, linkEnd);
+        UserLog.logUserInfo("requested", link);
 
-		redirectRequest(response, link);
-		us.addProcessingTime(System.currentTimeMillis() - startTime);
-	}
+        WebPageHandler handler = WebPartHandlerManager.getWebPageHandler(link);
+        String newLink = PartUtil.DEFAULT_PAGE_NAME;
+        if (handler != null) {
+            Map args = getRequestArgs(request);
+            SysLog.logSysInfo("GET arguments: " + getRequestArgsAsString(us, args));
+            newLink = handler.handleGet(us, link, args);
+        }
 
-	/**
-	 * 
-	 */
-	protected Map getRequestArgs(HttpServletRequest request) throws IOException, ServletException {
+        if (newLink.equals(link)) { // no redirect necessary
+            WebPart result = handler.makeWebPart(us);
+            us.addProcessingTime(System.currentTimeMillis() - startTime);
+            configureResponse(us, response, result);
+            us.clearSavedArgs(); // saved args go from post to next get
+            us.resetProcessingTime();
+        } else {
+            SysLog.logSysInfo("redirect", newLink);
+            redirectRequest(response, newLink);
+            us.addProcessingTime(System.currentTimeMillis() - startTime);
+        }
+    }
+
+    /**
+     *
+     */
+    public void myPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        long startTime = System.currentTimeMillis();
+        UserSession us = ensureUserSession(request);
+
+        String link = request.getRequestURI();
+        int linkStart = link.lastIndexOf("/") + 1;
+        int linkEnd = link.indexOf(".form");
+        if (linkEnd != -1) {
+            link = link.substring(linkStart, linkEnd);
+        } else {
+            link = PartUtil.NULL_FORM_NAME;
+        }
+        UserLog.logUserInfo("postedto", link);
+
+        Map args = getRequestArgs(request);
+        SysLog.logSysInfo("POST arguments: " + getRequestArgsAsString(us, args));
+
+        WebFormHandler formHandler = WebPartHandlerManager.getWebFormHandler(link);
+        link = PartUtil.DEFAULT_PAGE_NAME;
+        if (formHandler != null) {
+            link = formHandler.handlePost(us, args);
+        }
+
+        redirectRequest(response, link);
+        us.addProcessingTime(System.currentTimeMillis() - startTime);
+    }
+
+    /**
+     *
+     */
+    protected Map getRequestArgs(HttpServletRequest request) throws IOException, ServletException {
         String contentType = request.getContentType();
         if ((contentType != null) && contentType.startsWith("multipart/form-data")) {
-			return getMultiPartRequestArgs(request);
-		} else {
-			return request.getParameterMap();
-		}
-	}
+            return getMultiPartRequestArgs(request);
+        } else {
+            return request.getParameterMap();
+        }
+    }
 
-	/**
-	 * 
-	 */
-	protected Map getMultiPartRequestArgs(HttpServletRequest request) throws IOException, ServletException {
-		Map<String, String> result = new HashMap<String, String>();
+    /**
+     *
+     */
+    protected Map getMultiPartRequestArgs(HttpServletRequest request) throws IOException, ServletException {
+        Map<String, String> result = new HashMap<String, String>();
 
-		Collection<Part> parts = request.getParts();
-		for (Iterator<Part> i = parts.iterator(); i.hasNext(); ) {
-			Part part = i.next();
+        Collection<Part> parts = request.getParts();
+        for (Iterator<Part> i = parts.iterator(); i.hasNext(); ) {
+            Part part = i.next();
 
-			String key = part.getName();
-			if (key.equals("file")) {
-				String tempFileName = SysConfig.getTempDir().asString() + Thread.currentThread().getId();
-				part.write(tempFileName);
-				result.put("fileName", tempFileName);
-			} else {
-				result.put(key, request.getParameter(key));
-			}			
-		}
-		
-		return result;
-	}
+            String key = part.getName();
+            if (key.equals("file")) {
+                String tempFileName = SysConfig.getTempDir().asString() + Thread.currentThread().getId();
+                part.write(tempFileName);
+                result.put("fileName", tempFileName);
+            } else {
+                result.put(key, request.getParameter(key));
+            }
+        }
+
+        return result;
+    }
 
 }

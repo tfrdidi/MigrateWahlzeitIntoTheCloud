@@ -22,17 +22,16 @@ package org.wahlzeit.services;
 
 /**
  * A SysSession is a context for system threads i.e. not user sessions.
- * 
- * @author dirkriehle
  *
+ * @author dirkriehle
  */
 public class SysSession extends Session {
-	
-	/**
-	 * 
-	 */
-	public SysSession(String myName) {
-		initialize(myName);	
-	}
+
+    /**
+     *
+     */
+    public SysSession(String myName) {
+        initialize(myName);
+    }
 
 }

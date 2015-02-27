@@ -20,55 +20,52 @@
 
 package org.wahlzeit.handlers;
 
-import java.util.Map;
-
 import org.wahlzeit.model.AccessRights;
 import org.wahlzeit.model.UserSession;
-import org.wahlzeit.webparts.Writable;
 import org.wahlzeit.webparts.WebPart;
+import org.wahlzeit.webparts.Writable;
 
+import java.util.Map;
 
 
 /**
- * 
  * @author dirkriehle
- *
  */
 public class ShowPartPageHandler extends AbstractWebPageHandler {
-	
-	/**
-	 * 
-	 */
-	protected WebPartHandler partHandler = null;
 
-	/**
-	 * 
-	 */
-	public ShowPartPageHandler(AccessRights myRights, WebPartHandler myPartHandler) {
-		initialize(myRights, myPartHandler);
-	}
+    /**
+     *
+     */
+    protected WebPartHandler partHandler = null;
 
-	/**
-	 * 
-	 */
-	protected void initialize(AccessRights myRights, WebPartHandler myPartHandler) {
-		super.initialize(PartUtil.SHOW_PART_PAGE_FILE, myRights);
-		partHandler = myPartHandler;
-	}
+    /**
+     *
+     */
+    public ShowPartPageHandler(AccessRights myRights, WebPartHandler myPartHandler) {
+        initialize(myRights, myPartHandler);
+    }
 
-	/**
-	 * 
-	 */
-	protected String doHandleGet(UserSession us, String link, Map args) {
-		return partHandler.handleGet(us, link, null);
-	}
+    /**
+     *
+     */
+    protected void initialize(AccessRights myRights, WebPartHandler myPartHandler) {
+        super.initialize(PartUtil.SHOW_PART_PAGE_FILE, myRights);
+        partHandler = myPartHandler;
+    }
 
-	/**
-	 * 
-	 */
-	public void makeWebPageBody(UserSession us, WebPart page) {
-		Writable part = partHandler.makeWebPart(us);
-		page.addWritable("part", part);
-	}
-	
+    /**
+     *
+     */
+    protected String doHandleGet(UserSession us, String link, Map args) {
+        return partHandler.handleGet(us, link, null);
+    }
+
+    /**
+     *
+     */
+    public void makeWebPageBody(UserSession us, WebPart page) {
+        Writable part = partHandler.makeWebPart(us);
+        page.addWritable("part", part);
+    }
+
 }

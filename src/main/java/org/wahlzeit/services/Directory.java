@@ -23,45 +23,43 @@ package org.wahlzeit.services;
 import java.io.File;
 
 /**
- * 
  * @author dirkriehle
- *
  */
 public class Directory {
-	
-	/**
-	 * 
-	 */
-	protected String rootDir = "";
-	protected String relativeDir = "";
-	
-	/**
-	 * 
-	 */
-	public Directory(String newRootDir, String newRelativeDir) {
-		rootDir = newRootDir;
-		relativeDir = newRelativeDir;
-	}
-	
-	/**
-	 * 
-	 */
-	public String asString() {
-		return rootDir + File.separator + relativeDir;
-	}
-	
-	/**
-	 * 
-	 */
-	public String getRootDir() {
-		return rootDir;
-	}
-	
-	/**
-	 * 
-	 */
-	public String getRelativeDir() {
-		return relativeDir;
-	}
+
+    /**
+     *
+     */
+    protected String rootDir = "";
+    protected String relativeDir = "";
+
+    /**
+     *
+     */
+    public Directory(String newRootDir, String newRelativeDir) {
+        rootDir = newRootDir;
+        relativeDir = newRelativeDir;
+    }
+
+    /**
+     *
+     */
+    public String asString() {
+        return rootDir + File.separator + relativeDir;
+    }
+
+    /**
+     *
+     */
+    public String getRootDir() {
+        return rootDir;
+    }
+
+    /**
+     *
+     */
+    public String getRelativeDir() {
+        return relativeDir;
+    }
 
 }

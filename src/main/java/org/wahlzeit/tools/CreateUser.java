@@ -20,67 +20,62 @@
 
 package org.wahlzeit.tools;
 
-import java.io.*;
-
-import org.wahlzeit.utils.*;
-import org.wahlzeit.main.*;
-import org.wahlzeit.model.*;
+import org.wahlzeit.main.ScriptMain;
+import org.wahlzeit.utils.StringUtil;
 
 /**
- * 
  * @author dirkriehle
- *
  */
 public class CreateUser extends ScriptMain {
-	
-	/**
-	 * 
-	 */
-	public static void main(String[] argv) {
-		new CreateUser().run(argv);
-	}
-	
-	/**
-	 * 
-	 */
-	protected String userName = "testuser";
-	protected String password = "testuser";
-	protected String emailAddress = "info@wahlzeit.org";
-	protected String photoDir = "config/photos";
-	
-	/**
-	 * 
-	 */
-	protected void handleArgv(String argv[]) {
-		super.handleArgv(argv);
-		
-		if (StringUtil.isNullOrEmptyString(password)) {
-			password = userName;
-		}
-	}
-	
-	/**
-	 * 
-	 */
-	protected int handleArg(String arg, int i, String[] argv) {
-		if (arg.equals("--password")) {
-			password = argv[++i];
-		} else if (arg.equals("--username")) {
-			userName = argv[++i];
-		} else if (arg.equals("--emailaddress")) {
-			emailAddress = argv[++i];
-		} else if (arg.equals("--photodir")) {
-			photoDir = argv[++i];
-		}
-		
-		return i;
-	}
-	
-	/**
-	 * 
-	 */
-	protected void execute() throws Exception {
-		createUser(userName, password, emailAddress, photoDir);
-	}
-	
+
+    /**
+     *
+     */
+    public static void main(String[] argv) {
+        new CreateUser().run(argv);
+    }
+
+    /**
+     *
+     */
+    protected String userName = "testuser";
+    protected String password = "testuser";
+    protected String emailAddress = "info@wahlzeit.org";
+    protected String photoDir = "config/photos";
+
+    /**
+     *
+     */
+    protected void handleArgv(String argv[]) {
+        super.handleArgv(argv);
+
+        if (StringUtil.isNullOrEmptyString(password)) {
+            password = userName;
+        }
+    }
+
+    /**
+     *
+     */
+    protected int handleArg(String arg, int i, String[] argv) {
+        if (arg.equals("--password")) {
+            password = argv[++i];
+        } else if (arg.equals("--username")) {
+            userName = argv[++i];
+        } else if (arg.equals("--emailaddress")) {
+            emailAddress = argv[++i];
+        } else if (arg.equals("--photodir")) {
+            photoDir = argv[++i];
+        }
+
+        return i;
+    }
+
+    /**
+     *
+     */
+    protected void execute() throws Exception {
+        createUser(userName, password, emailAddress, photoDir);
+    }
+
 }

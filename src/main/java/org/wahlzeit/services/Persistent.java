@@ -20,50 +20,51 @@
 
 package org.wahlzeit.services;
 
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * A Persistent object is one that can be read from and written to a RDMBS.
  * Also, it has a write count, which serves as a dirty flag.
- * 
- * @author dirkriehle
  *
+ * @author dirkriehle
  */
 public interface Persistent {
-	
-	/**
-	 * 
-	 */
-	public boolean isDirty();
-	
-	/**
-	 * 
-	 */
-	public void incWriteCount();
-	
-	/**
-	 * 
-	 */
-	public void resetWriteCount();
 
-	/**
-	 * 
-	 */
-	public String getIdAsString();
-	
-	/**
-	 * 
-	 */
-	public void readFrom(ResultSet rset) throws SQLException;
-	
-	/**
-	 * 
-	 */
-	public void writeOn(ResultSet rset) throws SQLException;
-	
-	/**
-	 * 
-	 */
-	public void writeId(PreparedStatement stmt, int pos) throws SQLException;
-	
+    /**
+     *
+     */
+    public boolean isDirty();
+
+    /**
+     *
+     */
+    public void incWriteCount();
+
+    /**
+     *
+     */
+    public void resetWriteCount();
+
+    /**
+     *
+     */
+    public String getIdAsString();
+
+    /**
+     *
+     */
+    public void readFrom(ResultSet rset) throws SQLException;
+
+    /**
+     *
+     */
+    public void writeOn(ResultSet rset) throws SQLException;
+
+    /**
+     *
+     */
+    public void writeId(PreparedStatement stmt, int pos) throws SQLException;
+
 }

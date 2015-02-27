@@ -20,68 +20,71 @@
 
 package org.wahlzeit.handlers;
 
-import org.wahlzeit.model.*;
-import org.wahlzeit.utils.*;
-import org.wahlzeit.webparts.*;
+import org.wahlzeit.model.AccessRights;
+import org.wahlzeit.model.Photo;
+import org.wahlzeit.model.User;
+import org.wahlzeit.model.UserSession;
+import org.wahlzeit.utils.HtmlUtil;
+import org.wahlzeit.webparts.WebPart;
+import org.wahlzeit.webparts.Writable;
+import org.wahlzeit.webparts.WritableList;
 
 /**
- * 
  * @author dirkriehle
- *
  */
 public class ShowUserHomePageHandler extends AbstractWebPageHandler {
-	
-	/**
-	 *
-	 */
-	public ShowUserHomePageHandler() {
-		initialize(PartUtil.SHOW_USER_HOME_PAGE_FILE, AccessRights.USER);
-	}
 
-	/**
-	 * 
-	 */
-	protected void makeWebPageBody(UserSession us, WebPart page) {
-		Writable part = makeUserProfileForm(us);
-		page.addWritable("profile", part);
-		
-		User user = (User) us.getClient();
-		Photo[] photos = user.getPhotos();
-		boolean wasEmpty = true;
-		if (photos.length != 0) {
-			WritableList list = new WritableList();
-			for (int i = 0; i < photos.length; i++) {
-				Photo photo = photos[i];
-				if (!photo.getStatus().isDeleted()) {
-					part = makeUserPhotoForm(us, photos[i]);
-					list.append(part);
-					wasEmpty = false;
-				}
-			}
-			page.addWritable("photos", list);
-		}
-		
-		if (wasEmpty){
-			page.addString("photos", HtmlUtil.asP(us.cfg().getNoPhotoUploaded()));
-		}	
-	}
-	
-	/**
-	 * 
-	 */
-	protected Writable makeUserProfileForm(UserSession us) {
-		WebFormHandler handler = getFormHandler(PartUtil.SHOW_USER_PROFILE_FORM_NAME);
-		return handler.makeWebPart(us);
-	}
-	
-	
-	/**
-	 * 
-	 */
-	protected Writable makeUserPhotoForm(UserSession us, Photo photo) {
-		us.setPhoto(photo);
-		WebFormHandler handler = getFormHandler(PartUtil.SHOW_USER_PHOTO_FORM_NAME);
-		return handler.makeWebPart(us);
-	}
-	
+    /**
+     *
+     */
+    public ShowUserHomePageHandler() {
+        initialize(PartUtil.SHOW_USER_HOME_PAGE_FILE, AccessRights.USER);
+    }
+
+    /**
+     *
+     */
+    protected void makeWebPageBody(UserSession us, WebPart page) {
+        Writable part = makeUserProfileForm(us);
+        page.addWritable("profile", part);
+
+        User user = (User) us.getClient();
+        Photo[] photos = user.getPhotos();
+        boolean wasEmpty = true;
+        if (photos.length != 0) {
+            WritableList list = new WritableList();
+            for (int i = 0; i < photos.length; i++) {
+                Photo photo = photos[i];
+                if (!photo.getStatus().isDeleted()) {
+                    part = makeUserPhotoForm(us, photos[i]);
+                    list.append(part);
+                    wasEmpty = false;
+                }
+            }
+            page.addWritable("photos", list);
+        }
+
+        if (wasEmpty) {
+            page.addString("photos", HtmlUtil.asP(us.cfg().getNoPhotoUploaded()));
+        }
+    }
+
+    /**
+     *
+     */
+    protected Writable makeUserProfileForm(UserSession us) {
+        WebFormHandler handler = getFormHandler(PartUtil.SHOW_USER_PROFILE_FORM_NAME);
+        return handler.makeWebPart(us);
+    }
+
+
+    /**
+     *
+     */
+    protected Writable makeUserPhotoForm(UserSession us, Photo photo) {
+        us.setPhoto(photo);
+        WebFormHandler handler = getFormHandler(PartUtil.SHOW_USER_PHOTO_FORM_NAME);
+        return handler.makeWebPart(us);
+    }
+
 }

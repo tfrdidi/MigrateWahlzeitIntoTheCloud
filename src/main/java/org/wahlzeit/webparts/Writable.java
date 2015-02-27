@@ -20,19 +20,19 @@
 
 package org.wahlzeit.webparts;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.Writer;
 
 /**
  * A Writable can write a representation of itself to a Writer.
- * 
- * @author dirkriehle
  *
+ * @author dirkriehle
  */
 public interface Writable {
-	
-	/**
-	 * 
-	 */
-	public void writeOn(Writer writer) throws IOException;
-	
+
+    /**
+     *
+     */
+    public void writeOn(Writer writer) throws IOException;
+
 }

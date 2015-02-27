@@ -20,21 +20,19 @@
 
 package org.wahlzeit.handlers;
 
-import org.wahlzeit.model.*;
-import org.wahlzeit.webparts.*;
+import org.wahlzeit.model.UserSession;
+import org.wahlzeit.webparts.WebPart;
 
 
 /**
- * 
  * @author dirkriehle
- *
  */
 public interface WebPageHandler extends WebPartHandler {
 
-	/**
-	 * 
-	 */
-	public WebPart makeWebPart(UserSession us);
-	
-	
+    /**
+     *
+     */
+    public WebPart makeWebPart(UserSession us);
+
+
 }

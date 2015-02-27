@@ -20,27 +20,25 @@
 
 package org.wahlzeit.handlers;
 
-import java.util.*;
+import org.wahlzeit.model.UserSession;
+import org.wahlzeit.webparts.WebPart;
 
-import org.wahlzeit.model.*;
-import org.wahlzeit.webparts.*;
+import java.util.Map;
 
 
 /**
- * 
  * @author dirkriehle
- *
  */
 public interface WebPartHandler {
-	
-	/**
-	 * 
-	 */
-	public WebPart makeWebPart(UserSession us);
-	
-	/**
-	 * 
-	 */
-	public String handleGet(UserSession us, String link, Map args);
-	
+
+    /**
+     *
+     */
+    public WebPart makeWebPart(UserSession us);
+
+    /**
+     *
+     */
+    public String handleGet(UserSession us, String link, Map args);
+
 }
