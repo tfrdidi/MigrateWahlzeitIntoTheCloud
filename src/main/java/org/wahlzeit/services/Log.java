@@ -20,8 +20,7 @@
 
 package org.wahlzeit.services;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.log4j.Logger;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -167,7 +166,7 @@ public class Log {
     /**
      *
      */
-    protected static Logger logger = LogManager.getLogger(Log.class.getName());
+    protected static Logger logger = Logger.getLogger(Log.class.getName());
 
     /**
      *
