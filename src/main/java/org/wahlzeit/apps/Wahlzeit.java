@@ -42,7 +42,7 @@ public class Wahlzeit implements ServletContextListener {
         try {
             ServletContext sc = sce.getServletContext();
 
-            // configures log4j
+            // configures logging
             String contextPath = sc.getContextPath();
             System.setProperty("contextPath", contextPath);
             SysLog.logSysInfo("context-path", contextPath);
