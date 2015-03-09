@@ -20,7 +20,7 @@
 
 package org.wahlzeit.services;
 
-import org.apache.log4j.Logger;
+import java.util.logging.Logger;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
