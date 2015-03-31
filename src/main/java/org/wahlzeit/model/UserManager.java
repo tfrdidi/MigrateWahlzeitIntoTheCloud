@@ -116,13 +116,7 @@ public class UserManager extends ObjectManager {
         User result = doGetUserByTag(tag);
 
         if (result == null) {
-            try {
-                PreparedStatement stmt = getReadingStatement("SELECT * FROM users WHERE name_as_tag = ?");
-                result = (User) readObject(stmt, tag);
-            } catch (SQLException sex) {
-                SysLog.logThrowable(sex);
-            }
-
+            result = readObject(User.class, User.NAME_AS_TAG, tag);
             if (result != null) {
                 doAddUser(result);
             }
@@ -326,12 +320,7 @@ public class UserManager extends ObjectManager {
      */
     public User getUserByEmailAddress(EmailAddress emailAddress) {
         User result = null;
-        try {
-            PreparedStatement stmt = getReadingStatement("SELECT * FROM users WHERE email_address = ?");
-            result = (User) readObject(stmt, emailAddress.asString());
-        } catch (SQLException sex) {
-            SysLog.logThrowable(sex);
-        }
+        result = readObject(User.class, User.EMAIL_ADDRESS, emailAddress.asString());
 
         if (result != null) {
             User current = doGetUserByTag(result.getNameAsTag());

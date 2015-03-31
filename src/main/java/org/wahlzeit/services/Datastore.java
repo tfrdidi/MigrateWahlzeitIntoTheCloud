@@ -27,4 +27,8 @@ public class Datastore {
     public void saveEntity(Entity e) {
         OfyService.ofy().save().entity(e).now();
     }
+
+    public Object loadEntity(Class type, Long id) {
+        return OfyService.ofy().load().type(type).filterKey(id).first().now();
+    }
 }

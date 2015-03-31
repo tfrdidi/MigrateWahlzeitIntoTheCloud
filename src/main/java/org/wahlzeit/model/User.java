@@ -54,6 +54,7 @@ public class User extends Client implements Persistent {
     public static final String PASSWORD_AGAIN = "passwordAgain";
     public static final String EMAIL_ADDRESS = "emailAddress";
     public static final String TERMS = "termsAndConditions";
+    public static final String NAME_AS_TAG = "nameAsTag";
 
     /**
      *

@@ -20,11 +20,19 @@
 
 package org.wahlzeit.services;
 
+import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
+import com.googlecode.objectify.cmd.LoadType;
+import org.wahlzeit.model.Photo;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * An ObjectManager creates/reads/updates/deletes Persistent (objects) from a (relational) Database.
@@ -35,33 +43,20 @@ import java.util.Iterator;
  */
 public abstract class ObjectManager {
 
-    /**
-     *
-     */
-    public DatabaseConnection getDatabaseConnection() throws SQLException {
-        return SessionManager.getDatabaseConnection();
-    }
+    private static final Logger log = Logger.getLogger(ObjectManager.class.getName());
+    private static final Key applicationRootKey = KeyFactory.createKey("Application", "Wahlzeit");
 
     /**
      *
      */
-    protected PreparedStatement getReadingStatement(String stmt) throws SQLException {
-        DatabaseConnection dbc = getDatabaseConnection();
-        return dbc.getReadingStatement(stmt);
+    public <E> E readObject(Class<E> type, Long id) {
+        log.log(Level.FINE, "Load Type " + type.toString() + " with ID " + id + " from datastore.");
+        return OfyService.ofy().load().type(type).ancestor(applicationRootKey).filterKey(id).first().now();
     }
 
-    /**
-     *
-     */
-    protected PreparedStatement getUpdatingStatement(String stmt) throws SQLException {
-        DatabaseConnection dbc = getDatabaseConnection();
-        return dbc.getUpdatingStatement(stmt);
-    }
+    //protected abstract <E> Persistent createObject(Class<E> type, Long id);
 
-    /**
-     *
-     */
-    protected Persistent readObject(PreparedStatement stmt, int value) throws SQLException {
+    /*protected Persistent readObject(PreparedStatement stmt, int value) throws SQLException {
         Persistent result = null;
         stmt.setInt(1, value);
         SysLog.logQuery(stmt);
@@ -71,12 +66,12 @@ public abstract class ObjectManager {
         }
 
         return result;
-    }
+    }*/
 
     /**
      *
      */
-    protected Persistent readObject(PreparedStatement stmt, String value) throws SQLException {
+    /*protected Persistent readObject(PreparedStatement stmt, String value) throws SQLException {
         Persistent result = null;
         stmt.setString(1, value);
         SysLog.logQuery(stmt);
@@ -86,6 +81,15 @@ public abstract class ObjectManager {
         }
 
         return result;
+    }*/
+
+    /**
+     * Reads an Entity of the specified type where the wanted parameter has the given name,
+     * e.g. readObject(User.class, "emailAddress", "name@provider.com").
+     */
+    public <E> E readObject(Class<E> type, String parameterName, String parameterValue) {
+        log.log(Level.FINE, "Load Type " + type.toString() + " with parameter " + parameterName + " == " + parameterValue  + " from datastore.");
+        return OfyService.ofy().load().type(type).ancestor(applicationRootKey).filter(parameterName, parameterValue).first().now();
     }
 
     /**

@@ -22,6 +22,7 @@ package org.wahlzeit.model;
 
 import org.wahlzeit.main.ServiceMain;
 import org.wahlzeit.services.ObjectManager;
+import org.wahlzeit.services.OfyService;
 import org.wahlzeit.services.Persistent;
 import org.wahlzeit.services.SysLog;
 
@@ -70,13 +71,13 @@ public class PhotoManager extends ObjectManager {
      *
      */
     public static final boolean hasPhoto(String id) {
-        return hasPhoto(PhotoId.getIdFromString(id));
+        return hasPhoto(Long.valueOf(id));
     }
 
     /**
      *
      */
-    public static final boolean hasPhoto(PhotoId id) {
+    public static final boolean hasPhoto(Long id) {
         return getPhoto(id) != null;
     }
 
@@ -84,13 +85,13 @@ public class PhotoManager extends ObjectManager {
      *
      */
     public static final Photo getPhoto(String id) {
-        return getPhoto(PhotoId.getIdFromString(id));
+        return getPhoto(Long.valueOf(id));
     }
 
     /**
      *
      */
-    public static final Photo getPhoto(PhotoId id) {
+    public static final Photo getPhoto(Long id) {
         return instance.getPhotoFromId(id);
     }
 
@@ -112,20 +113,15 @@ public class PhotoManager extends ObjectManager {
     /**
      *
      */
-    public Photo getPhotoFromId(PhotoId id) {
-        if (id.isNullId()) {
+    public Photo getPhotoFromId(Long id) {
+        if (id == null) {
             return null;
         }
 
         Photo result = doGetPhotoFromId(id);
 
         if (result == null) {
-            try {
-                PreparedStatement stmt = getReadingStatement("SELECT * FROM photos WHERE id = ?");
-                result = (Photo) readObject(stmt, id.asInt());
-            } catch (SQLException sex) {
-                SysLog.logThrowable(sex);
-            }
+                result = PhotoFactory.getInstance().loadPhoto(id);
             if (result != null) {
                 doAddPhoto(result);
             }
@@ -138,7 +134,7 @@ public class PhotoManager extends ObjectManager {
      * @methodtype get
      * @methodproperties primitive
      */
-    protected Photo doGetPhotoFromId(PhotoId id) {
+    protected Photo doGetPhotoFromId(Long id) {
         return photoCache.get(id);
     }
 
@@ -153,7 +149,7 @@ public class PhotoManager extends ObjectManager {
      *
      */
     public void addPhoto(Photo photo) {
-        PhotoId id = photo.getId();
+        Long id = photo.getId();
         assertIsNewPhoto(id);
         doAddPhoto(photo);
 
@@ -363,7 +359,7 @@ public class PhotoManager extends ObjectManager {
     /**
      * @methodtype assertion
      */
-    protected void assertIsNewPhoto(PhotoId id) {
+    protected void assertIsNewPhoto(Long id) {
         if (hasPhoto(id)) {
             throw new IllegalStateException("Photo already exists!");
         }

@@ -20,8 +20,11 @@
 
 package org.wahlzeit.model;
 
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Parent;
 import org.wahlzeit.services.DataObject;
 import org.wahlzeit.services.EmailAddress;
 import org.wahlzeit.services.Language;
@@ -69,8 +72,9 @@ public class Photo extends DataObject {
     /**
      *
      */
-    @Id protected PhotoId id = null;
+    @Id protected Long id = null;
 
+    @Parent Key parent = KeyFactory.createKey("Application", "Wahlzeit");
     /**
      *
      */
@@ -117,14 +121,14 @@ public class Photo extends DataObject {
      *
      */
     public Photo() {
-        id = PhotoId.getNextId();
+        id = 1L; // TODO: PhotoId PhotoId.getNextId();
         incWriteCount();
     }
 
     /**
      * @methodtype constructor
      */
-    public Photo(PhotoId myId) {
+    public Photo(Long myId) {
         id = myId;
 
         incWriteCount();
@@ -134,20 +138,13 @@ public class Photo extends DataObject {
      * @methodtype get
      */
     public String getIdAsString() {
-        return String.valueOf(id.asInt());
-    }
-
-    /**
-     *
-     */
-    public void writeId(PreparedStatement stmt, int pos) throws SQLException {
-        stmt.setInt(pos, id.asInt());
+        return String.valueOf(id);
     }
 
     /**
      * @methodtype get
      */
-    public PhotoId getId() {
+    public Long getId() {
         return id;
     }
 

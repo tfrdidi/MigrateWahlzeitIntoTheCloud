@@ -2,6 +2,7 @@
 /classes
 /web/data/photos
 /web/WEB-INF/classes
+/lib
 .gradle
 .idea
 *.iml

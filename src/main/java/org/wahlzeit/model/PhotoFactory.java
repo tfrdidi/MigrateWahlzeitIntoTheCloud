@@ -20,10 +20,9 @@
 
 package org.wahlzeit.model;
 
+import com.google.appengine.api.datastore.KeyFactory;
+import org.wahlzeit.services.OfyService;
 import org.wahlzeit.services.SysLog;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 /**
  * @author dirkriehle
@@ -81,17 +80,17 @@ public class PhotoFactory {
     }
 
     /**
-     *
+     *  Creates a new photo with the specified id
      */
-    public Photo createPhoto(PhotoId id) {
+    public Photo createPhoto(Long id) {
         return new Photo(id);
     }
 
     /**
-     *
+     *  Loads a photo from the datastore
      */
-    public Photo createPhoto(ResultSet rs) throws SQLException {
-        return new Photo(rs);
+    public Photo loadPhoto(Long id) {
+        return OfyService.ofy().load().type(Photo.class).ancestor(KeyFactory.createKey("Application", "Wahlzeit")).filterKey(id).first().now();
     }
 
     /**
