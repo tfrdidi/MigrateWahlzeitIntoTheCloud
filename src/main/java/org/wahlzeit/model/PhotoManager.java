@@ -106,7 +106,7 @@ public class PhotoManager extends ObjectManager {
      * @methodtype boolean-query
      * @methodproperties primitive
      */
-    protected boolean doHasPhoto(PhotoId id) {
+    protected boolean doHasPhoto(Long id) {
         return photoCache.containsKey(id);
     }
 
@@ -174,19 +174,14 @@ public class PhotoManager extends ObjectManager {
      *
      */
     public void loadPhotos(Collection<Photo> result) {
-        try {
-            PreparedStatement stmt = getReadingStatement("SELECT * FROM photos");
-            readObjects(result, stmt);
-            for (Iterator<Photo> i = result.iterator(); i.hasNext(); ) {
-                Photo photo = i.next();
-                if (!doHasPhoto(photo.getId())) {
-                    doAddPhoto(photo);
-                } else {
-                    SysLog.logSysInfo("photo", photo.getId().asString(), "photo had already been loaded");
-                }
+        result = readObjects(Photo.class);
+        for (Iterator<Photo> i = result.iterator(); i.hasNext(); ) {
+            Photo photo = i.next();
+            if (!doHasPhoto(photo.getId())) {
+                doAddPhoto(photo);
+            } else {
+                SysLog.logSysInfo("photo", String.valueOf(photo.getId()), "photo had already been loaded");
             }
-        } catch (SQLException sex) {
-            SysLog.logThrowable(sex);
         }
 
         SysLog.logSysInfo("loaded all photos");

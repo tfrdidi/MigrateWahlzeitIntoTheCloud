@@ -29,6 +29,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -91,6 +92,14 @@ public abstract class ObjectManager {
     }
 
 
+    /**
+     * Reads all Entities of the specified type,
+     * e.g. readObject(User.class) to get a list of all users
+     */
+    protected <E> List<E> readObjects(Class<E> type) {
+        log.log(Level.FINE, "Load all Entities of type " + type.toString() + " from datastore.");
+        return OfyService.ofy().load().type(type).ancestor(applicationRootKey).list();
+    }
 
     /**
      *
