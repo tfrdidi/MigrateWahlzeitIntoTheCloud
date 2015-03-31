@@ -209,19 +209,14 @@ public class UserManager extends ObjectManager {
      *
      */
     public void loadUsers(Collection<User> result) {
-        try {
-            PreparedStatement stmt = getReadingStatement("SELECT * FROM users");
-            readObjects(result, stmt);
-            for (Iterator<User> i = result.iterator(); i.hasNext(); ) {
-                User user = i.next();
-                if (!doHasUserByTag(user.getNameAsTag())) {
-                    doAddUser(user);
-                } else {
-                    SysLog.logSysInfo("user", user.getName(), "user had already been loaded");
-                }
+        result = readObjects(User.class);
+        for (Iterator<User> i = result.iterator(); i.hasNext(); ) {
+            User user = i.next();
+            if (!doHasUserByTag(user.getNameAsTag())) {
+                doAddUser(user);
+            } else {
+                SysLog.logSysInfo("user", user.getName(), "user had already been loaded");
             }
-        } catch (SQLException sex) {
-            SysLog.logThrowable(sex);
         }
 
         SysLog.logSysInfo("loaded all users");
