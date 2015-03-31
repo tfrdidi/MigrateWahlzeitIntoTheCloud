@@ -129,13 +129,7 @@ public class PhotoCaseManager extends ObjectManager {
      * @methodtype command
      */
     public void loadOpenPhotoCases(Collection<PhotoCase> result) {
-        try {
-            PreparedStatement stmt = getReadingStatement("SELECT * FROM cases WHERE was_decided = FALSE");
-            readObjects(result, stmt);
-        } catch (SQLException sex) {
-            SysLog.logThrowable(sex);
-        }
-
+        result = readObjects(PhotoCase.class, PhotoCase.WAS_DECIDED, false);
         SysLog.logSysInfo("loaded all open photo cases");
     }
 
