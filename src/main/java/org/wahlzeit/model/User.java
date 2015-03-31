@@ -149,13 +149,6 @@ public class User extends Client implements Persistent {
     /**
      *
      */
-    public User(ResultSet rset) throws SQLException {
-        readFrom(rset);
-    }
-
-    /**
-     *
-     */
     protected User() {
         // do nothing
     }
@@ -212,54 +205,6 @@ public class User extends Client implements Persistent {
      */
     public String getIdAsString() {
         return String.valueOf(id);
-    }
-
-    /**
-     * @methodtype command
-     */
-    public void readFrom(ResultSet rset) throws SQLException {
-        id = rset.getInt("id");
-        name = rset.getString("name");
-        nameAsTag = rset.getString("name_as_tag");
-        emailAddress = EmailAddress.getFromString(rset.getString("email_address"));
-        password = rset.getString("password");
-        rights = AccessRights.getFromInt(rset.getInt("rights"));
-        language = Language.getFromInt(rset.getInt("language"));
-        notifyAboutPraise = rset.getBoolean("notify_about_praise");
-        homePage = StringUtil.asUrlOrDefault(rset.getString("home_page"), getDefaultHomePage());
-        gender = Gender.getFromInt(rset.getInt("gender"));
-        status = UserStatus.getFromInt(rset.getInt("status"));
-        confirmationCode = rset.getLong("confirmation_code");
-        photos = PhotoManager.getInstance().findPhotosByOwner(name);
-        userPhoto = PhotoManager.getPhoto(PhotoId.getIdFromInt(rset.getInt("photo")));
-        creationTime = rset.getLong("creation_time");
-    }
-
-    /**
-     *
-     */
-    public void writeOn(ResultSet rset) throws SQLException {
-        rset.updateInt("id", id);
-        rset.updateString("name", name);
-        rset.updateString("name_as_tag", nameAsTag);
-        rset.updateString("email_address", (emailAddress == null) ? "" : emailAddress.asString());
-        rset.updateString("password", password);
-        rset.updateInt("rights", rights.asInt());
-        rset.updateInt("language", language.asInt());
-        rset.updateBoolean("notify_about_praise", notifyAboutPraise);
-        rset.updateString("home_page", homePage.toString());
-        rset.updateInt("gender", gender.asInt());
-        rset.updateInt("status", status.asInt());
-        rset.updateLong("confirmation_code", confirmationCode);
-        rset.updateInt("photo", (userPhoto == null) ? 0 : userPhoto.getId().asInt());
-        rset.updateLong("creation_time", creationTime);
-    }
-
-    /**
-     *
-     */
-    public void writeId(PreparedStatement stmt, int pos) throws SQLException {
-        stmt.setInt(pos, id);
     }
 
     /**
@@ -528,8 +473,8 @@ public class User extends Client implements Persistent {
                 double sc1 = p1.getPraise();
                 double sc2 = p2.getPraise();
                 if (sc1 == sc2) {
-                    String id1 = p1.getId().asString();
-                    String id2 = p2.getId().asString();
+                    String id1 = String.valueOf(p1.getId());
+                    String id2 = String.valueOf(p2.getId());
                     return id1.compareTo(id2);
                 } else if (sc1 < sc2) {
                     return 1;
