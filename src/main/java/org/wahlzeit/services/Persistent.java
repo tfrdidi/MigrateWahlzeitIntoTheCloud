@@ -52,19 +52,4 @@ public interface Persistent {
      */
     public String getIdAsString();
 
-    /**
-     *
-     */
-    public void readFrom(ResultSet rset) throws SQLException;
-
-    /**
-     *
-     */
-    public void writeOn(ResultSet rset) throws SQLException;
-
-    /**
-     *
-     */
-    public void writeId(PreparedStatement stmt, int pos) throws SQLException;
-
 }
