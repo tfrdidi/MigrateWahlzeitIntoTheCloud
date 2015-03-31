@@ -53,7 +53,7 @@ public class PhotoManager extends ObjectManager {
     /**
      * In-memory cache for photos
      */
-    protected Map<PhotoId, Photo> photoCache = new HashMap<PhotoId, Photo>();
+    protected Map<Long, Photo> photoCache = new HashMap<Long, Photo>();
 
     /**
      *
