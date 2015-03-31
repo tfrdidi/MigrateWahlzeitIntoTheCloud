@@ -209,7 +209,7 @@ public class UserManager extends ObjectManager {
      *
      */
     public void loadUsers(Collection<User> result) {
-        result = readObjects(User.class);
+        readObjects(result, User.class);
         for (Iterator<User> i = result.iterator(); i.hasNext(); ) {
             User user = i.next();
             if (!doHasUserByTag(user.getNameAsTag())) {

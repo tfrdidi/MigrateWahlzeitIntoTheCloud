@@ -174,7 +174,7 @@ public class PhotoManager extends ObjectManager {
      *
      */
     public void loadPhotos(Collection<Photo> result) {
-        result = readObjects(Photo.class);
+        readObjects(result, Photo.class);
         for (Iterator<Photo> i = result.iterator(); i.hasNext(); ) {
             Photo photo = i.next();
             if (!doHasPhoto(photo.getId())) {
