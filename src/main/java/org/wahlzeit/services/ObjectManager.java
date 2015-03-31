@@ -83,19 +83,6 @@ public abstract class ObjectManager {
     /**
      *
      */
-    protected void readObjects(Collection result, PreparedStatement stmt, String value) throws SQLException {
-        stmt.setString(1, value);
-        SysLog.logQuery(stmt);
-        ResultSet rset = stmt.executeQuery();
-        while (rset.next()) {
-            Persistent obj = createObject(rset);
-            result.add(obj);
-        }
-    }
-
-    /**
-     *
-     */
     protected abstract Persistent createObject(ResultSet rset) throws SQLException;
 
     /**
