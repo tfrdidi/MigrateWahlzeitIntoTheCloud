@@ -141,21 +141,13 @@ public class PhotoManager extends ObjectManager {
     /**
      *
      */
-    protected Photo createObject(ResultSet rset) throws SQLException {
-        return PhotoFactory.getInstance().createPhoto(rset);
-    }
-
-    /**
-     *
-     */
     public void addPhoto(Photo photo) {
         Long id = photo.getId();
         assertIsNewPhoto(id);
         doAddPhoto(photo);
 
         try {
-            PreparedStatement stmt = getReadingStatement("INSERT INTO photos(id) VALUES(?)");
-            createObject(photo, stmt, id.asInt());
+            writeObject(photo);
             ServiceMain.getInstance().saveGlobals();
         } catch (SQLException sex) {
             SysLog.logThrowable(sex);

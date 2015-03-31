@@ -81,11 +81,6 @@ public abstract class ObjectManager {
     }
 
     /**
-     *
-     */
-    protected abstract Persistent createObject(ResultSet rset) throws SQLException;
-
-    /**
      * Writes the given Entity to the datastore.
      */
     protected <E> void writeObject(E e) {
