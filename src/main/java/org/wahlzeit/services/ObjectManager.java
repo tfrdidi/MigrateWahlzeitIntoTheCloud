@@ -102,6 +102,15 @@ public abstract class ObjectManager {
     }
 
     /**
+     * Reads all Entities of the specified type, where the given parameter matches the wanted value
+     * e.g. readObject(User.class) to get a list of all users
+     */
+    protected <E> List<E> readObjects(Class<E> type, String parameterName, String parameterValue) {
+        log.log(Level.FINE, "Load all Entities of type " + type.toString() + " where parameter " + parameterName + " = " + parameterValue + " from datastore.");
+        return OfyService.ofy().load().type(type).ancestor(applicationRootKey).filter(parameterName, parameterValue).list();
+    }
+
+    /**
      *
      */
     protected void readObjects(Collection result, PreparedStatement stmt) throws SQLException {
