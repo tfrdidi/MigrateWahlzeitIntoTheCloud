@@ -20,6 +20,8 @@
 
 package org.wahlzeit.model;
 
+import com.googlecode.objectify.annotation.Entity;
+import com.googlecode.objectify.annotation.Index;
 import org.wahlzeit.services.EmailAddress;
 
 /**
@@ -28,6 +30,7 @@ import org.wahlzeit.services.EmailAddress;
  *
  * @author dirkriehle
  */
+@Entity
 public abstract class Client {
 
     /**
@@ -38,7 +41,7 @@ public abstract class Client {
     /**
      *
      */
-    protected EmailAddress emailAddress = EmailAddress.EMPTY;
+    @Index protected EmailAddress emailAddress = EmailAddress.EMPTY;
 
     /**
      *

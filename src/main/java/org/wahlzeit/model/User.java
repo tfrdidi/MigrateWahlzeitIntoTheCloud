@@ -20,6 +20,9 @@
 
 package org.wahlzeit.model;
 
+import com.googlecode.objectify.annotation.Entity;
+import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Index;
 import org.wahlzeit.services.EmailAddress;
 import org.wahlzeit.services.Language;
 import org.wahlzeit.services.Persistent;
@@ -43,6 +46,7 @@ import java.util.Set;
  *
  * @author dirkriehle
  */
+@Entity
 public class User extends Client implements Persistent {
 
     /**
@@ -102,9 +106,9 @@ public class User extends Client implements Persistent {
     /**
      *
      */
-    protected int id;
+    @Id protected int id;
     protected String name;
-    protected String nameAsTag;
+    @Index protected String nameAsTag;
     protected String password;
 
     /**
