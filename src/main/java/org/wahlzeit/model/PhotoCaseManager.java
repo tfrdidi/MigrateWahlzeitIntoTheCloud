@@ -129,7 +129,7 @@ public class PhotoCaseManager extends ObjectManager {
      * @methodtype command
      */
     public void loadOpenPhotoCases(Collection<PhotoCase> result) {
-        result = readObjects(PhotoCase.class, PhotoCase.WAS_DECIDED, false);
+        readObjects(result, PhotoCase.class, PhotoCase.WAS_DECIDED, false);
         SysLog.logSysInfo("loaded all open photo cases");
     }
 

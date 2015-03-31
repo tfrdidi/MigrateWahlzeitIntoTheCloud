@@ -222,6 +222,7 @@ public class PhotoManager extends ObjectManager {
         } catch (SQLException sex) {
             SysLog.logThrowable(sex);
         }
+        readObjects(result, Photo.class, Photo.OWNER_NAME, ownerName);
 
         for (Iterator<Photo> i = result.iterator(); i.hasNext(); ) {
             doAddPhoto(i.next());

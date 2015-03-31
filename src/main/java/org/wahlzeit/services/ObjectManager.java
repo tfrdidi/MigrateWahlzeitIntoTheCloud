@@ -53,35 +53,6 @@ public abstract class ObjectManager {
         return OfyService.ofy().load().type(type).ancestor(applicationRootKey).filterKey(key).first().now();
     }
 
-    //protected abstract <E> Persistent createObject(Class<E> type, Long id);
-
-    /*protected Persistent readObject(PreparedStatement stmt, int value) throws SQLException {
-        Persistent result = null;
-        stmt.setInt(1, value);
-        SysLog.logQuery(stmt);
-        ResultSet rset = stmt.executeQuery();
-        if (rset.next()) {
-            result = createObject(rset);
-        }
-
-        return result;
-    }*/
-
-    /**
-     *
-     */
-    /*protected Persistent readObject(PreparedStatement stmt, String value) throws SQLException {
-        Persistent result = null;
-        stmt.setString(1, value);
-        SysLog.logQuery(stmt);
-        ResultSet rset = stmt.executeQuery();
-        if (rset.next()) {
-            result = createObject(rset);
-        }
-
-        return result;
-    }*/
-
     /**
      * Reads an Entity of the specified type where the wanted parameter has the given name,
      * e.g. readObject(User.class, "emailAddress", "name@provider.com").
@@ -90,7 +61,6 @@ public abstract class ObjectManager {
         log.log(Level.FINE, "Load Type " + type.toString() + " with parameter " + parameterName + " == " + parameterValue  + " from datastore.");
         return OfyService.ofy().load().type(type).ancestor(applicationRootKey).filter(parameterName, parameterValue).first().now();
     }
-
 
     /**
      * Reads all Entities of the specified type,
@@ -105,21 +75,9 @@ public abstract class ObjectManager {
      * Reads all Entities of the specified type, where the given parameter matches the wanted value
      * e.g. readObject(User.class) to get a list of all users
      */
-    protected <E> List<E> readObjects(Class<E> type, String parameterName, Object value) {
+    protected <E> void readObjects(Collection result, Class<E> type, String parameterName, Object value) {
         log.log(Level.FINE, "Load all Entities of type " + type.toString() + " where parameter " + parameterName + " = " + value.toString() + " from datastore.");
-        return OfyService.ofy().load().type(type).ancestor(applicationRootKey).filter(parameterName, value).list();
-    }
-
-    /**
-     *
-     */
-    protected void readObjects(Collection result, PreparedStatement stmt) throws SQLException {
-        SysLog.logQuery(stmt);
-        ResultSet rset = stmt.executeQuery();
-        while (rset.next()) {
-            Persistent obj = createObject(rset);
-            result.add(obj);
-        }
+        result.addAll(OfyService.ofy().load().type(type).ancestor(applicationRootKey).filter(parameterName, value).list());
     }
 
     /**

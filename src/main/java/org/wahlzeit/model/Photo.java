@@ -24,6 +24,7 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Parent;
 import org.wahlzeit.services.DataObject;
 import org.wahlzeit.services.EmailAddress;
@@ -56,6 +57,7 @@ public class Photo extends DataObject {
     public static final String KEYWORDS = "keywords";
 
     public static final String TAGS = "tags";
+    public static final String OWNER_NAME = "ownerName";
 
     public static final String STATUS = "status";
     public static final String IS_INVISIBLE = "isInvisible";
@@ -79,7 +81,7 @@ public class Photo extends DataObject {
      *
      */
     protected int ownerId = 0;
-    protected String ownerName;
+    @Index protected String ownerName;
 
     /**
      *
