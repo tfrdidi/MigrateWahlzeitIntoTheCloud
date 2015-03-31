@@ -45,11 +45,11 @@ public abstract class ObjectManager {
     private static final Key applicationRootKey = KeyFactory.createKey("Application", "Wahlzeit");
 
     /**
-     *
+     *  Finds the first Entity with the given key
      */
-    public <E> E readObject(Class<E> type, Long id) {
-        log.log(Level.FINE, "Load Type " + type.toString() + " with ID " + id + " from datastore.");
-        return OfyService.ofy().load().type(type).ancestor(applicationRootKey).filterKey(id).first().now();
+    protected <E> E readObject(Class<E> type, Long key) {
+        log.log(Level.FINE, "Load Type " + type.toString() + " with ID " + key + " from datastore.");
+        return OfyService.ofy().load().type(type).ancestor(applicationRootKey).filterKey(key).first().now();
     }
 
     //protected abstract <E> Persistent createObject(Class<E> type, Long id);
@@ -85,10 +85,12 @@ public abstract class ObjectManager {
      * Reads an Entity of the specified type where the wanted parameter has the given name,
      * e.g. readObject(User.class, "emailAddress", "name@provider.com").
      */
-    public <E> E readObject(Class<E> type, String parameterName, String parameterValue) {
+    protected <E> E readObject(Class<E> type, String parameterName, String parameterValue) {
         log.log(Level.FINE, "Load Type " + type.toString() + " with parameter " + parameterName + " == " + parameterValue  + " from datastore.");
         return OfyService.ofy().load().type(type).ancestor(applicationRootKey).filter(parameterName, parameterValue).first().now();
     }
+
+
 
     /**
      *
@@ -123,11 +125,11 @@ public abstract class ObjectManager {
     /**
      *
      */
-    protected void createObject(Persistent obj, PreparedStatement stmt, String value) throws SQLException {
+    /*protected void createObject(Persistent obj, PreparedStatement stmt, String value) throws SQLException {
         stmt.setString(1, value);
         SysLog.logQuery(stmt);
         stmt.executeUpdate();
-    }
+    }*/
 
     /**
      * Writes the given Entity to the datastore.
