@@ -216,12 +216,6 @@ public class PhotoManager extends ObjectManager {
      */
     public Set<Photo> findPhotosByOwner(String ownerName) {
         Set<Photo> result = new HashSet<Photo>();
-        try {
-            PreparedStatement stmt = getReadingStatement("SELECT * FROM photos WHERE owner_name = ?");
-            readObjects(result, stmt, ownerName);
-        } catch (SQLException sex) {
-            SysLog.logThrowable(sex);
-        }
         readObjects(result, Photo.class, Photo.OWNER_NAME, ownerName);
 
         for (Iterator<Photo> i = result.iterator(); i.hasNext(); ) {
