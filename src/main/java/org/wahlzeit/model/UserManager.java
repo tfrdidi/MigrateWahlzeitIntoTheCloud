@@ -169,13 +169,7 @@ public class UserManager extends ObjectManager {
         assertIsNonNullArgument(user);
         assertIsUnknownUserAsIllegalArgument(user);
 
-        try {
-            int id = user.getId();
-            PreparedStatement stmt = getReadingStatement("INSERT INTO users(id) VALUES(?)");
-            createObject(user, stmt, id);
-        } catch (SQLException sex) {
-            SysLog.logThrowable(sex);
-        }
+        writeObject(user);
 
         doAddUser(user);
     }

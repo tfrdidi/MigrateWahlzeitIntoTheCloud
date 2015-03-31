@@ -20,11 +20,9 @@
 
 package org.wahlzeit.services;
 
-import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
-import com.googlecode.objectify.cmd.LoadType;
-import org.wahlzeit.model.Photo;
+import com.googlecode.objectify.annotation.Entity;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -125,17 +123,25 @@ public abstract class ObjectManager {
     /**
      *
      */
-    protected void createObject(Persistent obj, PreparedStatement stmt, int value) throws SQLException {
-        stmt.setInt(1, value);
+    protected void createObject(Persistent obj, PreparedStatement stmt, String value) throws SQLException {
+        stmt.setString(1, value);
         SysLog.logQuery(stmt);
         stmt.executeUpdate();
     }
 
     /**
+     * Writes the given Entity to the datastore.
+     */
+    protected <E> void writeObject(E e) {
+        log.log(Level.FINE, "Write Entity  " + e.toString() + " into the datastore.");
+        OfyService.ofy().save().entity(e).now();
+    }
+
+    /**
      *
      */
-    protected void createObject(Persistent obj, PreparedStatement stmt, String value) throws SQLException {
-        stmt.setString(1, value);
+    protected void createObject(Persistent obj, PreparedStatement stmt, int value) throws SQLException {
+        stmt.setInt(1, value);
         SysLog.logQuery(stmt);
         stmt.executeUpdate();
     }
