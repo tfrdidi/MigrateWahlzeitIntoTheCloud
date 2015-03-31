@@ -4,34 +4,34 @@ apply plugin: 'appengine'
 def appEmail = "tfr.didi@gmail.com"
 def appengineVersion = "1.9.17"
 
-buildscript { 
-  repositories { 
-     mavenCentral()
-  } 
-  
-  dependencies {
-    classpath "com.google.appengine:gradle-appengine-plugin:1.9.17"
-  }
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath "com.google.appengine:gradle-appengine-plugin:1.9.17"
+    }
 }
 
 repositories {
-  mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
- appengineSdk "com.google.appengine:appengine-java-sdk:${appengineVersion}"
-    providedCompile "javax.servlet:javax.servlet-api:3.0.1"
- compile "com.google.appengine:appengine-api-1.0-sdk:${appengineVersion}"
- compile "org.apache.tomcat:tomcat-catalina:8.0.18"
+    appengineSdk "com.google.appengine:appengine-java-sdk:${appengineVersion}"
+    compile "javax.servlet:javax.servlet-api:3.0.1"
+    compile "com.google.appengine:appengine-api-1.0-sdk:${appengineVersion}"
+    compile "org.apache.tomcat:tomcat-catalina:8.0.18"
 }
 
 appengine {
-  httpPort = 8080
-  downloadSdk = true
+    httpPort = 8080
+    downloadSdk = true
 
-  appcfg {
-    email = "${appEmail}"
-    noCookies = true
-    oauth2 = false
-  }
+    appcfg {
+        email = "${appEmail}"
+        noCookies = true
+        oauth2 = false
+    }
 }

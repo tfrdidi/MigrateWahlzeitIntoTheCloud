@@ -79,13 +79,6 @@ public class Session {
     /**
      *
      */
-    public boolean hasDatabaseConnection() {
-        return databaseConnection != null;
-    }
-
-    /**
-     *
-     */
     public DatabaseConnection ensureDatabaseConnection() {
         if (databaseConnection == null) {
             try {
