@@ -48,4 +48,19 @@ public abstract class ScriptMain extends ModelMain {
             log.log(Level.SEVERE, "Exception: ", ex);
         }
     }
+
+
+    /**
+     *
+     */
+    protected void handleArgv(String argv[]) {
+        for (int i = 0; i < argv.length; i++) {
+            i = handleArg(argv[i], i, argv);
+        }
+    }
+
+    /**
+     *
+     */
+    abstract protected int handleArg(String arg, int i, String argv[]);
 }
