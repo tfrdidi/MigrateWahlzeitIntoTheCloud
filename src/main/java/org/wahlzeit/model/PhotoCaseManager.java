@@ -127,12 +127,7 @@ public class PhotoCaseManager extends ObjectManager {
      * @methodtype command
      */
     public void savePhotoCases() {
-        try {
-            PreparedStatement stmt = getUpdatingStatement("SELECT * FROM cases WHERE id = ?");
-            updateObjects(openPhotoCases.values(), stmt);
-        } catch (SQLException sex) {
-            SysLog.logThrowable(sex);
-        }
+        updateObjects(openPhotoCases.values());
     }
 
     /**

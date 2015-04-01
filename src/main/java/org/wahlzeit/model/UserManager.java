@@ -264,12 +264,7 @@ public class UserManager extends ObjectManager {
      *
      */
     public void saveUser(User user) {
-        try {
-            PreparedStatement stmt = getUpdatingStatement("SELECT * FROM users WHERE id = ?");
-            updateObject(user, stmt);
-        } catch (SQLException sex) {
-            SysLog.logThrowable(sex);
-        }
+        updateObject(user);
     }
 
     /**
@@ -284,12 +279,7 @@ public class UserManager extends ObjectManager {
      *
      */
     public void saveUsers() {
-        try {
-            PreparedStatement stmt = getUpdatingStatement("SELECT * FROM users WHERE id = ?");
-            updateObjects(users.values(), stmt);
-        } catch (SQLException sex) {
-            SysLog.logThrowable(sex);
-        }
+        updateObjects(users.values());
     }
 
     /**

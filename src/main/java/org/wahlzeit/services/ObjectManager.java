@@ -23,11 +23,8 @@ package org.wahlzeit.services;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -88,39 +85,28 @@ public abstract class ObjectManager {
     }
 
     /**
-     *
+     * Updates the given entitiy in the datastore.
      */
-    protected void updateObject(Persistent obj, PreparedStatement stmt) throws SQLException {
-        if (obj.isDirty()) {
-            obj.writeId(stmt, 1);
-            SysLog.logQuery(stmt);
-            ResultSet rset = stmt.executeQuery();
-            if (rset.next()) {
-                obj.writeOn(rset);
-                rset.updateRow();
-                updateDependents(obj);
-                obj.resetWriteCount();
-            } else {
-                SysLog.logSysError("trying to update non-existent object: " + obj.getIdAsString() + "(" + obj.toString() + ")");
-            }
-        }
+    protected <E> void updateObject(E entity) {
+        writeObject(entity);
     }
 
     /**
-     *
+     * Updates all entities of the given collection in the datastore.
      */
-    protected void updateObjects(Collection coll, PreparedStatement stmt) throws SQLException {
-        for (Iterator i = coll.iterator(); i.hasNext(); ) {
-            Persistent obj = (Persistent) i.next();
-            updateObject(obj, stmt);
+    protected <E>void updateObjects(Collection<E> collection) {
+        for(E o : collection) {
+            updateObject(o);
         }
     }
+
 
     /**
      *
      */
     protected void updateDependents(Persistent obj) throws SQLException {
         // do nothing
+        // TODO: check if necessary for photo
     }
 
     /**
@@ -137,7 +123,7 @@ public abstract class ObjectManager {
      */
     protected <E> void deleteObjects(Class<E> type, String propertyName, Object value) {
         log.log(Level.FINE, "Delete entities of type " + type + " where property " + propertyName + " == " + value.toString() + " from datastore.");
-        List<com.googlecode.objectify.Key<E>> keys = OfyService.ofy().load().type(type).ancestor(applicationRootKey).filter(propertyName, value).list())
+        List<com.googlecode.objectify.Key<E>> keys = OfyService.ofy().load().type(type).ancestor(applicationRootKey).filter(propertyName, value).keys().list();
         OfyService.ofy().delete().type(type).ids(keys);
     }
 

@@ -183,24 +183,14 @@ public class PhotoManager extends ObjectManager {
      *
      */
     public void savePhoto(Photo photo) {
-        try {
-            PreparedStatement stmt = getUpdatingStatement("SELECT * FROM photos WHERE id = ?");
-            updateObject(photo, stmt);
-        } catch (SQLException sex) {
-            SysLog.logThrowable(sex);
-        }
+        updateObject(photo);
     }
 
     /**
      *
      */
     public void savePhotos() {
-        try {
-            PreparedStatement stmt = getUpdatingStatement("SELECT * FROM photos WHERE id = ?");
-            updateObjects(photoCache.values(), stmt);
-        } catch (SQLException sex) {
-            SysLog.logThrowable(sex);
-        }
+        updateObjects(photoCache.values());
     }
 
     /**
