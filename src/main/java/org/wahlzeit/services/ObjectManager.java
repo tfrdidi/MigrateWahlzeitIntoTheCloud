@@ -124,15 +124,6 @@ public abstract class ObjectManager {
     }
 
     /**
-     *
-     */
-    protected void deleteObject(Persistent obj, PreparedStatement stmt) throws SQLException {
-        obj.writeId(stmt, 1);
-        SysLog.logQuery(stmt);
-        stmt.executeUpdate();
-    }
-
-    /**
      * Deletes the given entity from the datastore.
      */
     protected <E> void deleteObject(E entity) {
