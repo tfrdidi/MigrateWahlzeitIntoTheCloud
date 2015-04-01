@@ -26,18 +26,15 @@ import org.wahlzeit.services.Persistent;
 import org.wahlzeit.services.SysLog;
 
 import java.io.File;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.List;
 
 /**
  * A photo manager provides access to and manages photos.
