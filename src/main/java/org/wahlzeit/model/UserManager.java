@@ -188,12 +188,7 @@ public class UserManager extends ObjectManager {
         assertIsNonNullArgument(user);
         doDeleteUser(user);
 
-        try {
-            PreparedStatement stmt = getReadingStatement("DELETE FROM users WHERE id = ?");
-            deleteObject(user, stmt);
-        } catch (SQLException sex) {
-            SysLog.logThrowable(sex);
-        }
+        deleteObject(user);
 
         assertIsUnknownUserAsIllegalState(user);
     }

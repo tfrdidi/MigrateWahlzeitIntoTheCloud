@@ -308,23 +308,21 @@ public class PhotoManager extends ObjectManager {
     }
 
     /**
-     *
+     *  Removes all tags of the Photo (obj) in the datastore that have been removed by the user
+     *  and adds all new tags of the photo to the datastore.
      */
     protected void updateDependents(Persistent obj) throws SQLException {
         Photo photo = (Photo) obj;
 
-        PreparedStatement stmt = getReadingStatement("DELETE FROM tags WHERE photo_id = ?");
-        deleteObject(obj, stmt);
+        // delete all existing tags, for the case that some have been removed
+        deleteObjects(Tag.class, Tag.PHOTO_ID, photo.getId());
 
-        stmt = getReadingStatement("INSERT INTO tags VALUES(?, ?)");
+        // add all current tags to the datastore
         Set<String> tags = new HashSet<String>();
         photoTagCollector.collect(tags, photo);
         for (Iterator<String> i = tags.iterator(); i.hasNext(); ) {
-            String tag = i.next();
-            stmt.setString(1, tag);
-            stmt.setInt(2, photo.getId().asInt());
-            SysLog.logQuery(stmt);
-            stmt.executeUpdate();
+            Tag tag = new Tag(i.next(), photo.getId());
+            writeObject(tag);
         }
     }
 
