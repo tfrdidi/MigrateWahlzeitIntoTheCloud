@@ -22,7 +22,6 @@ package org.wahlzeit.model;
 
 import org.wahlzeit.main.ServiceMain;
 import org.wahlzeit.services.ObjectManager;
-import org.wahlzeit.services.OfyService;
 import org.wahlzeit.services.Persistent;
 import org.wahlzeit.services.SysLog;
 
@@ -37,6 +36,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
+import java.util.List;
 
 /**
  * A photo manager provides access to and manages photos.
@@ -214,7 +214,7 @@ public class PhotoManager extends ObjectManager {
         Photo result = getPhotoFromFilter(filter);
 
         if (result == null) {
-            java.util.List<PhotoId> list = getFilteredPhotoIds(filter);
+            List<Long> list = getFilteredPhotoIds(filter);
             filter.setDisplayablePhotoIds(list);
             result = getPhotoFromFilter(filter);
         }
@@ -226,7 +226,7 @@ public class PhotoManager extends ObjectManager {
      *
      */
     protected Photo getPhotoFromFilter(PhotoFilter filter) {
-        PhotoId id = filter.getRandomDisplayablePhotoId();
+        Long id = filter.getRandomDisplayablePhotoId();
         Photo result = getPhotoFromId(id);
         while ((result != null) && !result.isVisible()) {
             id = filter.getRandomDisplayablePhotoId();
@@ -242,11 +242,11 @@ public class PhotoManager extends ObjectManager {
     /**
      *
      */
-    protected java.util.List<PhotoId> getFilteredPhotoIds(PhotoFilter filter) {
-        java.util.List<PhotoId> result = new LinkedList<PhotoId>();
+    protected java.util.List<Long> getFilteredPhotoIds(PhotoFilter filter) {
+        List<Long> result = new LinkedList<Long>();
 
         try {
-            java.util.List<String> filterConditions = filter.getFilterConditions();
+            List<String> filterConditions = filter.getFilterConditions();
 
             int noFilterConditions = filterConditions.size();
             PreparedStatement stmt = getUpdatingStatementFromConditions(noFilterConditions);
