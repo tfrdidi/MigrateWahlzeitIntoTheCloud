@@ -52,8 +52,6 @@ public class RunScript extends ScriptMain {
      *
      */
     protected void execute() throws Exception {
-        super.execute();
-
         runScript(scriptName);
     }
 

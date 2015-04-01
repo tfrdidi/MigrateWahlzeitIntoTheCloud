@@ -63,4 +63,9 @@ public abstract class ScriptMain extends ModelMain {
      *
      */
     abstract protected int handleArg(String arg, int i, String argv[]);
+
+    /**
+     *
+     */
+    abstract protected void execute() throws Exception;
 }
