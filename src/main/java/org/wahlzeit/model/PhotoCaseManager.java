@@ -101,15 +101,8 @@ public class PhotoCaseManager extends ObjectManager {
      */
     public void addPhotoCase(PhotoCase myCase) {
         openPhotoCases.put(myCase.getId(), myCase);
-        try {
-            writeObject(myCase);
-
-            PreparedStatement stmt2 = getUpdatingStatement("SELECT * FROM cases WHERE id = ?");
-            updateObject(myCase, stmt2);
-            // @FIXME Main.saveGlobals();
-        } catch (SQLException sex) {
-            SysLog.logThrowable(sex);
-        }
+        writeObject(myCase);
+        // @FIXME Main.saveGlobals();
     }
 
     /**
