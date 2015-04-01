@@ -70,7 +70,9 @@ public class Photo extends DataObject {
     /**
      *
      */
-    @Id protected Long id = null;
+    //TODO: change it to a single long
+    @Id Long idLong;
+    @Index protected PhotoId id = null;
 
     @Parent Key parent = KeyFactory.createKey("Application", "Wahlzeit");
     /**
@@ -119,14 +121,14 @@ public class Photo extends DataObject {
      *
      */
     public Photo() {
-        id = 1L; // TODO: PhotoId PhotoId.getNextId();
+        id = PhotoId.getNextId();
         incWriteCount();
     }
 
     /**
      * @methodtype constructor
      */
-    public Photo(Long myId) {
+    public Photo(PhotoId myId) {
         id = myId;
 
         incWriteCount();
@@ -142,7 +144,7 @@ public class Photo extends DataObject {
     /**
      * @methodtype get
      */
-    public Long getId() {
+    public PhotoId getId() {
         return id;
     }
 
