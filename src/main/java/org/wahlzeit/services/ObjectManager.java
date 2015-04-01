@@ -22,14 +22,12 @@ package org.wahlzeit.services;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
-import com.googlecode.objectify.annotation.Entity;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -58,7 +56,7 @@ public abstract class ObjectManager {
      * e.g. readObject(User.class, "emailAddress", "name@provider.com").
      */
     protected <E> E readObject(Class<E> type, String parameterName, String parameterValue) {
-        log.log(Level.FINE, "Load Type " + type.toString() + " with parameter " + parameterName + " == " + parameterValue  + " from datastore.");
+        log.log(Level.FINE, "Load Type " + type.toString() + " with parameter " + parameterName + " == " + parameterValue + " from datastore.");
         return OfyService.ofy().load().type(type).ancestor(applicationRootKey).filter(parameterName, parameterValue).first().now();
     }
 
@@ -131,6 +129,14 @@ public abstract class ObjectManager {
         obj.writeId(stmt, 1);
         SysLog.logQuery(stmt);
         stmt.executeUpdate();
+    }
+
+    /**
+     * Deletes the given entity from the datastore.
+     */
+    protected <E> void deleteObject(E entity) {
+        log.log(Level.FINE, "Delete entity " + entity.toString() + " from datastore.");
+        OfyService.ofy().delete().entity(entity).now();
     }
 
     /**

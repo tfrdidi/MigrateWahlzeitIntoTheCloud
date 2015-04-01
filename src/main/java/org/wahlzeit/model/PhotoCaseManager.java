@@ -112,12 +112,7 @@ public class PhotoCaseManager extends ObjectManager {
      */
     public void removePhotoCase(PhotoCase myCase) {
         openPhotoCases.remove(myCase.getId());
-        try {
-            PreparedStatement stmt = getUpdatingStatement("SELECT * FROM cases WHERE id = ?");
-            updateObject(myCase, stmt);
-        } catch (SQLException sex) {
-            SysLog.logThrowable(sex);
-        }
+        deleteObject(myCase);
     }
 
     /**
