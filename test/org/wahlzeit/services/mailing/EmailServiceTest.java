@@ -20,8 +20,7 @@
 package org.wahlzeit.services.mailing;
 
 import junit.framework.*;
-import org.wahlzeit.services.*;
-import org.wahlzeit.services.mailing.*;
+import org.wahlzeit.services.EmailAddress;
 
 /**
  *

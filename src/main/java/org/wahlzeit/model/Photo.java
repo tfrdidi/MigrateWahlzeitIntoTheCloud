@@ -29,12 +29,8 @@ import com.googlecode.objectify.annotation.Parent;
 import org.wahlzeit.services.DataObject;
 import org.wahlzeit.services.EmailAddress;
 import org.wahlzeit.services.Language;
-import org.wahlzeit.utils.StringUtil;
 
 import java.net.URL;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 /**
  * A photo represents a user-provided (uploaded) photo.

@@ -20,18 +20,15 @@
 
 package org.wahlzeit.model;
 
-import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
+import com.googlecode.objectify.annotation.Subclass;
 import org.wahlzeit.services.EmailAddress;
 import org.wahlzeit.services.Language;
 import org.wahlzeit.services.Persistent;
 import org.wahlzeit.utils.StringUtil;
 
 import java.net.URL;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -46,7 +43,7 @@ import java.util.Set;
  *
  * @author dirkriehle
  */
-@Entity
+@Subclass(index=true)
 public class User extends Client implements Persistent {
 
     /**

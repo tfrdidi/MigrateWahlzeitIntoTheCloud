@@ -24,10 +24,7 @@ import org.wahlzeit.services.SysConfig;
 import org.wahlzeit.services.SysLog;
 
 import javax.imageio.ImageIO;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.RenderingHints;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 

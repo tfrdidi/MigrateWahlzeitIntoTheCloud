@@ -20,10 +20,6 @@
 
 package org.wahlzeit.services;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 /**
  * A Persistent object is one that can be read from and written to a RDMBS.
  * Also, it has a write count, which serves as a dirty flag.

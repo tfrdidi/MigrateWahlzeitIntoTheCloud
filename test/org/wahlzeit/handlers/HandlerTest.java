@@ -20,7 +20,7 @@
 package org.wahlzeit.handlers;
 
 import junit.framework.*;
-import org.wahlzeit.model.*;
+import org.wahlzeit.model.UserSession;
 
 public interface HandlerTest extends Test {
 

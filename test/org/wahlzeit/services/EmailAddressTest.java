@@ -20,8 +20,6 @@
 
 package org.wahlzeit.services;
 
-import org.wahlzeit.utils.StringUtil;
-
 import junit.framework.*;
 
 /**

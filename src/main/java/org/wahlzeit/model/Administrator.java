@@ -20,6 +20,7 @@
 
 package org.wahlzeit.model;
 
+import com.googlecode.objectify.annotation.Subclass;
 import org.wahlzeit.services.EmailAddress;
 
 
@@ -28,6 +29,7 @@ import org.wahlzeit.services.EmailAddress;
  *
  * @author dirkriehle
  */
+@Subclass(index=true)
 public class Administrator extends Moderator {
 
     /**
