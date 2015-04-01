@@ -139,29 +139,6 @@ public class UserManager extends ObjectManager {
     }
 
     /**
-     * @methodtype factory
-     */
-    protected User createObject(ResultSet rset) throws SQLException {
-        User result = null;
-
-        AccessRights rights = AccessRights.getFromInt(rset.getInt("rights"));
-        if (rights == AccessRights.USER) {
-            result = new User();
-            result.readFrom(rset);
-        } else if (rights == AccessRights.MODERATOR) {
-            result = new Moderator();
-            result.readFrom(rset);
-        } else if (rights == AccessRights.ADMINISTRATOR) {
-            result = new Administrator();
-            result.readFrom(rset);
-        } else {
-            SysLog.logSysInfo("received NONE rights value");
-        }
-
-        return result;
-    }
-
-    /**
      *
      */
     public void addUser(User user) {
