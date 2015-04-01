@@ -101,7 +101,9 @@ public class PhotoCaseManager extends ObjectManager {
      */
     public void addPhotoCase(PhotoCase myCase) {
         openPhotoCases.put(myCase.getId(), myCase);
-        writeObject(myCase);
+        if(myCase.isDirty()) {
+            writeObject(myCase);
+        }
         // @FIXME Main.saveGlobals();
     }
 
