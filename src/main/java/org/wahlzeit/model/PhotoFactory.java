@@ -89,8 +89,8 @@ public class PhotoFactory {
     /**
      *  Loads a photo from the datastore
      */
-    public Photo loadPhoto(Long id) {
-        return OfyService.ofy().load().type(Photo.class).ancestor(KeyFactory.createKey("Application", "Wahlzeit")).filterKey(id).first().now();
+    public Photo loadPhoto(PhotoId id) {
+        return OfyService.ofy().load().type(Photo.class).ancestor(KeyFactory.createKey("Application", "Wahlzeit")).filter(Photo.ID, id).first().now();
     }
 
     /**

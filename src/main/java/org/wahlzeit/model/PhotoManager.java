@@ -75,7 +75,7 @@ public class PhotoManager extends ObjectManager {
     /**
      *
      */
-    public static final boolean hasPhoto(Long id) {
+    public static final boolean hasPhoto(PhotoId id) {
         return getPhoto(id) != null;
     }
 
@@ -89,7 +89,7 @@ public class PhotoManager extends ObjectManager {
     /**
      *
      */
-    public static final Photo getPhoto(Long id) {
+    public static final Photo getPhoto(PhotoId id) {
         return instance.getPhotoFromId(id);
     }
 
@@ -111,7 +111,7 @@ public class PhotoManager extends ObjectManager {
     /**
      *
      */
-    public Photo getPhotoFromId(Long id) {
+    public Photo getPhotoFromId(PhotoId id) {
         if (id == null) {
             return null;
         }
@@ -119,7 +119,7 @@ public class PhotoManager extends ObjectManager {
         Photo result = doGetPhotoFromId(id);
 
         if (result == null) {
-                result = PhotoFactory.getInstance().loadPhoto(id);
+            result = PhotoFactory.getInstance().loadPhoto(id);
             if (result != null) {
                 doAddPhoto(result);
             }
@@ -132,7 +132,7 @@ public class PhotoManager extends ObjectManager {
      * @methodtype get
      * @methodproperties primitive
      */
-    protected Photo doGetPhotoFromId(Long id) {
+    protected Photo doGetPhotoFromId(PhotoId id) {
         return photoCache.get(id);
     }
 
@@ -140,16 +140,12 @@ public class PhotoManager extends ObjectManager {
      *
      */
     public void addPhoto(Photo photo) {
-        Long id = photo.getId();
+        PhotoId id = photo.getId();
         assertIsNewPhoto(id);
         doAddPhoto(photo);
 
-        try {
-            writeObject(photo);
-            ServiceMain.getInstance().saveGlobals();
-        } catch (SQLException sex) {
-            SysLog.logThrowable(sex);
-        }
+        writeObject(photo);
+        ServiceMain.getInstance().saveGlobals();
     }
 
     /**
@@ -287,7 +283,7 @@ public class PhotoManager extends ObjectManager {
     /**
      * @methodtype assertion
      */
-    protected void assertIsNewPhoto(Long id) {
+    protected void assertIsNewPhoto(PhotoId id) {
         if (hasPhoto(id)) {
             throw new IllegalStateException("Photo already exists!");
         }
