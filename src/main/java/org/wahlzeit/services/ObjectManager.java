@@ -62,7 +62,7 @@ public abstract class ObjectManager {
      * Reads all Entities of the specified type,
      * e.g. readObject(User.class) to get a list of all users
      */
-    protected <E> void readObjects(Collection result, Class<E> type) {
+    protected <E> void readObjects(Collection<E> result, Class<E> type) {
         log.log(Level.FINE, "Load all Entities of type " + type.toString() + " from datastore.");
         result.addAll(OfyService.ofy().load().type(type).ancestor(applicationRootKey).list());
     }
@@ -71,7 +71,7 @@ public abstract class ObjectManager {
      * Reads all Entities of the specified type, where the given property matches the wanted value
      * e.g. readObject(User.class) to get a list of all users
      */
-    protected <E> void readObjects(Collection result, Class<E> type, String propertyName, Object value) {
+    protected <E> void readObjects(Collection<E> result, Class<E> type, String propertyName, Object value) {
         log.log(Level.FINE, "Load all Entities of type " + type.toString() + " where parameter " + propertyName + " = " + value.toString() + " from datastore.");
         result.addAll(OfyService.ofy().load().type(type).ancestor(applicationRootKey).filter(propertyName, value).list());
     }

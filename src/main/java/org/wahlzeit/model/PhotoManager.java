@@ -29,6 +29,7 @@ import java.io.File;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -242,59 +243,19 @@ public class PhotoManager extends ObjectManager {
     /**
      *
      */
-    protected java.util.List<Long> getFilteredPhotoIds(PhotoFilter filter) {
+    protected List<Long> getFilteredPhotoIds(PhotoFilter filter) {
+        // get all tags that match the filter conditions
+        List<Tag> tags = new LinkedList<Tag>();
+        for(String condition : filter.getFilterConditions()) {
+            readObjects(tags, Tag.class, Tag.TEXT, condition);
+        }
+
+        // get the list of all photo ids that correspond to the tags
         List<Long> result = new LinkedList<Long>();
-
-        try {
-            List<String> filterConditions = filter.getFilterConditions();
-
-            int noFilterConditions = filterConditions.size();
-            PreparedStatement stmt = getUpdatingStatementFromConditions(noFilterConditions);
-            for (int i = 0; i < noFilterConditions; i++) {
-                stmt.setString(i + 1, filterConditions.get(i));
-            }
-
-            SysLog.logQuery(stmt);
-            ResultSet rset = stmt.executeQuery();
-
-            if (noFilterConditions == 0) {
-                noFilterConditions++;
-            }
-
-            int[] ids = new int[PhotoId.getCurrentIdAsInt() + 1];
-            while (rset.next()) {
-                int id = rset.getInt("photo_id");
-                if (++ids[id] == noFilterConditions) {
-                    PhotoId photoId = PhotoId.getIdFromInt(id);
-                    if (!filter.isProcessedPhotoId(photoId)) {
-                        result.add(photoId);
-                    }
-                }
-            }
-        } catch (SQLException sex) {
-            SysLog.logThrowable(sex);
+        for(Tag tag : tags) {
+            result.add(tag.getPhotoId());
         }
-
         return result;
-    }
-
-    /**
-     *
-     */
-    protected PreparedStatement getUpdatingStatementFromConditions(int no) throws SQLException {
-        String query = "SELECT * FROM tags";
-        if (no > 0) {
-            query += " WHERE";
-        }
-
-        for (int i = 0; i < no; i++) {
-            if (i > 0) {
-                query += " OR";
-            }
-            query += " (tag = ?)";
-        }
-
-        return getUpdatingStatement(query);
     }
 
     /**
