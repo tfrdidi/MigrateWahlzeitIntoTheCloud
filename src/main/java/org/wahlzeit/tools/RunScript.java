@@ -31,7 +31,7 @@ public class RunScript extends ScriptMain {
      *
      */
     public static void main(String[] argv) {
-        new RunScript().run(argv);
+        new RunScript().run();
     }
 
     /**

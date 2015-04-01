@@ -20,7 +20,8 @@
 
 package org.wahlzeit.main;
 
-import org.wahlzeit.services.SysLog;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A Main class that serves to run scripts (and exit afterwards).
@@ -29,63 +30,22 @@ import org.wahlzeit.services.SysLog;
  */
 public abstract class ScriptMain extends ModelMain {
 
-    /**
-     *
-     */
-    protected boolean isToSetUpDatabase = false;
-    protected boolean isToTearDownDatabase = false;
+    private static final Logger log = Logger.getLogger(ScriptMain.class.getName());
 
     /**
      *
      */
-    public void run(String[] argv) {
-        handleArgv(argv);
-
+    public void run() {
         try {
             startUp("web");
-            execute();
         } catch (Exception ex) {
-            SysLog.logThrowable(ex);
+            log.log(Level.SEVERE, "Exception: ", ex);
         }
 
         try {
             shutDown();
         } catch (Exception ex) {
-            SysLog.logThrowable(ex);
+            log.log(Level.SEVERE, "Exception: ", ex);
         }
     }
-
-    /**
-     *
-     */
-    protected void handleArgv(String argv[]) {
-        for (int i = 0; i < argv.length; i++) {
-            i = handleArg(argv[i], i, argv);
-        }
-    }
-
-    /**
-     *
-     */
-    protected int handleArg(String arg, int i, String argv[]) {
-        if (arg.equals("-S") || arg.equals("--setup")) {
-            isToSetUpDatabase = true;
-        } else if (arg.equals("-T") || arg.equals("--teardown")) {
-            isToTearDownDatabase = true;
-        }
-
-        return i;
-    }
-
-    /**
-     *
-     */
-    protected void execute() throws Exception {
-        if (isToSetUpDatabase) {
-            setUpDatabase();
-        } else if (isToTearDownDatabase) {
-            tearDownDatabase();
-        }
-    }
-
 }

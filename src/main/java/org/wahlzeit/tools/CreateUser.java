@@ -32,7 +32,7 @@ public class CreateUser extends ScriptMain {
      *
      */
     public static void main(String[] argv) {
-        new CreateUser().run(argv);
+        new CreateUser().run();
     }
 
     /**
