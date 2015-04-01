@@ -79,10 +79,10 @@ public class PhotoCaseManager extends ObjectManager {
     /**
      * @methodtype get
      */
-    public PhotoCase getPhotoCase(Long id) {
+    public PhotoCase getPhotoCase(PhotoId id) {
         PhotoCase result = openPhotoCases.get(id);
         if (result == null) {
-            result = readObject(PhotoCase.class, id);
+            result = readObject(PhotoCase.class, PhotoCase.ID, id);
         }
 
         return result;

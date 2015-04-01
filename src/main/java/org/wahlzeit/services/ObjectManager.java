@@ -53,7 +53,7 @@ public abstract class ObjectManager {
      * Reads an Entity of the specified type where the wanted parameter has the given name,
      * e.g. readObject(User.class, "emailAddress", "name@provider.com").
      */
-    protected <E> E readObject(Class<E> type, String parameterName, String parameterValue) {
+    protected <E> E readObject(Class<E> type, String parameterName, Object parameterValue) {
         log.log(Level.FINE, "Load Type " + type.toString() + " with parameter " + parameterName + " == " + parameterValue + " from datastore.");
         return OfyService.ofy().load().type(type).ancestor(applicationRootKey).filter(parameterName, parameterValue).first().now();
     }
