@@ -102,8 +102,8 @@ public class PhotoCaseManager extends ObjectManager {
     public void addPhotoCase(PhotoCase myCase) {
         openPhotoCases.put(myCase.getId(), myCase);
         try {
-            PreparedStatement stmt1 = getReadingStatement("INSERT INTO cases(id) VALUES(?)");
-            createObject(myCase, stmt1, myCase.getId().asInt());
+            writeObject(myCase);
+
             PreparedStatement stmt2 = getUpdatingStatement("SELECT * FROM cases WHERE id = ?");
             updateObject(myCase, stmt2);
             // @FIXME Main.saveGlobals();

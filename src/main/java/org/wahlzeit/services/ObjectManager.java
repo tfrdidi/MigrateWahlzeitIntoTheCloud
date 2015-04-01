@@ -91,15 +91,6 @@ public abstract class ObjectManager {
     /**
      *
      */
-    protected void createObject(Persistent obj, PreparedStatement stmt, int value) throws SQLException {
-        stmt.setInt(1, value);
-        SysLog.logQuery(stmt);
-        stmt.executeUpdate();
-    }
-
-    /**
-     *
-     */
     protected void updateObject(Persistent obj, PreparedStatement stmt) throws SQLException {
         if (obj.isDirty()) {
             obj.writeId(stmt, 1);
