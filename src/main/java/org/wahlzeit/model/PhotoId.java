@@ -44,7 +44,7 @@ public class PhotoId {
     /**
      *
      */
-    public static final PhotoId NULL_ID = new PhotoId(0);
+    public static final Long NULL_ID = 0L;
 
     /**
      *
