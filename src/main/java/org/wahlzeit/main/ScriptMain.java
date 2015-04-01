@@ -62,7 +62,10 @@ public abstract class ScriptMain extends ModelMain {
     /**
      *
      */
-    abstract protected int handleArg(String arg, int i, String argv[]);
+    protected int handleArg(String arg, int i, String argv[]) {
+        // do nothing
+        return 0;
+    }
 
     /**
      *

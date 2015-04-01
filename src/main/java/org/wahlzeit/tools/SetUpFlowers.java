@@ -44,9 +44,6 @@ public class SetUpFlowers extends ScriptMain {
      */
     public void startUp(String rootDir) throws Exception {
         super.startUp(rootDir);
-
-        tearDownDatabase();
-        setUpDatabase();
         loadGlobals();
     }
 
