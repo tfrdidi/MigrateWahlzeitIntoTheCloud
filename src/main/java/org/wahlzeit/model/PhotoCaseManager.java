@@ -77,13 +77,6 @@ public class PhotoCaseManager extends ObjectManager {
     }
 
     /**
-     * @methodtype factory
-     */
-    protected PhotoCase createObject(ResultSet rset) throws SQLException {
-        return new PhotoCase(rset);
-    }
-
-    /**
      * @methodtype get
      */
     public PhotoCase getPhotoCase(Long id) {

@@ -20,11 +20,6 @@
 
 package org.wahlzeit.model;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
-
 /**
  * A photo case is a case where someone flagged a photo as inappropriate.
  *
@@ -68,54 +63,8 @@ public class PhotoCase extends Case {
     /**
      *
      */
-    public PhotoCase(ResultSet rset) throws SQLException {
-        readFrom(rset);
-    }
-
-    /**
-     *
-     */
     public String getIdAsString() {
         return String.valueOf(id);
-    }
-
-    /**
-     *
-     */
-    public void readFrom(ResultSet rset) throws SQLException {
-        id = new CaseId(rset.getInt("id"));
-        photo = PhotoManager.getPhoto(PhotoId.getIdFromInt(rset.getInt("photo")));
-        createdOn = rset.getLong("creation_time");
-
-        flagger = rset.getString("flagger");
-        reason = FlagReason.getFromInt(rset.getInt("reason"));
-        explanation = rset.getString("explanation");
-
-        wasDecided = rset.getBoolean("was_decided");
-        decidedOn = rset.getLong("decision_time");
-    }
-
-    /**
-     *
-     */
-    public void writeOn(ResultSet rset) throws SQLException {
-        rset.updateInt("id", id.asInt());
-        rset.updateInt("photo", (photo == null) ? 0 : photo.getId().asInt());
-        rset.updateLong("creation_time", createdOn);
-
-        rset.updateString("flagger", flagger);
-        rset.updateInt("reason", reason.asInt());
-        rset.updateString("explanation", explanation);
-
-        rset.updateBoolean("was_decided", wasDecided);
-        rset.updateLong("decision_time", decidedOn);
-    }
-
-    /**
-     *
-     */
-    public void writeId(PreparedStatement stmt, int pos) throws SQLException {
-        stmt.setInt(pos, id.asInt());
     }
 
     /**
