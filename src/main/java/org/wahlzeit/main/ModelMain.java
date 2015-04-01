@@ -33,7 +33,6 @@ import org.wahlzeit.model.UserManager;
 import org.wahlzeit.services.ConfigDir;
 import org.wahlzeit.services.DatabaseConnection;
 import org.wahlzeit.services.FileUtil;
-import org.wahlzeit.services.ObjectManager;
 import org.wahlzeit.services.OfyService;
 import org.wahlzeit.services.SessionManager;
 import org.wahlzeit.services.SysConfig;
@@ -43,11 +42,8 @@ import org.wahlzeit.servlets.AbstractServlet;
 import java.io.File;
 import java.io.FileFilter;
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -67,8 +63,7 @@ public abstract class ModelMain extends AbstractMain {
         super.startUp(rootDir);
 
         if (!hasGlobals()) {
-            tearDownDatabase();
-            setUpDatabase();
+            createDefaultGlobals();
         }
 
         loadGlobals();
@@ -79,12 +74,20 @@ public abstract class ModelMain extends AbstractMain {
     /**
      *
      */
-    protected boolean hasGlobals() throws SQLException {
-        DatabaseConnection dbc = mainSession.ensureDatabaseConnection();
-        Connection conn = dbc.getRdbmsConnection();
-        DatabaseMetaData dbm = conn.getMetaData();
-        ResultSet tables = dbm.getTables(null, null, "globals", null);
-        return tables.next();
+    protected boolean hasGlobals() {
+        return OfyService.ofy().load().type(Globals.class).filterKey(Globals.DEAULT_ID).first().now() != null;
+    }
+
+    /**
+     *
+     */
+    protected void createDefaultGlobals() {
+        Globals globals = new Globals();
+        globals.setLastUserId(1);
+        globals.setLastPhotoId(0);
+        globals.setLastCaseId(0);
+        globals.setLastSessionId(0);
+        OfyService.ofy().save().entity(globals).now();
     }
 
     /**
@@ -94,20 +97,6 @@ public abstract class ModelMain extends AbstractMain {
         saveAll();
 
         super.shutDown();
-    }
-
-    /**
-     *
-     */
-    public void setUpDatabase() throws SQLException {
-        runScript("CreateTables.sql");
-    }
-
-    /**
-     *
-     */
-    public void tearDownDatabase() throws SQLException {
-        runScript("DropTables.sql");
     }
 
     /**
@@ -140,46 +129,46 @@ public abstract class ModelMain extends AbstractMain {
      */
     public void loadGlobals() throws SQLException {
         Globals globals = OfyService.ofy().load().type(Globals.class).filterKey(Globals.DEAULT_ID).first().now();
-        log.log(Level.FINE, "Load globals  with ID " + Globals.DEAULT_ID + " from datastore.");
+        log.info("Load globals  with ID " + Globals.DEAULT_ID + " from datastore.");
 
         int lastUserId = globals.getLastUserId();
         User.setLastUserId(lastUserId);
-        log.log(Level.FINE, "loaded global variable lastUserId: " + lastUserId);
+        log.info("loaded global variable lastUserId: " + lastUserId);
 
         int lastPhotoId = globals.getLastPhotoId();
         PhotoId.setCurrentIdFromInt(lastPhotoId);
-        log.log(Level.FINE, "loaded global variable lastPhotoId: " + lastPhotoId);
+        log.info("loaded global variable lastPhotoId: " + lastPhotoId);
 
         int lastCaseId = globals.getLastCaseId();
         Case.setLastCaseId(new CaseId(lastCaseId));
-        log.log(Level.FINE, "loaded global variable lastCaseId: " + lastCaseId);
+        log.info("loaded global variable lastCaseId: " + lastCaseId);
 
         int lastSessionId = globals.getLastSessionId();
         AbstractServlet.setLastSessionId(lastSessionId);
-        log.log(Level.FINE, "loaded global variable lastSessionId: " + lastSessionId);
+        log.info("loaded global variable lastSessionId: " + lastSessionId);
     }
 
     /**
      *
      */
-    public synchronized void saveGlobals() throws SQLException {
+    public synchronized void saveGlobals() {
         Globals globals = new Globals();
 
         int lastUserId = User.getLastUserId();
         globals.setLastUserId(lastUserId);
-        log.log(Level.FINE, "saved global variable lastUserId: " + lastUserId);
+        log.info("saved global variable lastUserId: " + lastUserId);
 
         int lastPhotoId = PhotoId.getCurrentIdAsInt();
         globals.setLastPhotoId(lastPhotoId);
-        log.log(Level.FINE, "saved global variable lastPhotoId: " + lastPhotoId);
+        log.info("saved global variable lastPhotoId: " + lastPhotoId);
 
         int lastCaseId = Case.getLastCaseId().asInt();
         globals.setLastCaseId(lastCaseId);
-        log.log(Level.FINE, "saved global variable lastCaseId: " + lastCaseId);
+        log.info("saved global variable lastCaseId: " + lastCaseId);
 
         int lastSessionId = AbstractServlet.getLastSessionId();
         globals.setLastSessionId(lastSessionId);
-        log.log(Level.FINE, "saved global variable lastSessionId: " + lastSessionId);
+        log.info("saved global variable lastSessionId: " + lastSessionId);
 
         OfyService.ofy().save().entity(globals).now();
     }
@@ -187,7 +176,7 @@ public abstract class ModelMain extends AbstractMain {
     /**
      *
      */
-    public void saveAll() throws SQLException {
+    public void saveAll() {
         PhotoCaseManager.getInstance().savePhotoCases();
         PhotoManager.getInstance().savePhotos();
         UserManager.getInstance().saveUsers();
