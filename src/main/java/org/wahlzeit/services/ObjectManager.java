@@ -23,7 +23,6 @@ package org.wahlzeit.services;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
@@ -104,7 +103,7 @@ public abstract class ObjectManager {
     /**
      *
      */
-    protected void updateDependents(Persistent obj) throws SQLException {
+    protected void updateDependents(Persistent obj) {
         // do nothing
         // TODO: check if necessary for photo
     }

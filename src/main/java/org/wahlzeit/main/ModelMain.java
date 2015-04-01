@@ -22,6 +22,7 @@ package org.wahlzeit.main;
 
 import org.wahlzeit.model.Case;
 import org.wahlzeit.model.CaseId;
+import org.wahlzeit.model.Globals;
 import org.wahlzeit.model.Photo;
 import org.wahlzeit.model.PhotoCaseManager;
 import org.wahlzeit.model.PhotoFactory;
@@ -32,6 +33,8 @@ import org.wahlzeit.model.UserManager;
 import org.wahlzeit.services.ConfigDir;
 import org.wahlzeit.services.DatabaseConnection;
 import org.wahlzeit.services.FileUtil;
+import org.wahlzeit.services.ObjectManager;
+import org.wahlzeit.services.OfyService;
 import org.wahlzeit.services.SessionManager;
 import org.wahlzeit.services.SysConfig;
 import org.wahlzeit.services.SysLog;
@@ -44,6 +47,8 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A single-threaded Main class with database connection.
@@ -52,6 +57,8 @@ import java.sql.Statement;
  * @author dirkriehle
  */
 public abstract class ModelMain extends AbstractMain {
+
+    private static final Logger log = Logger.getLogger(ModelMain.class.getName());
 
     /**
      *
@@ -132,65 +139,49 @@ public abstract class ModelMain extends AbstractMain {
      *
      */
     public void loadGlobals() throws SQLException {
-        DatabaseConnection dbc = mainSession.ensureDatabaseConnection();
-        Connection conn = dbc.getRdbmsConnection();
+        Globals globals = OfyService.ofy().load().type(Globals.class).filterKey(Globals.DEAULT_ID).first().now();
+        log.log(Level.FINE, "Load globals  with ID " + Globals.DEAULT_ID + " from datastore.");
 
-        String query = "SELECT * FROM globals";
-        SysLog.logQuery(query);
+        int lastUserId = globals.getLastUserId();
+        User.setLastUserId(lastUserId);
+        log.log(Level.FINE, "loaded global variable lastUserId: " + lastUserId);
 
-        Statement stmt = conn.createStatement();
-        ResultSet result = stmt.executeQuery(query);
-        if (result.next()) {
-            int lastUserId = result.getInt("last_user_id");
-            User.setLastUserId(lastUserId);
-            SysLog.logSysInfo("loaded global variable lastUserId: " + lastUserId);
-            int lastPhotoId = result.getInt("last_photo_id");
-            PhotoId.setCurrentIdFromInt(lastPhotoId);
-            SysLog.logSysInfo("loaded global variable lastPhotoId: " + lastPhotoId);
-            int lastCaseId = result.getInt("last_case_id");
-            Case.setLastCaseId(new CaseId(lastCaseId));
-            SysLog.logSysInfo("loaded global variable lastCaseId: " + lastCaseId);
-            int lastSessionId = result.getInt("last_session_id");
-            AbstractServlet.setLastSessionId(lastSessionId);
-            SysLog.logSysInfo("loaded global variable lastSessionId: " + lastSessionId);
-        } else {
-            SysLog.logSysError("Could not load globals!");
-        }
+        int lastPhotoId = globals.getLastPhotoId();
+        PhotoId.setCurrentIdFromInt(lastPhotoId);
+        log.log(Level.FINE, "loaded global variable lastPhotoId: " + lastPhotoId);
 
-        stmt.close();
+        int lastCaseId = globals.getLastCaseId();
+        Case.setLastCaseId(new CaseId(lastCaseId));
+        log.log(Level.FINE, "loaded global variable lastCaseId: " + lastCaseId);
+
+        int lastSessionId = globals.getLastSessionId();
+        AbstractServlet.setLastSessionId(lastSessionId);
+        log.log(Level.FINE, "loaded global variable lastSessionId: " + lastSessionId);
     }
 
     /**
      *
      */
     public synchronized void saveGlobals() throws SQLException {
-        DatabaseConnection dbc = SessionManager.getDatabaseConnection();
-        Connection conn = dbc.getRdbmsConnection();
+        Globals globals = new Globals();
 
-        String query = "SELECT * FROM globals";
-        SysLog.logQuery(query);
+        int lastUserId = User.getLastUserId();
+        globals.setLastUserId(lastUserId);
+        log.log(Level.FINE, "saved global variable lastUserId: " + lastUserId);
 
-        Statement stmt = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
-        ResultSet rset = stmt.executeQuery(query);
-        if (rset.next()) {
-            int lastUserId = User.getLastUserId();
-            rset.updateInt("last_user_id", lastUserId);
-            SysLog.logSysInfo("saved global variable lastUserId: " + lastUserId);
-            int lastPhotoId = PhotoId.getCurrentIdAsInt();
-            rset.updateInt("last_photo_id", lastPhotoId);
-            SysLog.logSysInfo("saved global variable lastPhotoId: " + lastPhotoId);
-            int lastCaseId = Case.getLastCaseId().asInt();
-            rset.updateInt("last_case_id", lastCaseId);
-            SysLog.logSysInfo("saved global variable lastCaseId: " + lastCaseId);
-            int lastSessionId = AbstractServlet.getLastSessionId();
-            rset.updateInt("last_session_id", lastSessionId);
-            SysLog.logSysInfo("saved global variable lastSessionId: " + lastSessionId);
-            rset.updateRow();
-        } else {
-            SysLog.logSysError("Could not save globals!");
-        }
+        int lastPhotoId = PhotoId.getCurrentIdAsInt();
+        globals.setLastPhotoId(lastPhotoId);
+        log.log(Level.FINE, "saved global variable lastPhotoId: " + lastPhotoId);
 
-        stmt.close();
+        int lastCaseId = Case.getLastCaseId().asInt();
+        globals.setLastCaseId(lastCaseId);
+        log.log(Level.FINE, "saved global variable lastCaseId: " + lastCaseId);
+
+        int lastSessionId = AbstractServlet.getLastSessionId();
+        globals.setLastSessionId(lastSessionId);
+        log.log(Level.FINE, "saved global variable lastSessionId: " + lastSessionId);
+
+        OfyService.ofy().save().entity(globals).now();
     }
 
     /**

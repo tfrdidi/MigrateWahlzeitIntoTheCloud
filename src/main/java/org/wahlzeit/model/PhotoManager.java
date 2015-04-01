@@ -259,7 +259,7 @@ public class PhotoManager extends ObjectManager {
      *  Removes all tags of the Photo (obj) in the datastore that have been removed by the user
      *  and adds all new tags of the photo to the datastore.
      */
-    protected void updateDependents(Persistent obj) throws SQLException {
+    protected void updateDependents(Persistent obj)  {
         Photo photo = (Photo) obj;
 
         // delete all existing tags, for the case that some have been removed
