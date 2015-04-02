@@ -20,8 +20,6 @@
 
 package org.wahlzeit.services;
 
-import java.sql.Statement;
-
 /**
  * Logging class for logging system-level messages.
  * System-level log entries are the result of system services and activities.
