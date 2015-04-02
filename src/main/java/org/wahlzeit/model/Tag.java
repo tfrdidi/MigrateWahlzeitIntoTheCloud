@@ -15,9 +15,9 @@ public class Tag {
 
     @Id private Long id;
     @Index private String text;
-    @Index private Long photoId;
+    @Index private PhotoId photoId;
 
-    public Tag(String text, Long photoId) {
+    public Tag(String text, PhotoId photoId) {
         this.text = text;
         this.photoId = photoId;
     }
@@ -26,7 +26,7 @@ public class Tag {
         return text;
     }
 
-    public Long getPhotoId() {
+    public PhotoId getPhotoId() {
         return photoId;
     }
 }

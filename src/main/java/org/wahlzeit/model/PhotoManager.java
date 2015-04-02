@@ -50,7 +50,7 @@ public class PhotoManager extends ObjectManager {
     /**
      * In-memory cache for photos
      */
-    protected Map<Long, Photo> photoCache = new HashMap<Long, Photo>();
+    protected Map<PhotoId, Photo> photoCache = new HashMap<PhotoId, Photo>();
 
     /**
      *
@@ -68,7 +68,7 @@ public class PhotoManager extends ObjectManager {
      *
      */
     public static final boolean hasPhoto(String id) {
-        return hasPhoto(Long.valueOf(id));
+        return hasPhoto(PhotoId.getIdFromString(id));
     }
 
     /**
@@ -82,7 +82,7 @@ public class PhotoManager extends ObjectManager {
      *
      */
     public static final Photo getPhoto(String id) {
-        return getPhoto(Long.valueOf(id));
+        return getPhoto(PhotoId.getIdFromString(id));
     }
 
     /**
@@ -103,7 +103,7 @@ public class PhotoManager extends ObjectManager {
      * @methodtype boolean-query
      * @methodproperties primitive
      */
-    protected boolean doHasPhoto(Long id) {
+    protected boolean doHasPhoto(PhotoId id) {
         return photoCache.containsKey(id);
     }
 
@@ -207,7 +207,7 @@ public class PhotoManager extends ObjectManager {
         Photo result = getPhotoFromFilter(filter);
 
         if (result == null) {
-            List<Long> list = getFilteredPhotoIds(filter);
+            List<PhotoId> list = getFilteredPhotoIds(filter);
             filter.setDisplayablePhotoIds(list);
             result = getPhotoFromFilter(filter);
         }
@@ -219,7 +219,7 @@ public class PhotoManager extends ObjectManager {
      *
      */
     protected Photo getPhotoFromFilter(PhotoFilter filter) {
-        Long id = filter.getRandomDisplayablePhotoId();
+        PhotoId id = filter.getRandomDisplayablePhotoId();
         Photo result = getPhotoFromId(id);
         while ((result != null) && !result.isVisible()) {
             id = filter.getRandomDisplayablePhotoId();
@@ -235,7 +235,7 @@ public class PhotoManager extends ObjectManager {
     /**
      *
      */
-    protected List<Long> getFilteredPhotoIds(PhotoFilter filter) {
+    protected List<PhotoId> getFilteredPhotoIds(PhotoFilter filter) {
         // get all tags that match the filter conditions
         List<Tag> tags = new LinkedList<Tag>();
         for(String condition : filter.getFilterConditions()) {
@@ -243,7 +243,7 @@ public class PhotoManager extends ObjectManager {
         }
 
         // get the list of all photo ids that correspond to the tags
-        List<Long> result = new LinkedList<Long>();
+        List<PhotoId> result = new LinkedList<PhotoId>();
         for(Tag tag : tags) {
             result.add(tag.getPhotoId());
         }

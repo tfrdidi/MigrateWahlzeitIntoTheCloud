@@ -49,8 +49,8 @@ public class PhotoFilter implements Serializable {
     /**
      *
      */
-    protected List<Long> displayablePhotoIds = Collections.EMPTY_LIST;
-    protected List<Long> processedPhotoIds = new LinkedList<Long>();
+    protected List<PhotoId> displayablePhotoIds = Collections.EMPTY_LIST;
+    protected List<PhotoId> processedPhotoIds = new LinkedList<PhotoId>();
 
     /**
      *
@@ -132,7 +132,7 @@ public class PhotoFilter implements Serializable {
     /**
      *
      */
-    public Long getRandomDisplayablePhotoId() {
+    public PhotoId getRandomDisplayablePhotoId() {
         if (!displayablePhotoIds.isEmpty()) {
             int size = displayablePhotoIds.size();
             int index = ((randomNumber.nextInt() % size) + size) / 2;
@@ -145,14 +145,14 @@ public class PhotoFilter implements Serializable {
     /**
      *
      */
-    public List<Long> getDisplayablePhotoIds() {
+    public List<PhotoId> getDisplayablePhotoIds() {
         return displayablePhotoIds;
     }
 
     /**
      *
      */
-    public void setDisplayablePhotoIds(List<Long> newPhotoIds) {
+    public void setDisplayablePhotoIds(List<PhotoId> newPhotoIds) {
         displayablePhotoIds = newPhotoIds;
     }
 
@@ -166,7 +166,7 @@ public class PhotoFilter implements Serializable {
     /**
      *
      */
-    public List<Long> getProcessedPhotoIds() {
+    public List<PhotoId> getProcessedPhotoIds() {
         return processedPhotoIds;
     }
 
