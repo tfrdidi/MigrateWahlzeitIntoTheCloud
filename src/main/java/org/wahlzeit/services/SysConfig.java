@@ -30,14 +30,6 @@ import java.io.File;
 public class SysConfig extends AbstractConfig {
 
     /**
-     * Database driver definitions
-     */
-    public static final String DB_DRIVER = "DB_DRIVER";
-    public static final String DB_CONNECTION = "DB_CONNECTION";
-    public static final String DB_USER = "DB_USER";
-    public static final String DB_PASSWORD = "DB_PASSWORD";
-
-    /**
      *
      */
     protected static SysConfig instance = null;
@@ -124,12 +116,6 @@ public class SysConfig extends AbstractConfig {
         photosDir = new Directory(rootDir, "data" + File.separator + "photos");
         backupDir = new Directory(rootDir, "data" + File.separator + "backup");
         tempDir = new Directory(rootDir, "data" + File.separator + "temp");
-
-        // Database connection
-        doSetValue(SysConfig.DB_DRIVER, "org.postgresql.Driver");
-        doSetValue(SysConfig.DB_CONNECTION, "jdbc:postgresql://localhost:5432/wahlzeit");
-        doSetValue(SysConfig.DB_USER, "wahlzeit");
-        doSetValue(SysConfig.DB_PASSWORD, "wahlzeit");
     }
 
     /**
@@ -180,33 +166,4 @@ public class SysConfig extends AbstractConfig {
     public static Directory getTempDir() {
         return getInstance().tempDir;
     }
-
-    /**
-     *
-     */
-    public static String getDbDriverAsString() {
-        return getInstance().getValue(SysConfig.DB_DRIVER);
-    }
-
-    /**
-     *
-     */
-    public static String getDbConnectionAsString() {
-        return getInstance().getValue(SysConfig.DB_CONNECTION);
-    }
-
-    /**
-     *
-     */
-    public static String getDbUserAsString() {
-        return getInstance().getValue(SysConfig.DB_USER);
-    }
-
-    /**
-     *
-     */
-    public static String getDbPasswordAsString() {
-        return getInstance().getValue(SysConfig.DB_PASSWORD);
-    }
-
 }

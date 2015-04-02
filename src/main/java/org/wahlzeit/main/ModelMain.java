@@ -127,7 +127,7 @@ public abstract class ModelMain extends AbstractMain {
     /**
      *
      */
-    public void loadGlobals() throws SQLException {
+    public void loadGlobals() {
         Globals globals = OfyService.ofy().load().type(Globals.class).filterKey(Globals.DEAULT_ID).first().now();
         log.info("Load globals  with ID " + Globals.DEAULT_ID + " from datastore.");
 
