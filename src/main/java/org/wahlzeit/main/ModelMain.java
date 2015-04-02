@@ -30,20 +30,11 @@ import org.wahlzeit.model.PhotoId;
 import org.wahlzeit.model.PhotoManager;
 import org.wahlzeit.model.User;
 import org.wahlzeit.model.UserManager;
-import org.wahlzeit.services.ConfigDir;
-import org.wahlzeit.services.DatabaseConnection;
-import org.wahlzeit.services.FileUtil;
 import org.wahlzeit.services.OfyService;
-import org.wahlzeit.services.SessionManager;
-import org.wahlzeit.services.SysConfig;
-import org.wahlzeit.services.SysLog;
 import org.wahlzeit.servlets.AbstractServlet;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.logging.Logger;
 
 /**
@@ -183,36 +174,4 @@ public abstract class ModelMain extends AbstractMain {
 
         saveGlobals();
     }
-
-    /**
-     *
-     */
-    protected void runScript(String scriptName) throws SQLException {
-        DatabaseConnection dbc = SessionManager.getDatabaseConnection();
-        Connection conn = dbc.getRdbmsConnection();
-
-        ConfigDir scriptsDir = SysConfig.getScriptsDir();
-
-        if (scriptsDir.hasDefaultFile(scriptName)) {
-            String defaultScriptFileName = scriptsDir.getAbsoluteDefaultConfigFileName(scriptName);
-            runScript(conn, defaultScriptFileName);
-        }
-
-        if (scriptsDir.hasCustomFile(scriptName)) {
-            String customConfigFileName = scriptsDir.getAbsoluteCustomConfigFileName(scriptName);
-            runScript(conn, customConfigFileName);
-        }
-    }
-
-    /**
-     *
-     */
-    protected void runScript(Connection conn, String fullFileName) throws SQLException {
-        String query = FileUtil.safelyReadFileAsString(fullFileName);
-        SysLog.logQuery(query);
-
-        Statement stmt = conn.createStatement();
-        stmt.execute(query);
-    }
-
 }

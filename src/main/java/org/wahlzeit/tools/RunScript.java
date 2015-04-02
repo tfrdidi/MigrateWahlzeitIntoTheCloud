@@ -48,11 +48,4 @@ public class RunScript extends ScriptMain {
         return i;
     }
 
-    /**
-     *
-     */
-    protected void execute() throws Exception {
-        runScript(scriptName);
-    }
-
 }

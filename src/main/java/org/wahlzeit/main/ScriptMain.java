@@ -66,9 +66,4 @@ public abstract class ScriptMain extends ModelMain {
         // do nothing
         return 0;
     }
-
-    /**
-     *
-     */
-    abstract protected void execute() throws Exception;
 }
