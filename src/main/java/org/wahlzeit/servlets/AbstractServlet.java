@@ -84,7 +84,6 @@ public abstract class AbstractServlet extends HttpServlet {
             displayNullPage(request, response);
         } else {
             myGet(request, response);
-            us.returnDatabaseConnection();
         }
 
         SessionManager.dropThreadLocalSession();
@@ -108,7 +107,6 @@ public abstract class AbstractServlet extends HttpServlet {
             displayNullPage(request, response);
         } else {
             myPost(request, response);
-            us.returnDatabaseConnection();
         }
 
         SessionManager.dropThreadLocalSession();
