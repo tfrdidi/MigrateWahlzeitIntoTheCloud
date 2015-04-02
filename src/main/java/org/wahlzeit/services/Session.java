@@ -34,10 +34,6 @@ public class Session {
      */
     protected String name = null;
 
-    /**
-     * Database stuff
-     */
-    protected DatabaseConnection databaseConnection = null;
 
     /**
      * processing time for requests
@@ -61,44 +57,8 @@ public class Session {
     /**
      *
      */
-    protected void finalize() throws Throwable {
-        try {
-            returnDatabaseConnection();
-        } finally {
-            super.finalize();
-        }
-    }
-
-    /**
-     *
-     */
     public String getName() {
         return name;
-    }
-
-    /**
-     *
-     */
-    public DatabaseConnection ensureDatabaseConnection() {
-        if (databaseConnection == null) {
-            try {
-                databaseConnection = DatabaseConnection.ensureDatabaseConnection();
-            } catch (Throwable t) {
-                SysLog.logThrowable(t);
-            }
-        }
-
-        return databaseConnection;
-    }
-
-    /**
-     *
-     */
-    public void returnDatabaseConnection() {
-        if (databaseConnection != null) {
-            DatabaseConnection.returnDatabaseConnection(databaseConnection);
-            databaseConnection = null;
-        }
     }
 
     /**

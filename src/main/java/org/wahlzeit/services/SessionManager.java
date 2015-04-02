@@ -54,11 +54,4 @@ public class SessionManager {
         setThreadLocalSession(null);
     }
 
-    /**
-     *
-     */
-    public static DatabaseConnection getDatabaseConnection() {
-        return getThreadLocalSession().ensureDatabaseConnection();
-    }
-
 }

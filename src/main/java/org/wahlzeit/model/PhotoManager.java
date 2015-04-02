@@ -26,7 +26,6 @@ import org.wahlzeit.services.Persistent;
 import org.wahlzeit.services.SysLog;
 
 import java.io.File;
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
