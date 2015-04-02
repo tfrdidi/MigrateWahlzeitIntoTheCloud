@@ -22,7 +22,6 @@ package org.wahlzeit.services;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.logging.Logger;
@@ -150,13 +149,6 @@ public class Log {
         StringWriter sw = new StringWriter();
         t.printStackTrace(new PrintWriter(sw));
         addField(sb, "stacktrace", sw.toString());
-    }
-
-    /**
-     *
-     */
-    public static final void addQuery(StringBuffer sb, Statement q) {
-        addField(sb, "query", q.toString());
     }
 
     /**

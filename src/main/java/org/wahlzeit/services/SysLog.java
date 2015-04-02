@@ -68,16 +68,6 @@ public class SysLog extends Log {
     /**
      *
      */
-    public static final void logQuery(Statement q) {
-        StringBuffer sb = createSysLogEntry();
-        addLogType(sb, "info");
-        addQuery(sb, q);
-        log(sb);
-    }
-
-    /**
-     *
-     */
     public static final void logQuery(String s) {
         StringBuffer sb = createSysLogEntry();
         addLogType(sb, "info");
