@@ -23,6 +23,7 @@ package org.wahlzeit.services;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,7 +35,7 @@ import java.util.Properties;
  *
  * @author dirkriehle
  */
-public abstract class AbstractConfig implements Configuration {
+public abstract class AbstractConfig implements Configuration, Serializable {
 
     /**
      *

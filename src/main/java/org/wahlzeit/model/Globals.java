@@ -13,6 +13,7 @@ import sun.org.mozilla.javascript.tools.shell.Global;
 @Entity
 public class Globals {
 
+    public static final String ID = "id";
     public static final Long DEAULT_ID = 1L;
 
     @Id private Long id;

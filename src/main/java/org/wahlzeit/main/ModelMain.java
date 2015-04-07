@@ -66,7 +66,7 @@ public abstract class ModelMain extends AbstractMain {
      *
      */
     protected boolean hasGlobals() {
-        return OfyService.ofy().load().type(Globals.class).filterKey(Globals.DEAULT_ID).first().now() != null;
+        return OfyService.ofy().load().type(Globals.class).first().now() != null;
     }
 
     /**
@@ -119,7 +119,7 @@ public abstract class ModelMain extends AbstractMain {
      *
      */
     public void loadGlobals() {
-        Globals globals = OfyService.ofy().load().type(Globals.class).filterKey(Globals.DEAULT_ID).first().now();
+        Globals globals = OfyService.ofy().load().type(Globals.class).id(Globals.DEAULT_ID).now();
         log.info("Load globals  with ID " + Globals.DEAULT_ID + " from datastore.");
 
         int lastUserId = globals.getLastUserId();
@@ -161,6 +161,8 @@ public abstract class ModelMain extends AbstractMain {
         globals.setLastSessionId(lastSessionId);
         log.info("saved global variable lastSessionId: " + lastSessionId);
 
+        // make sure only one globals object exists
+        OfyService.ofy().delete().type(Globals.class);
         OfyService.ofy().save().entity(globals).now();
     }
 
