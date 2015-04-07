@@ -2,7 +2,7 @@ apply plugin: 'war'
 apply plugin: 'appengine'
 
 def appEmail = "tfr.didi@gmail.com"
-def appengineVersion = "1.9.17"
+def appengineVersion = "1.9.18"
 
 buildscript {
     repositories {
@@ -10,7 +10,7 @@ buildscript {
     }
 
     dependencies {
-        classpath "com.google.appengine:gradle-appengine-plugin:1.9.17"
+        classpath "com.google.appengine:gradle-appengine-plugin:1.9.18"
     }
 }
 
@@ -20,10 +20,10 @@ repositories {
 
 dependencies {
     appengineSdk "com.google.appengine:appengine-java-sdk:${appengineVersion}"
-    compile "javax.servlet:javax.servlet-api:3.0.1"
-    compile "com.googlecode.objectify:objectify:5.0.3"
     compile "com.google.appengine:appengine-api-1.0-sdk:${appengineVersion}"
+    compile "javax.servlet:javax.servlet-api:3.0.1"
     compile "org.apache.tomcat:tomcat-catalina:8.0.18"
+    compile "com.googlecode.objectify:objectify:5.1.5"
 }
 
 appengine {

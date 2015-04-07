@@ -2,7 +2,6 @@ package org.wahlzeit.model;
 
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
-import sun.org.mozilla.javascript.tools.shell.Global;
 
 /**
  * Class that combines all global wahlzeit variables that need to be stored

@@ -20,6 +20,8 @@
 
 package org.wahlzeit.main;
 
+import com.googlecode.objectify.ObjectifyService;
+import com.googlecode.objectify.Work;
 import org.wahlzeit.model.Case;
 import org.wahlzeit.model.CaseId;
 import org.wahlzeit.model.Globals;
@@ -66,19 +68,30 @@ public abstract class ModelMain extends AbstractMain {
      *
      */
     protected boolean hasGlobals() {
-        return OfyService.ofy().load().type(Globals.class).first().now() != null;
+        return ObjectifyService.run(new Work<Boolean>() {
+            @Override
+            public Boolean run() {
+                return OfyService.ofy().load().type(Globals.class).first().now() != null;
+            }
+        });
     }
 
     /**
      *
      */
     protected void createDefaultGlobals() {
-        Globals globals = new Globals();
-        globals.setLastUserId(1);
-        globals.setLastPhotoId(0);
-        globals.setLastCaseId(0);
-        globals.setLastSessionId(0);
-        OfyService.ofy().save().entity(globals).now();
+        ObjectifyService.run(new Work<Boolean>() {
+            @Override
+            public Boolean run() {
+                Globals globals = new Globals();
+                globals.setLastUserId(1);
+                globals.setLastPhotoId(0);
+                globals.setLastCaseId(0);
+                globals.setLastSessionId(0);
+                OfyService.ofy().save().entity(globals).now();
+                return null;
+            }
+        });
     }
 
     /**
@@ -119,7 +132,12 @@ public abstract class ModelMain extends AbstractMain {
      *
      */
     public void loadGlobals() {
-        Globals globals = OfyService.ofy().load().type(Globals.class).id(Globals.DEAULT_ID).now();
+        Globals globals = ObjectifyService.run(new Work<Globals>() {
+            @Override
+            public Globals run() {
+                return OfyService.ofy().load().type(Globals.class).id(Globals.DEAULT_ID).now();
+            }
+        });
         log.info("Load globals  with ID " + Globals.DEAULT_ID + " from datastore.");
 
         int lastUserId = globals.getLastUserId();

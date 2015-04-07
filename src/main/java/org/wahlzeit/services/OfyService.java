@@ -4,7 +4,6 @@ import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
 import org.wahlzeit.model.Administrator;
-import org.wahlzeit.model.Client;
 import org.wahlzeit.model.Globals;
 import org.wahlzeit.model.Moderator;
 import org.wahlzeit.model.Photo;

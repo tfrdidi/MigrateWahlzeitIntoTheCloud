@@ -3,6 +3,7 @@
 /web/data/photos
 /web/WEB-INF/classes
 /lib
+/src/main/webapp/WEB-INF/lib/
 .gradle
 .idea
 *.iml
