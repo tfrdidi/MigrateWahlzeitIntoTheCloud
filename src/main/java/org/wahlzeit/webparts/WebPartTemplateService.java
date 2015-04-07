@@ -20,14 +20,18 @@
 
 package org.wahlzeit.webparts;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.Files;
+import com.google.common.io.Resources;
 import org.wahlzeit.services.ConfigDir;
 import org.wahlzeit.services.SysLog;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The WebPartTemplateService creates WebPartTemplates upon request by reading them from disk.
@@ -37,6 +41,8 @@ import java.util.Map;
  * @author dirkriehle
  */
 public class WebPartTemplateService {
+
+    private static final Logger log = Logger.getLogger(WebPartTemplateService.class.getName());
 
     /**
      *
@@ -106,30 +112,22 @@ public class WebPartTemplateService {
     protected void loadTemplate(String shortName) throws IOException {
         WebPartTemplate template = new WebPartTemplate(shortName);
         String fileName = getTemplatesDir().getAbsoluteConfigFileName(shortName + ".html");
-        File file = new File(fileName);
         SysLog.logSysInfo("file name", fileName, "opened HTML template file");
+        File file = new File(fileName);
 
-        FileReader reader = null;
         try {
-            reader = new FileReader(file);
+            String source = Files.toString(file, Charsets.UTF_8);
+            //String source = Resources.toString(Resources.getResource(fileName), Charsets.UTF_8);
 
-            // @FIXME: Assumes files are always < 50000 bytes
-            char[] readBuffer = new char[50000];
-            int status = reader.read(readBuffer);
-
-            SysLog.logSysInfo("file size", Integer.toString(status), "read HTML template file");
-
-            if (status != -1) {
-                String source = new String(readBuffer, 0, status);
+            if(source != null) {
                 template.initialize(source);
                 SysLog.logCreatedObject("WebPartTmpl", shortName);
             }
 
             templates.put(shortName, template);
-        } finally {
-            if (reader != null) {
-                reader.close();
-            }
+        }
+        catch (IOException e) {
+            log.log(Level.SEVERE, "I/O Error while reading Template file '" + fileName + "'", e);
         }
     }
 
