@@ -77,6 +77,9 @@ public abstract class AbstractServlet extends HttpServlet {
      *
      */
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
+
         UserSession us = ensureUserSession(request);
         SessionManager.setThreadLocalSession(us);
 
@@ -100,6 +103,9 @@ public abstract class AbstractServlet extends HttpServlet {
      *
      */
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
+
         UserSession us = ensureUserSession(request);
         SessionManager.setThreadLocalSession(us);
 
