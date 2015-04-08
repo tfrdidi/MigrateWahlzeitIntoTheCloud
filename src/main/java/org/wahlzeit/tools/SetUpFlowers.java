@@ -21,6 +21,7 @@
 package org.wahlzeit.tools;
 
 import org.wahlzeit.main.ScriptMain;
+import org.wahlzeit.model.GlobalsManager;
 import org.wahlzeit.services.SysConfig;
 
 import java.io.File;
@@ -44,7 +45,7 @@ public class SetUpFlowers extends ScriptMain {
      */
     public void startUp(String rootDir) throws Exception {
         super.startUp(rootDir);
-        loadGlobals();
+        GlobalsManager.getInstance().loadGlobals();
     }
 
     /**

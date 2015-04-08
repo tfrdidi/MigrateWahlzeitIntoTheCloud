@@ -144,7 +144,7 @@ public class PhotoManager extends ObjectManager {
         doAddPhoto(photo);
 
         writeObject(photo);
-        ServiceMain.getInstance().saveGlobals();
+        GlobalsManager.getInstance().saveGlobals();
     }
 
     /**

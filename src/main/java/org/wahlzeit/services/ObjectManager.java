@@ -43,9 +43,9 @@ public abstract class ObjectManager {
     /**
      *  Finds the first Entity with the given key
      */
-    protected <E> E readObject(Class<E> type, Long key) {
-        log.log(Level.FINE, "Load Type " + type.toString() + " with ID " + key + " from datastore.");
-        return OfyService.ofy().load().type(type).ancestor(applicationRootKey).filterKey(key).first().now();
+    protected <E> E readObject(Class<E> type, Long id) {
+        log.log(Level.FINE, "Load Type " + type.toString() + " with ID " + id + " from datastore.");
+        return OfyService.ofy().load().type(type).id(id).now();
     }
 
     /**
