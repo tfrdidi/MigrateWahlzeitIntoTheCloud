@@ -56,4 +56,15 @@ public class Globals {
     public void setLastSessionId(int lastSessionId) {
         this.lastSessionId = lastSessionId;
     }
+
+    public String asString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("Globals with ID ").append(id);
+        builder.append(" and the following parameters: ");
+        builder.append("last user ID: ").append(lastUserId);
+        builder.append(", last case ID: ").append(lastCaseId);
+        builder.append(", last photo ID: ").append(lastPhotoId);
+        builder.append(", and last session ID: ").append(lastSessionId);
+        return builder.toString();
+    }
 }
