@@ -32,7 +32,7 @@ import org.wahlzeit.model.PhotoId;
 import org.wahlzeit.model.PhotoManager;
 import org.wahlzeit.model.User;
 import org.wahlzeit.model.UserManager;
-import org.wahlzeit.services.OfyService;
+import static org.wahlzeit.services.OfyService.ofy;
 import org.wahlzeit.servlets.AbstractServlet;
 
 import java.io.File;
@@ -71,7 +71,7 @@ public abstract class ModelMain extends AbstractMain {
         return ObjectifyService.run(new Work<Boolean>() {
             @Override
             public Boolean run() {
-                return OfyService.ofy().load().type(Globals.class).first().now() != null;
+                return ofy().load().type(Globals.class).first().now() != null;
             }
         });
     }
@@ -88,7 +88,7 @@ public abstract class ModelMain extends AbstractMain {
                 globals.setLastPhotoId(0);
                 globals.setLastCaseId(0);
                 globals.setLastSessionId(0);
-                OfyService.ofy().save().entity(globals).now();
+                ofy().save().entity(globals).now();
                 return null;
             }
         });
@@ -135,7 +135,7 @@ public abstract class ModelMain extends AbstractMain {
         Globals globals = ObjectifyService.run(new Work<Globals>() {
             @Override
             public Globals run() {
-                return OfyService.ofy().load().type(Globals.class).id(Globals.DEAULT_ID).now();
+                return ofy().load().type(Globals.class).id(Globals.DEAULT_ID).now();
             }
         });
         log.info("Load globals  with ID " + Globals.DEAULT_ID + " from datastore.");
@@ -180,8 +180,8 @@ public abstract class ModelMain extends AbstractMain {
         log.info("saved global variable lastSessionId: " + lastSessionId);
 
         // make sure only one globals object exists
-        OfyService.ofy().delete().type(Globals.class);
-        OfyService.ofy().save().entity(globals).now();
+        ofy().delete().type(Globals.class);
+        ofy().save().entity(globals).now();
     }
 
     /**
