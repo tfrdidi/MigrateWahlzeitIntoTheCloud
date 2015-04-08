@@ -18,7 +18,7 @@ public class Globals {
     @Id private Long id;
 
     private int lastPhotoId;
-    private int lastUserId;
+    private Long lastUserId;
     private int lastSessionId;
     private int lastCaseId;
 
@@ -26,7 +26,7 @@ public class Globals {
         id = DEAULT_ID;
     }
 
-    public int getLastUserId() {
+    public Long getLastUserId() {
         return lastUserId;
     }
 
@@ -45,7 +45,7 @@ public class Globals {
         this.lastPhotoId = lastPhotoId;
     }
 
-    public void setLastUserId(int lastUserId) {
+    public void setLastUserId(Long lastUserId) {
         this.lastUserId = lastUserId;
     }
 

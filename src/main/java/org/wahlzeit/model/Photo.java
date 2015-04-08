@@ -78,7 +78,7 @@ public class Photo extends DataObject {
     /**
      *
      */
-    protected int ownerId = 0;
+    protected Long ownerId = 0L;
     @Index protected String ownerName;
 
     /**
@@ -151,14 +151,14 @@ public class Photo extends DataObject {
     /**
      * @methodtype get
      */
-    public int getOwnerId() {
+    public Long getOwnerId() {
         return ownerId;
     }
 
     /**
      * @methodtype set
      */
-    public void setOwnerId(int newId) {
+    public void setOwnerId(Long newId) {
         ownerId = newId;
         incWriteCount();
     }

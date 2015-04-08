@@ -84,7 +84,7 @@ public abstract class ModelMain extends AbstractMain {
             @Override
             public Boolean run() {
                 Globals globals = new Globals();
-                globals.setLastUserId(1);
+                globals.setLastUserId(Globals.DEAULT_ID);
                 globals.setLastPhotoId(0);
                 globals.setLastCaseId(0);
                 globals.setLastSessionId(0);
@@ -140,7 +140,7 @@ public abstract class ModelMain extends AbstractMain {
         });
         log.info("Load globals  with ID " + Globals.DEAULT_ID + " from datastore.");
 
-        int lastUserId = globals.getLastUserId();
+        Long lastUserId = globals.getLastUserId();
         User.setLastUserId(lastUserId);
         log.info("loaded global variable lastUserId: " + lastUserId);
 
@@ -163,7 +163,7 @@ public abstract class ModelMain extends AbstractMain {
     public synchronized void saveGlobals() {
         Globals globals = new Globals();
 
-        int lastUserId = User.getLastUserId();
+        Long lastUserId = User.getLastUserId();
         globals.setLastUserId(lastUserId);
         log.info("saved global variable lastUserId: " + lastUserId);
 

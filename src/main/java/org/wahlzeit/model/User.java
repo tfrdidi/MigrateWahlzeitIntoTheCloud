@@ -72,26 +72,26 @@ public class User extends Client implements Persistent {
     /**
      * 0 is never returned, first value is 1
      */
-    protected static int lastUserId = 0;
+    protected static Long lastUserId = 0L;
 
     /**
      *
      */
-    public static int getLastUserId() {
+    public static Long getLastUserId() {
         return lastUserId;
     }
 
     /**
      *
      */
-    public static synchronized void setLastUserId(int newId) {
+    public static synchronized void setLastUserId(Long newId) {
         lastUserId = newId;
     }
 
     /**
      *
      */
-    public static synchronized int getNextUserId() {
+    public static synchronized Long getNextUserId() {
         return ++lastUserId;
     }
 
@@ -103,7 +103,6 @@ public class User extends Client implements Persistent {
     /**
      *
      */
-    @Id protected int id;
     protected String name;
     @Index protected String nameAsTag;
     protected String password;
@@ -172,7 +171,7 @@ public class User extends Client implements Persistent {
     /**
      * @methodtype get
      */
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
