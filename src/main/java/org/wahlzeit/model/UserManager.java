@@ -20,6 +20,8 @@
 
 package org.wahlzeit.model;
 
+import com.googlecode.objectify.ObjectifyService;
+import com.googlecode.objectify.Work;
 import org.wahlzeit.services.EmailAddress;
 import org.wahlzeit.services.ObjectManager;
 import org.wahlzeit.services.SysLog;
@@ -33,6 +35,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.logging.Logger;
 
 /**
  * The UserManager provides access to and manages Users (including Moderators and Administrators).
@@ -55,7 +58,17 @@ public class UserManager extends ObjectManager {
     /**
      *
      */
+    /*private UserManager() {
+        assertAdminExists();
+    }*/
+
+    /**
+     *
+     */
     protected static UserManager instance = new UserManager();
+
+    private static final Long DEFAULT_ADMIN_ID = 1L;
+    private static final Logger log = Logger.getLogger(UserManager.class.getName());
 
     /**
      *
@@ -73,6 +86,26 @@ public class UserManager extends ObjectManager {
      *
      */
     protected Random codeGenerator = new Random(System.currentTimeMillis());
+
+    /**
+     * @methodtype assert
+     */
+    public void assertAdminExists() {
+        ObjectifyService.run(new Work<Void>() {
+            @Override
+            public Void run() {
+                if(readObject(Administrator.class, 1L) == null) {
+                    Administrator defaultAdministrator = new Administrator("admin", "admin", "root@localhost", 1);
+                    addUser(defaultAdministrator);
+                    log.info("No default Administrator exists. Created one.");
+                }
+                else {
+                    log.info("Default Administrator exists.");
+                }
+                return null;
+            }
+        });
+    }
 
     /**
      *

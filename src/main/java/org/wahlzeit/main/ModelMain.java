@@ -46,6 +46,7 @@ public abstract class ModelMain extends AbstractMain {
         super.startUp(rootDir);
 
         GlobalsManager.getInstance().loadGlobals();
+        UserManager.getInstance().assertAdminExists();
 
         PhotoFactory.initialize();
     }

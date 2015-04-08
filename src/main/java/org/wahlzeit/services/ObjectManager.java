@@ -44,7 +44,7 @@ public abstract class ObjectManager {
      *  Finds the first Entity with the given key
      */
     protected <E> E readObject(Class<E> type, Long id) {
-        log.log(Level.FINE, "Load Type " + type.toString() + " with ID " + id + " from datastore.");
+        log.info("Load Type " + type.toString() + " with ID " + id + " from datastore.");
         return OfyService.ofy().load().type(type).id(id).now();
     }
 
@@ -53,7 +53,7 @@ public abstract class ObjectManager {
      * e.g. readObject(User.class, "emailAddress", "name@provider.com").
      */
     protected <E> E readObject(Class<E> type, String parameterName, Object parameterValue) {
-        log.log(Level.FINE, "Load Type " + type.toString() + " with parameter " + parameterName + " == " + parameterValue + " from datastore.");
+        log.info("Load Type " + type.toString() + " with parameter " + parameterName + " == " + parameterValue + " from datastore.");
         return OfyService.ofy().load().type(type).ancestor(applicationRootKey).filter(parameterName, parameterValue).first().now();
     }
 
@@ -62,7 +62,7 @@ public abstract class ObjectManager {
      * e.g. readObject(User.class) to get a list of all users
      */
     protected <E> void readObjects(Collection<E> result, Class<E> type) {
-        log.log(Level.FINE, "Load all Entities of type " + type.toString() + " from datastore.");
+        log.info("Load all Entities of type " + type.toString() + " from datastore.");
         result.addAll(OfyService.ofy().load().type(type).ancestor(applicationRootKey).list());
     }
 
@@ -71,7 +71,7 @@ public abstract class ObjectManager {
      * e.g. readObject(User.class) to get a list of all users
      */
     protected <E> void readObjects(Collection<E> result, Class<E> type, String propertyName, Object value) {
-        log.log(Level.FINE, "Load all Entities of type " + type.toString() + " where parameter " + propertyName + " = " + value.toString() + " from datastore.");
+        log.info("Load all Entities of type " + type.toString() + " where parameter " + propertyName + " = " + value.toString() + " from datastore.");
         result.addAll(OfyService.ofy().load().type(type).ancestor(applicationRootKey).filter(propertyName, value).list());
     }
 
