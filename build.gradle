@@ -21,7 +21,7 @@ repositories {
 dependencies {
     appengineSdk "com.google.appengine:appengine-java-sdk:${appengineVersion}"
     compile "com.google.appengine:appengine-api-1.0-sdk:${appengineVersion}"
-    compile "javax.servlet:javax.servlet-api:3.0.1"
+    compile 'javax.servlet:servlet-api:2.5' // GAE works with 2.5
     compile "org.apache.tomcat:tomcat-catalina:8.0.18"
     compile "com.googlecode.objectify:objectify:5.1.5"
 }

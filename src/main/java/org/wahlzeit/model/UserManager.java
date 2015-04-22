@@ -95,7 +95,7 @@ public class UserManager extends ObjectManager {
             @Override
             public Void run() {
                 if(readObject(Administrator.class, 1L) == null) {
-                    Administrator defaultAdministrator = new Administrator("admin", "admin", "root@localhost", 1);
+                    Administrator defaultAdministrator = new Administrator("admin", "admin", "root@localhost", 0);
                     addUser(defaultAdministrator);
                     log.info("No default Administrator exists. Created one.");
                 }

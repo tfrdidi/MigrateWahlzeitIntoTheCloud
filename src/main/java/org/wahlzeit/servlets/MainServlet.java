@@ -26,26 +26,20 @@ import org.wahlzeit.handlers.WebPageHandler;
 import org.wahlzeit.handlers.WebPartHandlerManager;
 import org.wahlzeit.model.UserLog;
 import org.wahlzeit.model.UserSession;
-import org.wahlzeit.services.SysConfig;
 import org.wahlzeit.services.SysLog;
 import org.wahlzeit.webparts.WebPart;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Part;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 
 /**
  * @author dirkriehle
  */
-@MultipartConfig // Servlet 3.0 support for file upload
+//@MultipartConfig // Servlet 3.0 support for file upload
 public class MainServlet extends AbstractServlet {
 
     /**
@@ -126,19 +120,20 @@ public class MainServlet extends AbstractServlet {
      */
     protected Map getRequestArgs(HttpServletRequest request) throws IOException, ServletException {
         String contentType = request.getContentType();
-        if ((contentType != null) && contentType.startsWith("multipart/form-data")) {
-            return getMultiPartRequestArgs(request);
-        } else {
+        //if ((contentType != null) && contentType.startsWith("multipart/form-data")) {
+            log.info(contentType);
+        //}// else {
             return request.getParameterMap();
-        }
+        //}
     }
 
     /**
      *
-     */
+     *//*
     protected Map getMultiPartRequestArgs(HttpServletRequest request) throws IOException, ServletException {
         Map<String, String> result = new HashMap<String, String>();
 
+        request.get
         Collection<Part> parts = request.getParts();
         for (Iterator<Part> i = parts.iterator(); i.hasNext(); ) {
             Part part = i.next();
@@ -154,6 +149,6 @@ public class MainServlet extends AbstractServlet {
         }
 
         return result;
-    }
+    }*/
 
 }

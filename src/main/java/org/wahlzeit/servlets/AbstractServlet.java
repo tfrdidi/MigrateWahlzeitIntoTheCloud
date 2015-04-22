@@ -40,6 +40,7 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * @author dirkriehle
@@ -51,6 +52,7 @@ public abstract class AbstractServlet extends HttpServlet {
      */
     protected static int lastSessionId = 0; // system and agent are named differently
     private static final long serialVersionUID = 42L; // any does; class never serialized
+    protected static final Logger log = Logger.getLogger(AbstractServlet.class.getName());
 
     /**
      *
@@ -173,9 +175,12 @@ public abstract class AbstractServlet extends HttpServlet {
      *
      */
     protected void redirectRequest(HttpServletResponse response, String link) throws IOException {
-        response.setContentType("text/html");
-        response.sendRedirect(link + ".html");
-        response.setStatus(HttpServletResponse.SC_OK);
+        //response.setContentType("text/html");
+
+        //response.setStatus(HttpServletResponse.SC_FOUND);
+        //response.setHeader("Location", "http://localhost:8080/home.html");
+        log.info("Link: " + link);
+        response.sendRedirect("/" + link + ".html");
     }
 
     /**
