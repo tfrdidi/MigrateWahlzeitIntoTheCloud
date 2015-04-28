@@ -80,8 +80,9 @@ public abstract class ModelMain extends AbstractMain {
 
         File[] photoFiles = photoDirFile.listFiles(photoFileFilter);
         for (int i = 0; i < photoFiles.length; i++) {
-            Photo newPhoto = photoManager.createPhoto(photoFiles[i]);
-            user.addPhoto(newPhoto);
+            //TODO: change to datastore/cloud storage
+            //Photo newPhoto = photoManager.createPhoto(photoFiles[i]);
+            //user.addPhoto(newPhoto);
         }
     }
 

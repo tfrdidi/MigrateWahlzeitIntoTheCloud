@@ -20,13 +20,13 @@
 
 package org.wahlzeit.model;
 
-import org.wahlzeit.services.SysConfig;
+import com.google.appengine.api.images.Image;
+import com.google.appengine.api.images.ImagesService;
+import com.google.appengine.api.images.ImagesServiceFactory;
+import com.google.appengine.api.images.Transform;
 import org.wahlzeit.services.SysLog;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
+import java.util.logging.Logger;
 
 /**
  * PhotoUtil provides a set of utility functions to create defined images.
@@ -36,16 +36,19 @@ import java.io.File;
  */
 public class PhotoUtil {
 
+    private static final Logger log = Logger.getLogger(PhotoUtil.class.getName());
+
     /**
-     *
+     * @methodtype creation
      */
-    public static Photo createPhoto(File source, PhotoId id) throws Exception {
+    public static Photo createPhoto(String ownerName, String filename, PhotoId id) throws Exception {
         Photo result = PhotoFactory.getInstance().createPhoto(id);
 
-        Image sourceImage = createImageFiles(source, id);
+        Image sourceImage = GcsAdapter.getInstance().readFromCloudStorage(ownerName, filename);
+        createImageFiles(sourceImage, result);
 
-        int sourceWidth = sourceImage.getWidth(null);
-        int sourceHeight = sourceImage.getHeight(null);
+        int sourceWidth = sourceImage.getWidth();
+        int sourceHeight = sourceImage.getHeight();
         result.setWidthAndHeight(sourceWidth, sourceHeight);
 
         return result;
@@ -54,51 +57,40 @@ public class PhotoUtil {
     /**
      *
      */
-    public static Image createImageFiles(File source, PhotoId id) throws Exception {
-        Image sourceImage = ImageIO.read(source);
-        assertIsValidImage(sourceImage);
+    public static void createImageFiles(Image source, Photo photo) throws Exception {
+        assertIsValidImage(source);
 
-        int sourceWidth = sourceImage.getWidth(null);
-        int sourceHeight = sourceImage.getHeight(null);
+        int sourceWidth = source.getWidth();
+        int sourceHeight = source.getHeight();
         assertHasValidSize(sourceWidth, sourceHeight);
 
         for (PhotoSize size : PhotoSize.values()) {
             if (!size.isWiderAndHigher(sourceWidth, sourceHeight)) {
-                createImageFile(sourceImage, id, size);
+                scaleImage(source, size, photo);
             }
         }
-
-        return sourceImage;
     }
 
+
+
     /**
-     *
+     * @methodtype command
+     * Scale the source picture to the given size, store it in the datastore and reference it in the photo.
      */
-    protected static void createImageFile(Image source, PhotoId id, PhotoSize size) throws Exception {
-        int sourceWidth = source.getWidth(null);
-        int sourceHeight = source.getHeight(null);
+    protected static void scaleImage(Image source, PhotoSize size, Photo photo) throws Exception {
+        int sourceWidth = source.getWidth();
+        int sourceHeight = source.getHeight();
 
         int targetWidth = size.calcAdjustedWidth(sourceWidth, sourceHeight);
         int targetHeight = size.calcAdjustedHeight(sourceWidth, sourceHeight);
 
-        BufferedImage targetImage = scaleImage(source, targetWidth, targetHeight);
-        File target = new File(SysConfig.getPhotosDir().asString() + File.separator + id.asString() + size.asInt() + ".jpg");
-        ImageIO.write(targetImage, "jpg", target);
+        ImagesService imagesService = ImagesServiceFactory.getImagesService();
+        Transform resize = ImagesServiceFactory.makeResize(targetWidth, targetHeight);
+        Image newImage = imagesService.applyTransform(resize, source);
 
-        SysLog.logSysInfo("created image file for id: " + id.asString() + " of size: " + size.asString());
-    }
+        photo.setImage(size, newImage);
 
-    /**
-     *
-     */
-    protected static BufferedImage scaleImage(Image source, int width, int height) {
-        source = source.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-        BufferedImage result = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        Graphics2D g2d = result.createGraphics();
-        g2d.setBackground(Color.WHITE);
-        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-        g2d.drawImage(source, 0, 0, null);
-        return result;
+        SysLog.logSysInfo("Scaled image to size: " + size.asString());
     }
 
     /**

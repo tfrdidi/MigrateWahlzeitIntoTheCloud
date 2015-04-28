@@ -21,8 +21,18 @@
 package org.wahlzeit.model;
 
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.tools.cloudstorage.GcsFileMetadata;
+import com.google.appengine.tools.cloudstorage.GcsFileOptions;
+import com.google.appengine.tools.cloudstorage.GcsFilename;
+import com.google.appengine.tools.cloudstorage.GcsInputChannel;
 import org.wahlzeit.services.OfyService;
 import org.wahlzeit.services.SysLog;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.logging.Level;
 
 /**
  * @author dirkriehle
@@ -87,11 +97,22 @@ public class PhotoFactory {
     }
 
     /**
-     *  Loads a photo from the datastore
+     *  Loads a photo.
+     *  The Java object is loaded from the Google Datastore, the Images in all sizes are loaded from the
+     *  Google Cloud storage.
      */
     public Photo loadPhoto(PhotoId id) {
-        return OfyService.ofy().load().type(Photo.class).ancestor(KeyFactory.createKey("Application", "Wahlzeit")).filter(Photo.ID, id).first().now();
+       /* Photo result =
+                OfyService.ofy().load().type(Photo.class).ancestor(KeyFactory.createKey("Application", "Wahlzeit")).filter(Photo.ID, id).first().now();
+        for (PhotoSize size : PhotoSize.values()) {
+            GcsFilename gcsFilename = new GcsFilename("picturebucket", filename);
+
+
+
+        }*/
+        return null;
     }
+
 
     /**
      *

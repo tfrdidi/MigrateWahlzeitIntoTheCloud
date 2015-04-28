@@ -22,8 +22,11 @@ package org.wahlzeit.model;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.images.Image;
+import com.google.appengine.repackaged.com.google.api.client.util.ArrayMap;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Parent;
 import org.wahlzeit.services.DataObject;
@@ -31,6 +34,7 @@ import org.wahlzeit.services.EmailAddress;
 import org.wahlzeit.services.Language;
 
 import java.net.URL;
+import java.util.Map;
 
 /**
  * A photo represents a user-provided (uploaded) photo.
@@ -80,6 +84,14 @@ public class Photo extends DataObject {
      */
     protected Long ownerId = 0L;
     @Index protected String ownerName;
+
+    /**
+     * To avoid scaling when accessing a photo, all pictures sizes are stored in an own file.
+     * The photo java object is stored in the Google Datastore, the Images are stored in the
+     * Google Cloud Storage.
+     */
+    @Ignore
+    protected Map<PhotoSize, Image> images = new ArrayMap<PhotoSize, Image>();
 
     /**
      *
@@ -132,6 +144,20 @@ public class Photo extends DataObject {
         id = myId;
 
         incWriteCount();
+    }
+
+    /**
+     * @methodtype get
+     */
+    public Image getImage(PhotoSize photoSize) {
+        return images.get(photoSize);
+    }
+
+    /**
+     * @methodtype set
+     */
+    public void setImage(PhotoSize photoSize, Image image) {
+        this.images.put(photoSize, image);
     }
 
     /**

@@ -27,16 +27,10 @@ import org.wahlzeit.model.Tags;
 import org.wahlzeit.model.User;
 import org.wahlzeit.model.UserLog;
 import org.wahlzeit.model.UserSession;
-import org.wahlzeit.services.SysConfig;
 import org.wahlzeit.services.SysLog;
 import org.wahlzeit.utils.StringUtil;
 import org.wahlzeit.webparts.WebPart;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Map;
 
 /**
@@ -74,12 +68,12 @@ public class UploadPhotoFormHandler extends AbstractWebFormHandler {
 
         try {
             PhotoManager pm = PhotoManager.getInstance();
-            String sourceFileName = us.getAsString(args, "fileName");
-            File file = new File(sourceFileName);
-            Photo photo = pm.createPhoto(file);
+            String fileName = us.getAsString(args, "fileName");
 
-            String targetFileName = SysConfig.getBackupDir().asString() + photo.getId().asString();
-            createBackup(sourceFileName, targetFileName);
+            Photo photo = pm.createPhoto(us.getClientName(), fileName);
+
+            //String targetFileName = SysConfig.getBackupDir().asString() + photo.getId().asString();
+            //createBackup(fileName, targetFileName);
 
             User user = (User) us.getClient();
             user.addPhoto(photo);
@@ -103,17 +97,17 @@ public class UploadPhotoFormHandler extends AbstractWebFormHandler {
 
     /**
      *
-     */
+     *//*
     protected void createBackup(String sourceName, String targetName) {
         try {
             File sourceFile = new File(sourceName);
             InputStream inputStream = new FileInputStream(sourceFile);
             File targetFile = new File(targetName);
-            OutputStream outputStream = new FileOutputStream(targetFile);
+            //OutputStream outputStream = new FileOutputStream(targetFile);
             // @FIXME IO.copy(inputStream, outputStream);
         } catch (Exception ex) {
             SysLog.logSysInfo("could not create backup file of photo");
             SysLog.logThrowable(ex);
         }
-    }
+    }*/
 }

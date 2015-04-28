@@ -20,12 +20,13 @@
 
 package org.wahlzeit.model;
 
-import org.wahlzeit.main.ServiceMain;
+import com.google.appengine.api.images.Image;
+import com.google.appengine.tools.cloudstorage.GcsFilename;
 import org.wahlzeit.services.ObjectManager;
 import org.wahlzeit.services.Persistent;
 import org.wahlzeit.services.SysLog;
 
-import java.io.File;
+import java.security.InvalidParameterException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,6 +35,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 
 /**
  * A photo manager provides access to and manages photos.
@@ -179,6 +181,32 @@ public class PhotoManager extends ObjectManager {
         updateObject(photo);
     }
 
+    @Override
+    protected <E> void updateDependents(E obj) {
+        if(obj instanceof  Photo) {
+            Photo photo = (Photo) obj;
+            String ownerName = photo.getOwnerName();
+            String photoIdAsString = photo.getIdAsString();
+            for(PhotoSize photoSize : PhotoSize.values()) {
+                Image image = photo.getImage(photoSize);
+                if(image != null) {
+                    try {
+                        GcsAdapter.getInstance().writeToCloudStorage(image, ownerName, photoIdAsString, photoSize.asString());
+                    }
+                    catch (Exception e) {
+                        log.log(Level.SEVERE, "Could not store image in Cloud Storage.", e);
+                    }
+                }
+                else {
+                    log.info("No photo for size '" + photoSize.asString() + "'");
+                }
+            }
+        }
+        else {
+            throw new InvalidParameterException("Obj is not a Photo!");
+        }
+    }
+
     /**
      *
      */
@@ -272,9 +300,9 @@ public class PhotoManager extends ObjectManager {
     /**
      *
      */
-    public Photo createPhoto(File file) throws Exception {
+    public Photo createPhoto(String userName, String filename) throws Exception {
         PhotoId id = PhotoId.getNextId();
-        Photo result = PhotoUtil.createPhoto(file, id);
+        Photo result = PhotoUtil.createPhoto(userName, filename, id);
         addPhoto(result);
         return result;
     }

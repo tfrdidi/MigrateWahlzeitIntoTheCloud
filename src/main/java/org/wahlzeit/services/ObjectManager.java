@@ -29,15 +29,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * An ObjectManager creates/reads/updates/deletes Persistent (objects) from a (relational) Database.
+ * An ObjectManager creates/reads/updates/deletes Persistent (objects) from Google Datastore.
  * It is an abstract superclass that relies an inheritance interface and the Persistent interface.
- * Subclasses for specific types of object need to implement createObject and provide Statements.
  *
  * @author dirkriehle
  */
 public abstract class ObjectManager {
 
-    private static final Logger log = Logger.getLogger(ObjectManager.class.getName());
+    protected static final Logger log = Logger.getLogger(ObjectManager.class.getName());
     private static final Key applicationRootKey = KeyFactory.createKey("Application", "Wahlzeit");
 
     /**
@@ -93,19 +92,18 @@ public abstract class ObjectManager {
     /**
      * Updates all entities of the given collection in the datastore.
      */
-    protected <E>void updateObjects(Collection<E> collection) {
+    protected <E> void updateObjects(Collection<E> collection) {
         for(E o : collection) {
             updateObject(o);
+            updateDependents(o);
         }
     }
 
-
     /**
-     *
+     * Updates all dependencies of the object.
      */
-    protected void updateDependents(Persistent obj) {
-        // do nothing
-        // TODO: check if necessary for photo
+    protected <E> void updateDependents(E obj) {
+        // overwrite if your object has additional dependencies
     }
 
     /**

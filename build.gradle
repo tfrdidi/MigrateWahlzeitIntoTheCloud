@@ -22,8 +22,10 @@ dependencies {
     appengineSdk "com.google.appengine:appengine-java-sdk:${appengineVersion}"
     compile "com.google.appengine:appengine-api-1.0-sdk:${appengineVersion}"
     compile 'javax.servlet:servlet-api:2.5' // GAE works with 2.5
+    compile 'commons-fileupload:commons-fileupload:1.2'
     compile "org.apache.tomcat:tomcat-catalina:8.0.18"
     compile "com.googlecode.objectify:objectify:5.1.5"
+    compile "com.google.appengine.tools:appengine-gcs-client:0.4.4"
 }
 
 appengine {
