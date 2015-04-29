@@ -51,9 +51,9 @@ public abstract class ObjectManager {
      * Reads an Entity of the specified type where the wanted parameter has the given name,
      * e.g. readObject(User.class, "emailAddress", "name@provider.com").
      */
-    protected <E> E readObject(Class<E> type, String parameterName, Object parameterValue) {
-        log.info("Load Type " + type.toString() + " with parameter " + parameterName + " == " + parameterValue + " from datastore.");
-        return OfyService.ofy().load().type(type).ancestor(applicationRootKey).filter(parameterName, parameterValue).first().now();
+    protected <E> E readObject(Class<E> type, String parameterName, Object value) {
+        log.info("Load Type " + type.toString() + " with parameter " + parameterName + " == " + value + " from datastore.");
+        return OfyService.ofy().load().type(type).ancestor(applicationRootKey).filter(parameterName, value).first().now();
     }
 
     /**
@@ -77,41 +77,41 @@ public abstract class ObjectManager {
     /**
      * Writes the given Entity to the datastore.
      */
-    protected <E> void writeObject(E e) {
-        log.log(Level.FINE, "Write Entity  " + e.toString() + " into the datastore.");
-        OfyService.ofy().save().entity(e).now();
+    protected <E> void writeObject(E object) {
+        log.log(Level.FINE, "Write Entity  " + object.toString() + " into the datastore.");
+        OfyService.ofy().save().entity(object).now();
+        updateDependents(object);
     }
 
     /**
      * Updates the given entitiy in the datastore.
      */
-    protected <E> void updateObject(E entity) {
-        writeObject(entity);
+    protected <E> void updateObject(E object) {
+        writeObject(object);
     }
 
     /**
      * Updates all entities of the given collection in the datastore.
      */
     protected <E> void updateObjects(Collection<E> collection) {
-        for(E o : collection) {
-            updateObject(o);
-            updateDependents(o);
+        for(E object : collection) {
+            updateObject(object);
         }
     }
 
     /**
      * Updates all dependencies of the object.
      */
-    protected <E> void updateDependents(E obj) {
+    protected <E> void updateDependents(E object) {
         // overwrite if your object has additional dependencies
     }
 
     /**
      * Deletes the given entity from the datastore.
      */
-    protected <E> void deleteObject(E entity) {
-        log.log(Level.FINE, "Delete entity " + entity.toString() + " from datastore.");
-        OfyService.ofy().delete().entity(entity).now();
+    protected <E> void deleteObject(E object) {
+        log.log(Level.FINE, "Delete entity " + object.toString() + " from datastore.");
+        OfyService.ofy().delete().entity(object).now();
     }
 
     /**
