@@ -10,7 +10,9 @@ import com.google.appengine.tools.cloudstorage.GcsService;
 import com.google.appengine.tools.cloudstorage.GcsServiceFactory;
 import com.google.appengine.tools.cloudstorage.RetryParams;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URLConnection;
 import java.nio.ByteBuffer;
 import java.security.InvalidParameterException;
@@ -19,16 +21,23 @@ import java.util.logging.Logger;
 /**
  * Adapter for the Google Cloud Storage.
  * It offers read and write functions to store Images.
- *
+ * <p/>
  * Created by Lukas Hahmann on 28.04.15.
  */
 public class GcsAdapter {
 
     private static final Logger log = Logger.getLogger(GcsAdapter.class.getName());
 
-    private static final String BUCKET_NAME = "data";
-    // 2 MB Buffer, does not limit the size of the files
-    private static final int BUFFER_LENGTH = 2 * 1024 * 1024;
+    public static final String BUCKET_NAME = "data";
+    public static final String PHOTO_FOLDER = "photos";
+    public static final String PHOTO_FOLDER_PATH_WITH_BUCKET = File.separator + BUCKET_NAME + File.separator + PHOTO_FOLDER + File.separator;
+    public static final String PHOTO_FOLDER_PATH_WITHOUT_BUCKET = PHOTO_FOLDER + File.separator;
+
+    /**
+     * 1 MB Buffer, does not limit the size of the files.
+     * A valid compromise between unused allocation and reallocation.
+     */
+    private static final int BUFFER_LENGTH = 1024 * 1024;
 
     private static final GcsService gcsService =
             GcsServiceFactory.createGcsService(RetryParams.getDefaultInstance());
@@ -52,59 +61,79 @@ public class GcsAdapter {
     }
 
 
-
     // write-methods ---------------------------------------------------------------------------------------------------
 
     /**
-     * @methodtype wrapper
-     *
-     * Saves the image in the Google Cloud Storage, so you can access it via owner and filename again.
-     * An existing file of that owner with that file name is overwritten.
-     *
      * @throws InvalidParameterException - one parameter = null or invalid filename
-     *
-     * @see #readFromCloudStorage(String, String)
-     */
-    public void writeImageToCloudStorage(Image image, String ownerName, String filename)
-            throws InvalidParameterException, IOException {
-
-        assertValidString(ownerName);
-        assertValidImage(image);
-        assertValidFileName(filename);
-
-        GcsFilename gcsFilename = createGcsFileName(ownerName, filename);
-        writeToCloudStorage(image, gcsFilename);
-    }
-
-    /**
      * @methodtype wrapper
-     *
+     * <p/>
      * Saves the image in the Google Cloud Storage, so you can access it via ownerName, photoId and size again.
      * An existing file of that owner with that file name is overwritten.
-     *
-     * @throws InvalidParameterException - one parameter = null or invalid filename
-     *
-     * @see #readFromCloudStorage(String, String, String)
+     * @see #readFromCloudStorage(String, String)
      */
-    public void writeToCloudStorage(Image image, String ownerName, String photoIdAsString, String size)
+    public void writeToCloudStorage(Image image, String photoIdAsString, String size)
             throws InvalidParameterException, IOException {
 
-        assertValidString(ownerName);
         assertValidString(photoIdAsString);
         assertValidString(size);
         assertValidImage(image);
 
-        GcsFilename gcsFilename = createGcsFileName(ownerName, photoIdAsString, size);
+        GcsFilename gcsFilename = createGcsFileName(photoIdAsString, size);
         writeToCloudStorage(image, gcsFilename);
     }
 
     /**
      * @methodtype command
-     *
+     * <p/>
+     * Saves the file from the input stream under the filename in Google Cloud Storage
+     */
+    public void streamToCloudStorage(InputStream inputStream, String fileName)
+            throws IOException {
+
+        assert inputStream != null;
+        assertValidFileName(fileName);
+
+        log.info("Write file '" + PHOTO_FOLDER_PATH_WITHOUT_BUCKET + fileName + "' to cloud storage into the bucket '" + BUCKET_NAME + "'.");
+
+        GcsFilename gcsFilename = new GcsFilename(BUCKET_NAME, PHOTO_FOLDER_PATH_WITHOUT_BUCKET + fileName);
+
+        String fileType = URLConnection.guessContentTypeFromName(fileName);
+        log.info("Found filetype " + URLConnection.guessContentTypeFromName(fileName) + " for " + fileName);
+        GcsFileOptions.Builder fileOptionsBuilder = new GcsFileOptions.Builder();
+        if (fileType != null) {
+            fileOptionsBuilder.mimeType(fileType);
+        } else {
+            fileOptionsBuilder.mimeType("image/jpeg");
+        }
+        GcsFileOptions fileOptions = fileOptionsBuilder.build();
+        GcsOutputChannel outputChannel =
+                gcsService.createOrReplace(gcsFilename, fileOptions);
+        copy(inputStream, outputChannel);
+    }
+
+    /**
+     * Transfer the data from the inputStream to the outputStream. Then closes both streams.
+     */
+    private void copy(InputStream inputStream, GcsOutputChannel output) throws IOException {
+        try {
+            byte[] buffer = new byte[BUFFER_LENGTH];
+            int bytesRead = inputStream.read(buffer);
+            while (bytesRead != -1) {
+                output.write(ByteBuffer.wrap(buffer, 0, bytesRead));
+                bytesRead = inputStream.read(buffer);
+            }
+        } finally {
+            inputStream.close();
+        }
+        output.close();
+    }
+
+    /**
+     * @throws IOException - when can not write to Google Cloud Storage
+     * @methodtype command
+     * <p/>
      * Writes the file that is read from <code>input</code>into the google cloud storage under the
      * specified <code>fileName</code>.
-     *
-     * @throws IOException - when can not write to Google Cloud Storage
      */
     private void writeToCloudStorage(Image image, GcsFilename gcsFilename) throws IOException {
         log.info("Write file '" + gcsFilename.getObjectName() + "' to cloud storage into the bucket '" + gcsFilename.getBucketName() + "'.");
@@ -127,56 +156,48 @@ public class GcsAdapter {
     }
 
 
-
     // read methods ----------------------------------------------------------------------------------------------------
 
     /**
-     * @methodtype command
-     *
-     * Reads an image from Google Cloud Storage via ownerName and filename.
-     *
      * @throws IllegalArgumentException - one parameter = null or invalid filename
      * @throws IOException
-     *
-     * @see #writeImageToCloudStorage(Image, String, String)
+     * @methodtype command
+     * <p/>
+     * Reads an image from Google Cloud Storage via ownerName and filename.
+     * @see #streamToCloudStorage(InputStream, String)
      */
-    public Image readFromCloudStorage(String ownerName, String filename)
+    public Image readFromCloudStorage(String filename)
             throws IllegalArgumentException, IOException {
 
-        assertValidString(ownerName);
         assertValidFileName(filename);
 
-        GcsFilename gcsFilename = createGcsFileName(ownerName, filename);
+        GcsFilename gcsFilename = createGcsFileName(filename);
         return readFromCloudStorage(gcsFilename);
     }
 
     /**
-     * @methodtype command
-     *
-     * Reads an image from Google Cloud Storage via ownerName, photoId and the size.
-     *
      * @throws IllegalArgumentException - one parameter = null or emtpy
      * @throws IOException
-     *
-     * @see #writeToCloudStorage(Image, String, String, String)
+     * @methodtype command
+     * <p/>
+     * Reads an image from Google Cloud Storage via ownerName, photoId and the size.
+     * @see #writeToCloudStorage(Image, String, String)
      */
-    public Image readFromCloudStorage(String ownerName, String photoIdAsString, String size)
+    public Image readFromCloudStorage(String photoIdAsString, String size)
             throws IllegalArgumentException, IOException {
 
-        assertValidString(ownerName);
         assertValidString(photoIdAsString);
         assertValidString(size);
 
-        GcsFilename gcsFilename = createGcsFileName(ownerName, photoIdAsString, size);
+        GcsFilename gcsFilename = createGcsFileName(photoIdAsString, size);
         return readFromCloudStorage(gcsFilename);
     }
 
     /**
-     * @methodtype command
-     *
-     * Reads the specified file from Google Cloud Storage. When not found, null is returned.
-     *
      * @throws IOException - when can not access Google Cloud Storage, e.g. insufficient rights
+     * @methodtype command
+     * <p/>
+     * Reads the specified file from Google Cloud Storage. When not found, null is returned.
      */
     private Image readFromCloudStorage(GcsFilename gcsFilename)
             throws IOException, InvalidParameterException {
@@ -190,7 +211,6 @@ public class GcsAdapter {
     }
 
 
-
     // methods to create GcsFileNames ---------------------------------------------------------------------------------
 
     /**
@@ -201,7 +221,7 @@ public class GcsAdapter {
      * <p/>
      * BUCKET_NAME - ownerName/fileName/photoIdAsString
      */
-    private GcsFilename createGcsFileName(String owner, String photoIdAsString, String size) {
+    private GcsFilename createGcsFileName(String photoIdAsString, String size) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("photos").append("/").append(photoIdAsString).append("/").append(size);
         return new GcsFilename(BUCKET_NAME, stringBuilder.toString());
@@ -215,12 +235,11 @@ public class GcsAdapter {
      * <p/>
      * BUCKET_NAME - ownerName/fileName
      */
-    private GcsFilename createGcsFileName(String owner, String fileName) {
+    private GcsFilename createGcsFileName(String fileName) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("photos").append("/").append(fileName);
         return new GcsFilename(BUCKET_NAME, stringBuilder.toString());
     }
-
 
 
     // assertion methods -----------------------------------------------------------------------------------------------

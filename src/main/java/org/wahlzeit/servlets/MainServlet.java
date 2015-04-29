@@ -20,8 +20,6 @@
 
 package org.wahlzeit.servlets;
 
-import com.google.appengine.api.images.Image;
-import com.google.appengine.api.images.ImagesServiceFactory;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -38,8 +36,6 @@ import org.wahlzeit.webparts.WebPart;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -76,7 +72,7 @@ public class MainServlet extends AbstractServlet {
         WebPageHandler handler = WebPartHandlerManager.getWebPageHandler(link);
         String newLink = PartUtil.DEFAULT_PAGE_NAME;
         if (handler != null) {
-            Map args = getRequestArgs(request, us);
+            Map args = getRequestArgs(request);
             SysLog.logSysInfo("GET arguments: " + getRequestArgsAsString(us, args));
             newLink = handler.handleGet(us, link, args);
         }
@@ -111,7 +107,7 @@ public class MainServlet extends AbstractServlet {
         }
         UserLog.logUserInfo("postedto", link);
 
-        Map args = getRequestArgs(request, us);
+        Map args = getRequestArgs(request);
         SysLog.logSysInfo("POST arguments: " + getRequestArgsAsString(us, args));
 
         WebFormHandler formHandler = WebPartHandlerManager.getWebFormHandler(link);
@@ -127,10 +123,10 @@ public class MainServlet extends AbstractServlet {
     /**
      *
      */
-    protected Map getRequestArgs(HttpServletRequest request, UserSession us) throws IOException, ServletException {
+    protected Map getRequestArgs(HttpServletRequest request) throws IOException, ServletException {
         String contentType = request.getContentType();
         if ((contentType != null) && contentType.startsWith("multipart/form-data")) {
-            return getMultiPartRequestArgs(request, us);
+            return getMultiPartRequestArgs(request);
         } else {
             return request.getParameterMap();
         }
@@ -140,7 +136,7 @@ public class MainServlet extends AbstractServlet {
      * Searches for files in the request and puts them in the resulting map with the key "fileName".
      * When a file is found, you can access its path by searching for elements with the key "fileName".
      */
-    protected Map getMultiPartRequestArgs(HttpServletRequest request, UserSession us) throws IOException, ServletException {
+    protected Map getMultiPartRequestArgs(HttpServletRequest request) throws IOException, ServletException {
         Map<String, String> result = new HashMap<String, String>();
         try {
             ServletFileUpload upload = new ServletFileUpload();
@@ -151,8 +147,8 @@ public class MainServlet extends AbstractServlet {
                 String filename = fileItemStream.getName();
 
                 if (!fileItemStream.isFormField()) {
-                    String ownerName = us.getClientName();
-                    storeImage(fileItemStream, ownerName, filename);
+                    InputStream inputStream = fileItemStream.openStream();
+                    GcsAdapter.getInstance().streamToCloudStorage(inputStream, filename);
                     result.put("fileName", filename);
                 }
             }
@@ -161,27 +157,5 @@ public class MainServlet extends AbstractServlet {
         }
 
         return result;
-    }
-
-    /**
-     * @methodtype command
-     *
-     * Stream the image in the Google Cloud Storage.
-     */
-    private void storeImage(FileItemStream fileItemStream, String ownerName, String filename) throws IOException {
-        log.info("Got an uploaded file: " + fileItemStream.getFieldName() +
-                ", name = " + filename);
-
-        InputStream inputStream = fileItemStream.openStream();
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        byte[] data = new byte[16*1024];
-        int nRead = inputStream.read(data);
-        while(nRead != -1) {
-            buffer.write(data);
-            nRead = inputStream.read(data);
-        }
-        buffer.flush();
-        Image image = ImagesServiceFactory.makeImage(buffer.toByteArray());
-        GcsAdapter.getInstance().writeImageToCloudStorage(image, ownerName, filename);
     }
 }

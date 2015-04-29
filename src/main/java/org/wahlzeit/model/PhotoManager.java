@@ -185,13 +185,12 @@ public class PhotoManager extends ObjectManager {
     protected <E> void updateDependents(E obj) {
         if(obj instanceof  Photo) {
             Photo photo = (Photo) obj;
-            String ownerName = photo.getOwnerName();
             String photoIdAsString = photo.getIdAsString();
             for(PhotoSize photoSize : PhotoSize.values()) {
                 Image image = photo.getImage(photoSize);
                 if(image != null) {
                     try {
-                        GcsAdapter.getInstance().writeToCloudStorage(image, ownerName, photoIdAsString, photoSize.asString());
+                        GcsAdapter.getInstance().writeToCloudStorage(image, photoIdAsString, photoSize.asString());
                     }
                     catch (Exception e) {
                         log.log(Level.SEVERE, "Could not store image in Cloud Storage.", e);
@@ -300,9 +299,9 @@ public class PhotoManager extends ObjectManager {
     /**
      *
      */
-    public Photo createPhoto(String userName, String filename) throws Exception {
+    public Photo createPhoto(String filename) throws Exception {
         PhotoId id = PhotoId.getNextId();
-        Photo result = PhotoUtil.createPhoto(userName, filename, id);
+        Photo result = PhotoUtil.createPhoto(filename, id);
         addPhoto(result);
         return result;
     }
