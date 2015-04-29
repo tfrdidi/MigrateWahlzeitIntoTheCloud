@@ -26,7 +26,7 @@ public class GcsAdapter {
 
     private static final Logger log = Logger.getLogger(GcsAdapter.class.getName());
 
-    private static final String BUCKET_NAME = "picturebucket";
+    private static final String BUCKET_NAME = "data";
     // 2 MB Buffer, does not limit the size of the files
     private static final int BUFFER_LENGTH = 2 * 1024 * 1024;
 
@@ -203,7 +203,7 @@ public class GcsAdapter {
      */
     private GcsFilename createGcsFileName(String owner, String photoIdAsString, String size) {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(owner).append("/").append(photoIdAsString).append("/").append(size);
+        stringBuilder.append("photos").append("/").append(photoIdAsString).append("/").append(size);
         return new GcsFilename(BUCKET_NAME, stringBuilder.toString());
     }
 
@@ -217,7 +217,7 @@ public class GcsAdapter {
      */
     private GcsFilename createGcsFileName(String owner, String fileName) {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(owner).append("/").append(fileName);
+        stringBuilder.append("photos").append("/").append(fileName);
         return new GcsFilename(BUCKET_NAME, stringBuilder.toString());
     }
 
