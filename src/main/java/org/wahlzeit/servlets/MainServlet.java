@@ -20,6 +20,8 @@
 
 package org.wahlzeit.servlets;
 
+import com.google.appengine.api.images.Image;
+import com.google.appengine.api.images.ImagesServiceFactory;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -27,7 +29,6 @@ import org.wahlzeit.handlers.PartUtil;
 import org.wahlzeit.handlers.WebFormHandler;
 import org.wahlzeit.handlers.WebPageHandler;
 import org.wahlzeit.handlers.WebPartHandlerManager;
-import org.wahlzeit.model.GcsAdapter;
 import org.wahlzeit.model.UserLog;
 import org.wahlzeit.model.UserSession;
 import org.wahlzeit.services.SysLog;
@@ -36,6 +37,7 @@ import org.wahlzeit.webparts.WebPart;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -72,7 +74,7 @@ public class MainServlet extends AbstractServlet {
         WebPageHandler handler = WebPartHandlerManager.getWebPageHandler(link);
         String newLink = PartUtil.DEFAULT_PAGE_NAME;
         if (handler != null) {
-            Map args = getRequestArgs(request);
+            Map args = getRequestArgs(request, us);
             SysLog.logSysInfo("GET arguments: " + getRequestArgsAsString(us, args));
             newLink = handler.handleGet(us, link, args);
         }
@@ -107,7 +109,7 @@ public class MainServlet extends AbstractServlet {
         }
         UserLog.logUserInfo("postedto", link);
 
-        Map args = getRequestArgs(request);
+        Map args = getRequestArgs(request, us);
         SysLog.logSysInfo("POST arguments: " + getRequestArgsAsString(us, args));
 
         WebFormHandler formHandler = WebPartHandlerManager.getWebFormHandler(link);
@@ -123,10 +125,10 @@ public class MainServlet extends AbstractServlet {
     /**
      *
      */
-    protected Map getRequestArgs(HttpServletRequest request) throws IOException, ServletException {
+    protected Map getRequestArgs(HttpServletRequest request, UserSession us) throws IOException, ServletException {
         String contentType = request.getContentType();
         if ((contentType != null) && contentType.startsWith("multipart/form-data")) {
-            return getMultiPartRequestArgs(request);
+            return getMultiPartRequestArgs(request, us);
         } else {
             return request.getParameterMap();
         }
@@ -136,7 +138,7 @@ public class MainServlet extends AbstractServlet {
      * Searches for files in the request and puts them in the resulting map with the key "fileName".
      * When a file is found, you can access its path by searching for elements with the key "fileName".
      */
-    protected Map getMultiPartRequestArgs(HttpServletRequest request) throws IOException, ServletException {
+    protected Map getMultiPartRequestArgs(HttpServletRequest request, UserSession us) throws IOException, ServletException {
         Map<String, String> result = new HashMap<String, String>();
         try {
             ServletFileUpload upload = new ServletFileUpload();
@@ -148,7 +150,8 @@ public class MainServlet extends AbstractServlet {
 
                 if (!fileItemStream.isFormField()) {
                     InputStream inputStream = fileItemStream.openStream();
-                    GcsAdapter.getInstance().streamToCloudStorage(inputStream, filename);
+                    Image image = getImage(inputStream);
+                    us.setUploadedImage(image);
                     result.put("fileName", filename);
                 }
             }
@@ -157,5 +160,25 @@ public class MainServlet extends AbstractServlet {
         }
 
         return result;
+    }
+
+    /**
+     * Create an Image object from the Input stream.
+     */
+    private Image getImage(InputStream input) throws IOException {
+        Image image;
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024*1024];
+            int bytesRead = input.read(buffer);
+            while (bytesRead != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+                bytesRead = input.read(buffer);
+            }
+            image = ImagesServiceFactory.makeImage(outputStream.toByteArray());
+        } finally {
+            input.close();
+        }
+        return image;
     }
 }

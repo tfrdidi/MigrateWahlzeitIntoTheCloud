@@ -130,6 +130,11 @@ public class Photo extends DataObject {
     protected long creationTime = System.currentTimeMillis();
 
     /**
+     * The default type is jpg
+     */
+    protected String ending = "jpg";
+
+    /**
      *
      */
     public Photo() {
@@ -422,4 +427,12 @@ public class Photo extends DataObject {
         return creationTime;
     }
 
+
+    public String getEnding() {
+        return ending;
+    }
+
+    public void setEnding(String ending) {
+        this.ending = ending;
+    }
 }

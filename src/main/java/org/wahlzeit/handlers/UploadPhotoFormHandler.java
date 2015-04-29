@@ -20,6 +20,7 @@
 
 package org.wahlzeit.handlers;
 
+import com.google.appengine.api.images.Image;
 import org.wahlzeit.model.AccessRights;
 import org.wahlzeit.model.Photo;
 import org.wahlzeit.model.PhotoManager;
@@ -69,8 +70,8 @@ public class UploadPhotoFormHandler extends AbstractWebFormHandler {
         try {
             PhotoManager pm = PhotoManager.getInstance();
             String fileName = us.getAsString(args, "fileName");
-
-            Photo photo = pm.createPhoto(fileName);
+            Image uploadedImage = us.getUploadedImage();
+            Photo photo = pm.createPhoto(fileName, uploadedImage);
 
             //String targetFileName = SysConfig.getBackupDir().asString() + photo.getId().asString();
             //createBackup(fileName, targetFileName);

@@ -21,7 +21,6 @@
 package org.wahlzeit.model;
 
 import com.google.appengine.api.images.Image;
-import com.google.appengine.tools.cloudstorage.GcsFilename;
 import org.wahlzeit.services.ObjectManager;
 import org.wahlzeit.services.Persistent;
 import org.wahlzeit.services.SysLog;
@@ -185,12 +184,13 @@ public class PhotoManager extends ObjectManager {
     protected <E> void updateDependents(E obj) {
         if(obj instanceof  Photo) {
             Photo photo = (Photo) obj;
-            String photoIdAsString = photo.getIdAsString();
+            String photoIdAsString = photo.getId().asString();
+            String ending = photo.getEnding();
             for(PhotoSize photoSize : PhotoSize.values()) {
                 Image image = photo.getImage(photoSize);
                 if(image != null) {
                     try {
-                        GcsAdapter.getInstance().writeToCloudStorage(image, photoIdAsString, photoSize.asString());
+                        GcsAdapter.getInstance().writeToCloudStorage(image, photoIdAsString, photoSize.asInt(), ending);
                     }
                     catch (Exception e) {
                         log.log(Level.SEVERE, "Could not store image in Cloud Storage.", e);
@@ -299,9 +299,9 @@ public class PhotoManager extends ObjectManager {
     /**
      *
      */
-    public Photo createPhoto(String filename) throws Exception {
+    public Photo createPhoto(String filename, Image uploadedImage) throws Exception {
         PhotoId id = PhotoId.getNextId();
-        Photo result = PhotoUtil.createPhoto(filename, id);
+        Photo result = PhotoUtil.createPhoto(filename, id, uploadedImage);
         addPhoto(result);
         return result;
     }

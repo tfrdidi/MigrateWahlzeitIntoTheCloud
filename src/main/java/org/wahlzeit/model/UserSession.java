@@ -20,6 +20,7 @@
 
 package org.wahlzeit.model;
 
+import com.google.appengine.api.images.Image;
 import org.wahlzeit.services.EmailAddress;
 import org.wahlzeit.services.Language;
 import org.wahlzeit.services.Session;
@@ -42,6 +43,7 @@ public class UserSession extends Session implements Serializable {
      *
      */
     public static final String PHOTO = "photo";
+    public static final String UPLOADED_IMAGE = "uploadedImage";
     public static final String PRIOR_PHOTO = "priorPhoto";
     public static final String PHOTO_CASE = "photoCase";
     public static final String MESSAGE = "message";
@@ -294,6 +296,20 @@ public class UserSession extends Session implements Serializable {
      */
     public void setPhoto(Photo newPhoto) {
         savedArgs.put(PHOTO, newPhoto);
+    }
+
+    /**
+     *
+     */
+    public Image getUploadedImage() {
+        return (Image) savedArgs.get(UPLOADED_IMAGE);
+    }
+
+    /**
+     *
+     */
+    public void setUploadedImage(Image image) {
+        savedArgs.put(UPLOADED_IMAGE, image);
     }
 
     /**

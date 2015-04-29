@@ -12,7 +12,6 @@ import com.google.appengine.tools.cloudstorage.RetryParams;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URLConnection;
 import java.nio.ByteBuffer;
 import java.security.InvalidParameterException;
@@ -69,63 +68,17 @@ public class GcsAdapter {
      * <p/>
      * Saves the image in the Google Cloud Storage, so you can access it via ownerName, photoId and size again.
      * An existing file of that owner with that file name is overwritten.
-     * @see #readFromCloudStorage(String, String)
+     * @see #readFromCloudStorage(String, int, String)
      */
-    public void writeToCloudStorage(Image image, String photoIdAsString, String size)
+    public void writeToCloudStorage(Image image, String photoIdAsString, int size, String ending)
             throws InvalidParameterException, IOException {
 
         assertValidString(photoIdAsString);
-        assertValidString(size);
+        assertValidSize(size);
         assertValidImage(image);
 
-        GcsFilename gcsFilename = createGcsFileName(photoIdAsString, size);
+        GcsFilename gcsFilename = createGcsFileName(photoIdAsString, size, ending);
         writeToCloudStorage(image, gcsFilename);
-    }
-
-    /**
-     * @methodtype command
-     * <p/>
-     * Saves the file from the input stream under the filename in Google Cloud Storage
-     */
-    public void streamToCloudStorage(InputStream inputStream, String fileName)
-            throws IOException {
-
-        assert inputStream != null;
-        assertValidFileName(fileName);
-
-        log.info("Write file '" + PHOTO_FOLDER_PATH_WITHOUT_BUCKET + fileName + "' to cloud storage into the bucket '" + BUCKET_NAME + "'.");
-
-        GcsFilename gcsFilename = new GcsFilename(BUCKET_NAME, PHOTO_FOLDER_PATH_WITHOUT_BUCKET + fileName);
-
-        String fileType = URLConnection.guessContentTypeFromName(fileName);
-        log.info("Found filetype " + URLConnection.guessContentTypeFromName(fileName) + " for " + fileName);
-        GcsFileOptions.Builder fileOptionsBuilder = new GcsFileOptions.Builder();
-        if (fileType != null) {
-            fileOptionsBuilder.mimeType(fileType);
-        } else {
-            fileOptionsBuilder.mimeType("image/jpeg");
-        }
-        GcsFileOptions fileOptions = fileOptionsBuilder.build();
-        GcsOutputChannel outputChannel =
-                gcsService.createOrReplace(gcsFilename, fileOptions);
-        copy(inputStream, outputChannel);
-    }
-
-    /**
-     * Transfer the data from the inputStream to the outputStream. Then closes both streams.
-     */
-    private void copy(InputStream inputStream, GcsOutputChannel output) throws IOException {
-        try {
-            byte[] buffer = new byte[BUFFER_LENGTH];
-            int bytesRead = inputStream.read(buffer);
-            while (bytesRead != -1) {
-                output.write(ByteBuffer.wrap(buffer, 0, bytesRead));
-                bytesRead = inputStream.read(buffer);
-            }
-        } finally {
-            inputStream.close();
-        }
-        output.close();
     }
 
     /**
@@ -164,7 +117,7 @@ public class GcsAdapter {
      * @methodtype command
      * <p/>
      * Reads an image from Google Cloud Storage via ownerName and filename.
-     * @see #streamToCloudStorage(InputStream, String)
+     * @see #writeToCloudStorage(Image, String, int, String)
      */
     public Image readFromCloudStorage(String filename)
             throws IllegalArgumentException, IOException {
@@ -181,15 +134,15 @@ public class GcsAdapter {
      * @methodtype command
      * <p/>
      * Reads an image from Google Cloud Storage via ownerName, photoId and the size.
-     * @see #writeToCloudStorage(Image, String, String)
+     * @see #writeToCloudStorage(Image, String, int, String)
      */
-    public Image readFromCloudStorage(String photoIdAsString, String size)
+    public Image readFromCloudStorage(String photoIdAsString, int size, String ending)
             throws IllegalArgumentException, IOException {
 
         assertValidString(photoIdAsString);
-        assertValidString(size);
+        assertValidSize(size);
 
-        GcsFilename gcsFilename = createGcsFileName(photoIdAsString, size);
+        GcsFilename gcsFilename = createGcsFileName(photoIdAsString, size, ending);
         return readFromCloudStorage(gcsFilename);
     }
 
@@ -221,9 +174,9 @@ public class GcsAdapter {
      * <p/>
      * BUCKET_NAME - ownerName/fileName/photoIdAsString
      */
-    private GcsFilename createGcsFileName(String photoIdAsString, String size) {
+    private GcsFilename createGcsFileName(String photoIdAsString, int size, String ending) {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("photos").append("/").append(photoIdAsString).append("/").append(size);
+        stringBuilder.append("photos").append("/").append(photoIdAsString).append(size).append(".").append(ending);
         return new GcsFilename(BUCKET_NAME, stringBuilder.toString());
     }
 
@@ -250,6 +203,15 @@ public class GcsAdapter {
     private void assertValidString(String string) throws IllegalArgumentException {
         if (string == null || string == "") {
             throw new IllegalArgumentException("Invalid owner name!");
+        }
+    }
+
+    /**
+     * @methodtype assert
+     */
+    private void assertValidSize(int size) throws IllegalArgumentException {
+        if(size < 0) {
+            throw new IllegalArgumentException("Invalid size: " + size);
         }
     }
 

@@ -41,14 +41,14 @@ public class PhotoUtil {
     /**
      * @methodtype creation
      */
-    public static Photo createPhoto(String filename, PhotoId id) throws Exception {
+    public static Photo createPhoto(String filename, PhotoId id, Image uploadedImage) throws Exception {
         Photo result = PhotoFactory.getInstance().createPhoto(id);
+        result.setEnding(filename.substring(filename.lastIndexOf(".") + 1));
 
-        Image sourceImage = GcsAdapter.getInstance().readFromCloudStorage(filename);
-        createImageFiles(sourceImage, result);
+        createImageFiles(uploadedImage, result);
 
-        int sourceWidth = sourceImage.getWidth();
-        int sourceHeight = sourceImage.getHeight();
+        int sourceWidth = uploadedImage.getWidth();
+        int sourceHeight = uploadedImage.getHeight();
         result.setWidthAndHeight(sourceWidth, sourceHeight);
 
         return result;
