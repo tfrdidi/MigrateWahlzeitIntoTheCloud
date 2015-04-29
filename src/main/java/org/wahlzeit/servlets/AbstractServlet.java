@@ -175,10 +175,7 @@ public abstract class AbstractServlet extends HttpServlet {
      *
      */
     protected void redirectRequest(HttpServletResponse response, String link) throws IOException {
-        //response.setContentType("text/html");
-
-        //response.setStatus(HttpServletResponse.SC_FOUND);
-        //response.setHeader("Location", "http://localhost:8080/home.html");
+        response.setContentType("text/html");
         log.info("Link: " + link);
         response.sendRedirect("/" + link + ".html");
     }
