@@ -33,11 +33,14 @@ import org.wahlzeit.utils.StringUtil;
 import org.wahlzeit.webparts.WebPart;
 
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * @author dirkriehle
  */
 public class UploadPhotoFormHandler extends AbstractWebFormHandler {
+
+    private static Logger log = Logger.getLogger(UploadPhotoFormHandler.class.getName());
 
     /**
      *
@@ -73,13 +76,16 @@ public class UploadPhotoFormHandler extends AbstractWebFormHandler {
             Image uploadedImage = us.getUploadedImage();
             Photo photo = pm.createPhoto(fileName, uploadedImage);
 
+            // TODO: think about backup
             //String targetFileName = SysConfig.getBackupDir().asString() + photo.getId().asString();
             //createBackup(fileName, targetFileName);
 
             User user = (User) us.getClient();
             user.addPhoto(photo);
 
+            log.info("Tags: " + tags);
             photo.setTags(new Tags(tags));
+            log.info("Tags of photo: " + photo.getTags().asString());
 
             pm.savePhoto(photo);
 

@@ -20,8 +20,11 @@
 
 package org.wahlzeit.servlets;
 
+import com.google.api.client.util.Charsets;
 import com.google.appengine.api.images.Image;
 import com.google.appengine.api.images.ImagesServiceFactory;
+import com.google.common.io.CharStreams;
+import com.google.common.io.Closeables;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -40,6 +43,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -140,6 +144,10 @@ public class MainServlet extends AbstractServlet {
      */
     protected Map getMultiPartRequestArgs(HttpServletRequest request, UserSession us) throws IOException, ServletException {
         Map<String, String> result = new HashMap<String, String>();
+        result.putAll(request.getParameterMap());
+        for(Map.Entry<String, String> entry : result.entrySet()) {
+            log.info("Result entry: " + entry.getKey() + " - " + entry.getValue());
+        }
         try {
             ServletFileUpload upload = new ServletFileUpload();
             FileItemIterator iterator = upload.getItemIterator(request);
@@ -153,6 +161,12 @@ public class MainServlet extends AbstractServlet {
                     Image image = getImage(inputStream);
                     us.setUploadedImage(image);
                     result.put("fileName", filename);
+                }
+                else {
+                    String key = fileItemStream.getFieldName();
+                    InputStream is = fileItemStream.openStream();
+                    String value = CharStreams.toString(new InputStreamReader(is, Charsets.UTF_8));
+                    result.put(key, value);
                 }
             }
         } catch (Exception ex) {
