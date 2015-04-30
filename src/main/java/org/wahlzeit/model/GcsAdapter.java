@@ -8,6 +8,7 @@ import com.google.appengine.tools.cloudstorage.GcsInputChannel;
 import com.google.appengine.tools.cloudstorage.GcsOutputChannel;
 import com.google.appengine.tools.cloudstorage.GcsService;
 import com.google.appengine.tools.cloudstorage.GcsServiceFactory;
+import com.google.appengine.tools.cloudstorage.ListOptions;
 import com.google.appengine.tools.cloudstorage.RetryParams;
 
 import java.io.File;
@@ -141,6 +142,7 @@ public class GcsAdapter {
 
         assertValidString(photoIdAsString);
         assertValidSize(size);
+        assertValidString(ending);
 
         GcsFilename gcsFilename = createGcsFileName(photoIdAsString, size, ending);
         return readFromCloudStorage(gcsFilename);
@@ -164,7 +166,30 @@ public class GcsAdapter {
     }
 
 
-    // methods to create GcsFileNames ---------------------------------------------------------------------------------
+    // exist method ----------------------------------------------------------------------------------------------------
+
+    /**
+     * Checks if the specified Image already exists in the Google Cloud Storage
+     *
+     * @throws IllegalArgumentException
+     */
+    public boolean doesImageExist(String photoIdAsString, int size, String ending)
+            throws IllegalArgumentException{
+        assertValidString(photoIdAsString);
+        assertValidSize(size);
+        assertValidString(ending);
+
+        GcsFilename gcsFilename = createGcsFileName(photoIdAsString, size, ending);
+        try {
+            // will be null if file does not exist
+            return gcsService.getMetadata(gcsFilename) != null;
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+
+    // methods to create GcsFileNames ----------------------------------------------------------------------------------
 
     /**
      * @methodtype command

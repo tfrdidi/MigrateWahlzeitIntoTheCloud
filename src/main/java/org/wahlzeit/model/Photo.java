@@ -32,6 +32,7 @@ import com.googlecode.objectify.annotation.Parent;
 import org.wahlzeit.services.DataObject;
 import org.wahlzeit.services.EmailAddress;
 import org.wahlzeit.services.Language;
+import org.wahlzeit.services.ObjectManager;
 
 import java.net.URL;
 import java.util.Map;
@@ -75,10 +76,13 @@ public class Photo extends DataObject {
      *
      */
     //TODO: change it to a single long
-    @Id Long idLong;
-    @Index protected PhotoId id = null;
+    @Id
+    Long idLong;
+    @Index
+    protected PhotoId id = null;
 
-    @Parent Key parent = KeyFactory.createKey("Application", "Wahlzeit");
+    @Parent
+    Key parent = ObjectManager.applicationRootKey;
     /**
      *
      */

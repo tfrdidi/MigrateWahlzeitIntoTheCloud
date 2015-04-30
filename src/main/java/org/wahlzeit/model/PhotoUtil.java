@@ -66,7 +66,7 @@ public class PhotoUtil {
 
         for (PhotoSize size : PhotoSize.values()) {
             if (!size.isWiderAndHigher(sourceWidth, sourceHeight)) {
-                scaleImage(source, size, photo);
+                scaleImage(ImagesServiceFactory.makeImage(source.getImageData()), size, photo);
             }
         }
     }

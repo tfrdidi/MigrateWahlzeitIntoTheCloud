@@ -35,11 +35,14 @@ import org.wahlzeit.webparts.Writable;
 import org.wahlzeit.webparts.WritableList;
 
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * @author dirkriehle
  */
 public class ShowPhotoPageHandler extends AbstractWebPageHandler implements WebFormHandler {
+
+    private static Logger log = Logger.getLogger(ShowPhotoPageHandler.class.getName());
 
     /**
      *
@@ -105,6 +108,7 @@ public class ShowPhotoPageHandler extends AbstractWebPageHandler implements WebF
             page.addString(Photo.DESCRIPTION, getPhotoSummary(us, photo));
             page.addString(Photo.KEYWORDS, tags.asString(false, ','));
 
+            log.info("addProcessedPhoto: " + photo.getId().asString());
             us.addDisplayedPhoto(photo);
         }
 

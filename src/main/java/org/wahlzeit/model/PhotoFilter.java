@@ -173,7 +173,7 @@ public class PhotoFilter implements Serializable {
     /**
      *
      */
-    public boolean isProcessedPhotoId(Long photoId) {
+    public boolean isProcessedPhotoId(PhotoId photoId) {
         return processedPhotoIds.contains(photoId);
     }
 

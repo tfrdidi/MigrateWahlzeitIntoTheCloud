@@ -184,25 +184,51 @@ public class PhotoManager extends ObjectManager {
     protected <E> void updateDependents(E obj) {
         if(obj instanceof  Photo) {
             Photo photo = (Photo) obj;
-            String photoIdAsString = photo.getId().asString();
-            String ending = photo.getEnding();
-            for(PhotoSize photoSize : PhotoSize.values()) {
-                Image image = photo.getImage(photoSize);
-                if(image != null) {
-                    try {
-                        GcsAdapter.getInstance().writeToCloudStorage(image, photoIdAsString, photoSize.asInt(), ending);
-                    }
-                    catch (Exception e) {
-                        log.log(Level.SEVERE, "Could not store image in Cloud Storage.", e);
+            saveScaledImages(photo);
+            updateTags(photo);
+        }
+    }
+
+    /**
+     *  Removes all tags of the Photo (obj) in the datastore that have been removed by the user
+     *  and adds all new tags of the photo to the datastore.
+     */
+    protected void updateTags(Photo photo) {
+        // delete all existing tags, for the case that some have been removed
+        deleteObjects(Tag.class, Tag.PHOTO_ID, photo.getId());
+
+        // add all current tags to the datastore
+        Set<String> tags = new HashSet<String>();
+        photoTagCollector.collect(tags, photo);
+        for (Iterator<String> i = tags.iterator(); i.hasNext(); ) {
+            Tag tag = new Tag(i.next(), photo.getId().asString());
+            log.info("Write tag: " + tag.asString());
+            writeObject(tag);
+        }
+    }
+
+    /**
+     * Writes all Images of the different sizes to Google Cloud Storage.
+     */
+    protected void saveScaledImages(Photo photo) {
+        String photoIdAsString = photo.getId().asString();
+        String ending = photo.getEnding();
+        for(PhotoSize photoSize : PhotoSize.values()) {
+            Image image = photo.getImage(photoSize);
+            if(image != null) {
+                try {
+                    GcsAdapter gcsAdapter = GcsAdapter.getInstance();
+                    if(!gcsAdapter.doesImageExist(photoIdAsString, photoSize.asInt(), ending)) {
+                        gcsAdapter.writeToCloudStorage(image, photoIdAsString, photoSize.asInt(), ending);
                     }
                 }
-                else {
-                    log.info("No photo for size '" + photoSize.asString() + "'");
+                catch (Exception e) {
+                    log.log(Level.SEVERE, "Could not store image in Cloud Storage.", e);
                 }
             }
-        }
-        else {
-            throw new InvalidParameterException("Obj is not a Photo!");
+            else {
+                log.info("No photo for size '" + photoSize.asString() + "'");
+            }
         }
     }
 
@@ -252,6 +278,7 @@ public class PhotoManager extends ObjectManager {
             id = filter.getRandomDisplayablePhotoId();
             result = getPhotoFromId(id);
             if ((result != null) && !result.isVisible()) {
+                log.info("addProcessedPhoto: " + result.getId().asString());
                 filter.addProcessedPhoto(result);
             }
         }
@@ -265,35 +292,29 @@ public class PhotoManager extends ObjectManager {
     protected List<PhotoId> getFilteredPhotoIds(PhotoFilter filter) {
         // get all tags that match the filter conditions
         List<Tag> tags = new LinkedList<Tag>();
-        for(String condition : filter.getFilterConditions()) {
-            readObjects(tags, Tag.class, Tag.TEXT, condition);
+        int noFilterConditions = filter.getFilterConditions().size();
+        log.info("Number of filter conditions: " + noFilterConditions);
+
+        if (noFilterConditions == 0) {
+            readObjects(tags, Tag.class);
         }
+        else {
+            for (String condition : filter.getFilterConditions()) {
+                readObjects(tags, Tag.class, Tag.TEXT, condition);
+            }
+        }
+
+        log.info("Number of tags: " + tags.size());
 
         // get the list of all photo ids that correspond to the tags
         List<PhotoId> result = new LinkedList<PhotoId>();
         for(Tag tag : tags) {
-            result.add(tag.getPhotoId());
+            PhotoId photoId = PhotoId.getIdFromString(tag.getPhotoId());
+            if(!filter.isProcessedPhotoId(photoId)) {
+                result.add(PhotoId.getIdFromString(tag.getPhotoId()));
+            }
         }
         return result;
-    }
-
-    /**
-     *  Removes all tags of the Photo (obj) in the datastore that have been removed by the user
-     *  and adds all new tags of the photo to the datastore.
-     */
-    protected void updateDependents(Persistent obj)  {
-        Photo photo = (Photo) obj;
-
-        // delete all existing tags, for the case that some have been removed
-        deleteObjects(Tag.class, Tag.PHOTO_ID, photo.getId());
-
-        // add all current tags to the datastore
-        Set<String> tags = new HashSet<String>();
-        photoTagCollector.collect(tags, photo);
-        for (Iterator<String> i = tags.iterator(); i.hasNext(); ) {
-            Tag tag = new Tag(i.next(), photo.getId());
-            writeObject(tag);
-        }
     }
 
     /**

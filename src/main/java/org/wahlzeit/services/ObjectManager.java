@@ -37,7 +37,7 @@ import java.util.logging.Logger;
 public abstract class ObjectManager {
 
     protected static final Logger log = Logger.getLogger(ObjectManager.class.getName());
-    private static final Key applicationRootKey = KeyFactory.createKey("Application", "Wahlzeit");
+    public static final Key applicationRootKey = KeyFactory.createKey("Application", "Wahlzeit");
 
     /**
      *  Finds the first Entity with the given key

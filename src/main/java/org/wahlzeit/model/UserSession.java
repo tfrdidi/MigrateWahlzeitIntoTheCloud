@@ -219,6 +219,7 @@ public class UserSession extends Session implements Serializable {
      */
     public void addPraisedPhoto(Photo photo) {
         praisedPhotos.add(photo);
+        addDisplayedPhoto(photo);
     }
 
     /**
