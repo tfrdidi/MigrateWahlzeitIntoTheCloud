@@ -74,6 +74,7 @@ public abstract class ModelMain extends AbstractMain {
         File photoDirFile = new File(photoDir);
         FileFilter photoFileFilter = new FileFilter() {
             public boolean accept(File file) {
+                //TODO: check and change
                 return file.getName().endsWith(".jpg");
             }
         };

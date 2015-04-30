@@ -261,7 +261,7 @@ public abstract class AbstractWebPartHandler implements WebPartHandler {
      *
      */
     protected String getPhotoAsRelativeResourcePathString(Photo photo, PhotoSize size) {
-        String resName = photo.getId().asString() + size.asInt() + ".jpg";
+        String resName = photo.getId().asString() + size.asInt() + "." + photo.getEnding();
         return SysConfig.getPhotosDir().getRelativeDir() + '/' + resName;
     }
 
