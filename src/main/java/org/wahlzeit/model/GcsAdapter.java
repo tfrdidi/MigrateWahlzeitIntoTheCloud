@@ -9,6 +9,7 @@ import com.google.appengine.tools.cloudstorage.GcsOutputChannel;
 import com.google.appengine.tools.cloudstorage.GcsService;
 import com.google.appengine.tools.cloudstorage.GcsServiceFactory;
 import com.google.appengine.tools.cloudstorage.RetryParams;
+import org.wahlzeit.services.SysConfig;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,7 +28,7 @@ public class GcsAdapter {
 
     private static final Logger log = Logger.getLogger(GcsAdapter.class.getName());
 
-    public static final String BUCKET_NAME = "data";
+    public static final String BUCKET_NAME = SysConfig.DATA_PATH;
     public static final String PHOTO_FOLDER = "photos";
     public static final String PHOTO_FOLDER_PATH_WITH_BUCKET = File.separator + BUCKET_NAME + File.separator + PHOTO_FOLDER + File.separator;
 

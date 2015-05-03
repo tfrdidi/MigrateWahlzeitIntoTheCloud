@@ -20,11 +20,15 @@
 
 package org.wahlzeit.model;
 
+import com.googlecode.objectify.annotation.Entity;
+import com.googlecode.objectify.annotation.Id;
+
 /**
  * A photo case is a case where someone flagged a photo as inappropriate.
  *
  * @author dirkriehle
  */
+@Entity
 public class PhotoCase extends Case {
 
     /**
@@ -40,6 +44,8 @@ public class PhotoCase extends Case {
     /**
      *
      */
+    @Id
+    Long longId;
     protected CaseId id = CaseId.NULL_ID; // case id
     protected int applicationId = 0; // application id (unused on Java level)
     protected Photo photo = null; // photo id -> photo

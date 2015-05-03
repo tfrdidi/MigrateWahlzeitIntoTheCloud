@@ -181,7 +181,7 @@ public class PhotoManager extends ObjectManager {
     }
 
     @Override
-    protected <E> void updateDependents(E obj) {
+    protected void updateDependents(Persistent obj) {
         if(obj instanceof  Photo) {
             Photo photo = (Photo) obj;
             saveScaledImages(photo);
@@ -195,7 +195,7 @@ public class PhotoManager extends ObjectManager {
      */
     protected void updateTags(Photo photo) {
         // delete all existing tags, for the case that some have been removed
-        deleteObjects(Tag.class, Tag.PHOTO_ID, photo.getId());
+        deleteObjects(Tag.class, Tag.PHOTO_ID, photo.getId().asString());
 
         // add all current tags to the datastore
         Set<String> tags = new HashSet<String>();

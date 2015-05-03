@@ -117,7 +117,9 @@ public class PhotoCaseManager extends ObjectManager {
      * @methodtype command
      */
     public void savePhotoCases() {
-        updateObjects(openPhotoCases.values());
+        if(openPhotoCases != null && openPhotoCases.size() > 0) {
+            updateObjects(openPhotoCases.values());
+        }
     }
 
     /**

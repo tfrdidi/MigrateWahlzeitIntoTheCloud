@@ -29,6 +29,8 @@ import java.io.File;
  */
 public class SysConfig extends AbstractConfig {
 
+    public static String DATA_PATH = "org-wahlzeit-data";
+
     /**
      *
      */
@@ -113,9 +115,9 @@ public class SysConfig extends AbstractConfig {
         templatesDir = new ConfigDir(rootDir, "config" + File.separator + "templates");
 
         // Data directories
-        photosDir = new Directory(rootDir, "data" + File.separator + "photos");
-        backupDir = new Directory(rootDir, "data" + File.separator + "backup");
-        tempDir = new Directory(rootDir, "data" + File.separator + "temp");
+        photosDir = new Directory(rootDir, DATA_PATH + File.separator + "photos");
+        backupDir = new Directory(rootDir, DATA_PATH + File.separator + "backup");
+        tempDir = new Directory(rootDir, DATA_PATH + File.separator + "temp");
     }
 
     /**

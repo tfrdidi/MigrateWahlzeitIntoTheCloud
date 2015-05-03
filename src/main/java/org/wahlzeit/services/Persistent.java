@@ -43,9 +43,4 @@ public interface Persistent {
      */
     public void resetWriteCount();
 
-    /**
-     *
-     */
-    public String getIdAsString();
-
 }
