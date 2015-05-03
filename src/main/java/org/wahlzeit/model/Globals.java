@@ -2,6 +2,7 @@ package org.wahlzeit.model;
 
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
+import org.wahlzeit.services.DataObject;
 
 /**
  * Class that combines all global wahlzeit variables that need to be stored
@@ -10,7 +11,7 @@ import com.googlecode.objectify.annotation.Id;
  * Created by Lukas Hahmann on 01.04.15.
  */
 @Entity
-public class Globals {
+public class Globals extends DataObject {
 
     public static final String ID = "id";
     public static final Long DEAULT_ID = 1L;
@@ -24,6 +25,7 @@ public class Globals {
 
     public Globals() {
         id = DEAULT_ID;
+        incWriteCount();
     }
 
     public Long getLastUserId() {
@@ -41,20 +43,25 @@ public class Globals {
     public int getLastSessionId() {
         return lastSessionId;
     }
+
     public void setLastPhotoId(int lastPhotoId) {
         this.lastPhotoId = lastPhotoId;
+        incWriteCount();
     }
 
     public void setLastUserId(Long lastUserId) {
         this.lastUserId = lastUserId;
+        incWriteCount();
     }
 
     public void setLastCaseId(int lastCaseId) {
         this.lastCaseId = lastCaseId;
+        incWriteCount();
     }
 
     public void setLastSessionId(int lastSessionId) {
         this.lastSessionId = lastSessionId;
+        incWriteCount();
     }
 
     public String asString() {

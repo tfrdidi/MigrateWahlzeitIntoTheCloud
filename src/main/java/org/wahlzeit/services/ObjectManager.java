@@ -25,7 +25,6 @@ import com.google.appengine.api.datastore.KeyFactory;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -77,24 +76,30 @@ public abstract class ObjectManager {
     /**
      * Writes the given Entity to the datastore.
      */
-    protected <E> void writeObject(E object) {
-        log.log(Level.FINE, "Write Entity  " + object.toString() + " into the datastore.");
-        OfyService.ofy().save().entity(object).now();
-        updateDependents(object);
+    protected void writeObject(Persistent object) {
+        if(object.isDirty()) {
+            log.info("Write Entity  " + object.toString() + " into the datastore.");
+            OfyService.ofy().save().entity(object).now();
+            updateDependents(object);
+            object.resetWriteCount();
+        }
+        else {
+            log.info("No need to update object " + object.toString() + " in the datastore.");
+        }
     }
 
     /**
      * Updates the given entitiy in the datastore.
      */
-    protected <E> void updateObject(E object) {
+    protected void updateObject(Persistent object) {
         writeObject(object);
     }
 
     /**
      * Updates all entities of the given collection in the datastore.
      */
-    protected <E> void updateObjects(Collection<E> collection) {
-        for(E object : collection) {
+    protected void updateObjects(Collection<? extends Persistent> collection) {
+        for(Persistent object : collection) {
             updateObject(object);
         }
     }
@@ -102,7 +107,7 @@ public abstract class ObjectManager {
     /**
      * Updates all dependencies of the object.
      */
-    protected <E> void updateDependents(E object) {
+    protected void updateDependents(Persistent object) {
         // overwrite if your object has additional dependencies
     }
 
@@ -110,7 +115,7 @@ public abstract class ObjectManager {
      * Deletes the given entity from the datastore.
      */
     protected <E> void deleteObject(E object) {
-        log.log(Level.FINE, "Delete entity " + object.toString() + " from datastore.");
+        log.info("Delete entity " + object.toString() + " from datastore.");
         OfyService.ofy().delete().entity(object).now();
     }
 
@@ -119,7 +124,7 @@ public abstract class ObjectManager {
      * e.g. deleteObjects(PhotoCase.class, "wasDecided", true) to delete all cases that have been decided.
      */
     protected <E> void deleteObjects(Class<E> type, String propertyName, Object value) {
-        log.log(Level.FINE, "Delete entities of type " + type + " where property " + propertyName + " == " + value.toString() + " from datastore.");
+        log.info("Delete entities of type " + type + " where property " + propertyName + " == " + value.toString() + " from datastore.");
         List<com.googlecode.objectify.Key<E>> keys = OfyService.ofy().load().type(type).ancestor(applicationRootKey).filter(propertyName, value).keys().list();
         OfyService.ofy().delete().type(type).ids(keys);
     }
