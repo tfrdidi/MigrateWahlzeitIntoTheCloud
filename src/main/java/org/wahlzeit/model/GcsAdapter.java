@@ -8,7 +8,6 @@ import com.google.appengine.tools.cloudstorage.GcsInputChannel;
 import com.google.appengine.tools.cloudstorage.GcsOutputChannel;
 import com.google.appengine.tools.cloudstorage.GcsService;
 import com.google.appengine.tools.cloudstorage.GcsServiceFactory;
-import com.google.appengine.tools.cloudstorage.ListOptions;
 import com.google.appengine.tools.cloudstorage.RetryParams;
 
 import java.io.File;
@@ -31,7 +30,6 @@ public class GcsAdapter {
     public static final String BUCKET_NAME = "data";
     public static final String PHOTO_FOLDER = "photos";
     public static final String PHOTO_FOLDER_PATH_WITH_BUCKET = File.separator + BUCKET_NAME + File.separator + PHOTO_FOLDER + File.separator;
-    public static final String PHOTO_FOLDER_PATH_WITHOUT_BUCKET = PHOTO_FOLDER + File.separator;
 
     /**
      * 1 MB Buffer, does not limit the size of the files.
@@ -130,11 +128,13 @@ public class GcsAdapter {
     }
 
     /**
-     * @throws IllegalArgumentException - one parameter = null or emtpy
-     * @throws IOException
      * @methodtype command
      * <p/>
      * Reads an image from Google Cloud Storage via ownerName, photoId and the size.
+     *
+     * @throws IOException
+     * @throws IllegalArgumentException - one parameter = null or emtpy
+     *
      * @see #writeToCloudStorage(Image, String, int, String)
      */
     public Image readFromCloudStorage(String photoIdAsString, int size, String ending)
@@ -149,10 +149,9 @@ public class GcsAdapter {
     }
 
     /**
-     * @throws IOException - when can not access Google Cloud Storage, e.g. insufficient rights
      * @methodtype command
-     * <p/>
      * Reads the specified file from Google Cloud Storage. When not found, null is returned.
+     * @throws IOException - when can not access Google Cloud Storage, e.g. insufficient rights
      */
     private Image readFromCloudStorage(GcsFilename gcsFilename)
             throws IOException, InvalidParameterException {
