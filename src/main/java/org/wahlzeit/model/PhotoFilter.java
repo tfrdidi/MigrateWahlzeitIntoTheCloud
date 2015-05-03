@@ -28,11 +28,14 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Logger;
 
 /**
  * @author dirkriehle
  */
 public class PhotoFilter implements Serializable {
+
+    private static Logger log = Logger.getLogger(PhotoFilter.class.getName());
 
     /**
      *
@@ -101,6 +104,7 @@ public class PhotoFilter implements Serializable {
      */
     public void setTags(Tags newTags) {
         tags = newTags;
+        resetDisplayablePhotoIds();
     }
 
     /**
@@ -174,6 +178,10 @@ public class PhotoFilter implements Serializable {
      *
      */
     public boolean isProcessedPhotoId(PhotoId photoId) {
+        log.info("photoId: " + photoId.asString());
+        for (PhotoId id : processedPhotoIds) {
+            log.info("Processed id: " + id.asString());
+        }
         return processedPhotoIds.contains(photoId);
     }
 

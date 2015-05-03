@@ -312,6 +312,7 @@ public class PhotoManager extends ObjectManager {
             PhotoId photoId = PhotoId.getIdFromString(tag.getPhotoId());
             if(!filter.isProcessedPhotoId(photoId)) {
                 result.add(PhotoId.getIdFromString(tag.getPhotoId()));
+                log.info("Add Photo " + tag.getPhotoId() + " to filter result.");
             }
         }
         return result;
