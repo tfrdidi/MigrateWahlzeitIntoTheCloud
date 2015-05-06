@@ -95,16 +95,16 @@ public class ServiceMain extends ModelMain {
         configureWebPartHandlers();
         configureLanguageModels();
 
-        AgentManager am = AgentManager.getInstance();
-        am.startAllThreads();
+        //AgentManager am = AgentManager.getInstance();
+        //am.startAllThreads();
     }
 
     /**
      *
      */
     public void shutDown() throws Exception {
-        AgentManager am = AgentManager.getInstance();
-        am.stopAllThreads();
+        //AgentManager am = AgentManager.getInstance();
+        //am.stopAllThreads();
 
         super.shutDown();
     }

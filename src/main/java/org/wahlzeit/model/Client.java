@@ -25,6 +25,8 @@ import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
 import org.wahlzeit.services.EmailAddress;
 
+import java.io.Serializable;
+
 /**
  * A Client uses the system. It is an abstract superclass.
  * This package defines guest, user, moderator, and administrator clients.
@@ -32,7 +34,7 @@ import org.wahlzeit.services.EmailAddress;
  * @author dirkriehle
  */
 @Entity
-public abstract class Client {
+public abstract class Client implements Serializable{
 
     /**
      *

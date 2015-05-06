@@ -21,7 +21,6 @@
 package org.wahlzeit.model;
 
 import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.images.Image;
 import com.google.appengine.repackaged.com.google.api.client.util.ArrayMap;
 import com.googlecode.objectify.annotation.Entity;

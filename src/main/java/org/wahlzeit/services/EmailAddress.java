@@ -24,6 +24,7 @@ import org.wahlzeit.utils.StringUtil;
 
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,7 +34,7 @@ import java.util.Map;
  *
  * @author dirkriehle
  */
-public class EmailAddress {
+public class EmailAddress implements Serializable {
 
     /**
      *
