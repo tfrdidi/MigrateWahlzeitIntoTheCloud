@@ -42,6 +42,9 @@ public abstract class ObjectManager {
      *  Finds the first Entity with the given key
      */
     protected <E> E readObject(Class<E> type, Long id) {
+        assertIsNonNullArgument(type, "type");
+        assertIsNonNullArgument(id, "id");
+
         log.info("Load Type " + type.toString() + " with ID " + id + " from datastore.");
         return OfyService.ofy().load().type(type).id(id).now();
     }
@@ -51,6 +54,10 @@ public abstract class ObjectManager {
      * e.g. readObject(User.class, "emailAddress", "name@provider.com").
      */
     protected <E> E readObject(Class<E> type, String parameterName, Object value) {
+        assertIsNonNullArgument(type, "type");
+        assertIsNonNullArgument(parameterName, "parameterName");
+        assertIsNonNullArgument(value, "value");
+
         log.info("Load Type " + type.toString() + " with parameter " + parameterName + " == " + value + " from datastore.");
         return OfyService.ofy().load().type(type).ancestor(applicationRootKey).filter(parameterName, value).first().now();
     }
@@ -60,6 +67,9 @@ public abstract class ObjectManager {
      * e.g. readObject(User.class) to get a list of all users
      */
     protected <E> void readObjects(Collection<E> result, Class<E> type) {
+        assertIsNonNullArgument(result, "result");
+        assertIsNonNullArgument(type, "type");
+
         log.info("Load all Entities of type " + type.toString() + " from datastore.");
         result.addAll(OfyService.ofy().load().type(type).ancestor(applicationRootKey).list());
     }
@@ -69,6 +79,11 @@ public abstract class ObjectManager {
      * e.g. readObject(User.class) to get a list of all users
      */
     protected <E> void readObjects(Collection<E> result, Class<E> type, String propertyName, Object value) {
+        assertIsNonNullArgument(result, "result");
+        assertIsNonNullArgument(type, "type");
+        assertIsNonNullArgument(propertyName, "propertyName");
+        assertIsNonNullArgument(value, "value");
+
         log.info("Load all Entities of type " + type.toString() + " where parameter " + propertyName + " = " + value.toString() + " from datastore.");
         result.addAll(OfyService.ofy().load().type(type).ancestor(applicationRootKey).filter(propertyName, value).list());
     }
@@ -77,6 +92,8 @@ public abstract class ObjectManager {
      * Writes the given Entity to the datastore.
      */
     protected void writeObject(Persistent object) {
+        assertIsNonNullArgument(object, "object");
+
         if(object.isDirty()) {
             log.info("Write Entity  " + object.toString() + " into the datastore.");
             OfyService.ofy().save().entity(object).now();
@@ -115,6 +132,8 @@ public abstract class ObjectManager {
      * Deletes the given entity from the datastore.
      */
     protected <E> void deleteObject(E object) {
+        assertIsNonNullArgument(object, "object");
+
         log.info("Delete entity " + object.toString() + " from datastore.");
         OfyService.ofy().delete().entity(object).now();
     }
@@ -124,6 +143,10 @@ public abstract class ObjectManager {
      * e.g. deleteObjects(PhotoCase.class, "wasDecided", true) to delete all cases that have been decided.
      */
     protected <E> void deleteObjects(Class<E> type, String propertyName, Object value) {
+        assertIsNonNullArgument(type, "type");
+        assertIsNonNullArgument(propertyName, "propertyName");
+        assertIsNonNullArgument(value, "value");
+
         log.info("Delete entities of type " + type + " where property " + propertyName + " == " + value.toString() + " from datastore.");
         List<com.googlecode.objectify.Key<E>> keys = OfyService.ofy().load().type(type).ancestor(applicationRootKey).filter(propertyName, value).keys().list();
         OfyService.ofy().delete().type(type).ids(keys);

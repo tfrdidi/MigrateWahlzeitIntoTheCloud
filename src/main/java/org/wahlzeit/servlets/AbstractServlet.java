@@ -91,6 +91,7 @@ public abstract class AbstractServlet extends HttpServlet {
             myGet(request, response);
         }
 
+        request.getSession().setAttribute("session", us);
         SessionManager.dropThreadLocalSession();
     }
 
@@ -117,6 +118,7 @@ public abstract class AbstractServlet extends HttpServlet {
             myPost(request, response);
         }
 
+        request.getSession().setAttribute("session", us);
         SessionManager.dropThreadLocalSession();
     }
 
@@ -132,6 +134,7 @@ public abstract class AbstractServlet extends HttpServlet {
      */
     protected UserSession ensureUserSession(HttpServletRequest request) {
         HttpSession httpSession = request.getSession();
+        log.info("Sessionid: " + httpSession.getId());
         UserSession result = (UserSession) httpSession.getAttribute("session");
         if (result == null) {
             try {

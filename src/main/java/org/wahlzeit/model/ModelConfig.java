@@ -25,6 +25,7 @@ import org.wahlzeit.services.EmailAddress;
 import org.wahlzeit.services.Language;
 import org.wahlzeit.utils.EnumValue;
 
+import java.io.Serializable;
 import java.net.URL;
 
 
@@ -33,7 +34,7 @@ import java.net.URL;
  *
  * @author dirkriehle
  */
-public interface ModelConfig extends Configuration {
+public interface ModelConfig extends Configuration, Serializable {
 
     // Meta stuff
     public Language getLanguage();

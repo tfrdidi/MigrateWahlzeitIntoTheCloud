@@ -49,9 +49,6 @@ public class LoginFormHandler extends AbstractWebFormHandler {
     protected void doMakeWebPart(UserSession us, WebPart part) {
         Map args = us.getSavedArgs();
         part.addStringFromArgs(args, UserSession.MESSAGE);
-
-//		part.addString(WebContext.MESSAGE, ctx.getMessage());
-
         part.maskAndAddStringFromArgs(args, User.NAME);
     }
 

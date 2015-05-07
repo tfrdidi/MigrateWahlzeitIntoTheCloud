@@ -20,6 +20,7 @@
 
 package org.wahlzeit.model;
 
+import java.io.Serializable;
 import java.util.Random;
 
 /**
@@ -29,7 +30,7 @@ import java.util.Random;
  *
  * @author dirkriehle
  */
-public class PhotoId {
+public class PhotoId implements Serializable{
 
     /**
      * 0 is never returned from nextValue; first value is 1

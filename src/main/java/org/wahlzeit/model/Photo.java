@@ -20,9 +20,9 @@
 
 package org.wahlzeit.model;
 
+import com.google.api.client.util.ArrayMap;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.images.Image;
-import com.google.appengine.repackaged.com.google.api.client.util.ArrayMap;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Ignore;
@@ -94,7 +94,7 @@ public class Photo extends DataObject {
      * Google Cloud Storage.
      */
     @Ignore
-    protected Map<PhotoSize, Image> images = new ArrayMap<PhotoSize, Image>();
+    transient protected Map<PhotoSize, Image> images = new ArrayMap<PhotoSize, Image>();
 
     /**
      *

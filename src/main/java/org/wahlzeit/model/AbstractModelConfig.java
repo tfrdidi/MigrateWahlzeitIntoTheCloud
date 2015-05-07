@@ -31,6 +31,7 @@ import org.wahlzeit.utils.EnumValue;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -41,7 +42,7 @@ import java.text.SimpleDateFormat;
  *
  * @author dirkriehle
  */
-public abstract class AbstractModelConfig extends AbstractConfig implements ModelConfig {
+public abstract class AbstractModelConfig extends AbstractConfig implements ModelConfig, Serializable {
 
     /**
      *
