@@ -60,29 +60,29 @@ public class EmailUserNameFormHandler extends AbstractWebFormHandler {
     protected String doHandlePost(UserSession us, Map args) {
         String emailAddress = us.getAndSaveAsString(args, User.EMAIL_ADDRESS);
         if (StringUtil.isNullOrEmptyString(emailAddress)) {
-            us.setMessage(us.cfg().getFieldIsMissing());
+            us.setMessage(us.getConfiguration().getFieldIsMissing());
             return PartUtil.EMAIL_PASSWORD_PAGE_NAME;
         } else if (!StringUtil.isValidStrictEmailAddress(emailAddress)) {
-            us.setMessage(us.cfg().getEmailAddressIsInvalid());
+            us.setMessage(us.getConfiguration().getEmailAddressIsInvalid());
             return PartUtil.EMAIL_PASSWORD_PAGE_NAME;
         }
 
         UserManager userManager = UserManager.getInstance();
         User user = userManager.getUserByEmailAddress(emailAddress);
         if (user == null) {
-            us.setMessage(us.cfg().getUnknownEmailAddress());
+            us.setMessage(us.getConfiguration().getUnknownEmailAddress());
             return PartUtil.EMAIL_PASSWORD_PAGE_NAME;
         }
 
         EmailService emailService = EmailServiceManager.getDefaultService();
 
-        EmailAddress from = us.cfg().getModeratorEmailAddress();
+        EmailAddress from = us.getConfiguration().getModeratorEmailAddress();
         EmailAddress to = user.getEmailAddress();
-        emailService.sendEmailIgnoreException(from, to, us.cfg().getAuditEmailAddress(), us.cfg().getSendUserNameEmailSubject(), user.getName());
+        emailService.sendEmailIgnoreException(from, to, us.getConfiguration().getAuditEmailAddress(), us.getConfiguration().getSendUserNameEmailSubject(), user.getName());
 
         UserLog.logPerformedAction("EmailUserName");
 
-        us.setTwoLineMessage(us.cfg().getUserNameWasEmailed(), us.cfg().getContinueWithShowPhoto());
+        us.setTwoLineMessage(us.getConfiguration().getUserNameWasEmailed(), us.getConfiguration().getContinueWithShowPhoto());
 
         return PartUtil.SHOW_NOTE_PAGE_NAME;
     }

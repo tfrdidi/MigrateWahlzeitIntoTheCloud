@@ -52,14 +52,14 @@ public class ShowUserProfileFormHandler extends AbstractWebFormHandler {
         part.addString(Photo.THUMB, getPhotoThumb(us, photo));
 
         part.maskAndAddString(User.NAME, user.getName());
-        part.addString(User.STATUS, us.cfg().asValueString(user.getStatus()));
+        part.addString(User.STATUS, us.getConfiguration().asValueString(user.getStatus()));
         part.maskAndAddString(User.EMAIL_ADDRESS, user.getEmailAddress().asString());
-        part.addString(User.MEMBER_SINCE, us.cfg().asDateString(user.getCreationTime()));
-        part.addString(User.NOTIFY_ABOUT_PRAISE, us.cfg().asYesOrNoString(user.getNotifyAboutPraise()));
+        part.addString(User.MEMBER_SINCE, us.getConfiguration().asDateString(user.getCreationTime()));
+        part.addString(User.NOTIFY_ABOUT_PRAISE, us.getConfiguration().asYesOrNoString(user.getNotifyAboutPraise()));
         part.addString(User.HOME_PAGE, HtmlUtil.asHref(user.getHomePage().toString()));
         part.addString(User.NO_PHOTOS, String.valueOf(user.getNoPhotos()));
-        part.addString(User.GENDER, us.cfg().asValueString(user.getGender()));
-        part.addString(User.LANGUAGE, us.cfg().asValueString(user.getLanguage()));
+        part.addString(User.GENDER, us.getConfiguration().asValueString(user.getGender()));
+        part.addString(User.LANGUAGE, us.getConfiguration().asValueString(user.getLanguage()));
     }
 
     /**

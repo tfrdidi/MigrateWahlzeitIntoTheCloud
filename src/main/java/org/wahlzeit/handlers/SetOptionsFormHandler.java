@@ -78,9 +78,9 @@ public class SetOptionsFormHandler extends AbstractWebFormHandler {
         UserLog.addField(sb, "photoSize", photoSize);
         UserLog.log(sb);
 
-        String msg1 = us.cfg().getOptionsWereSet();
-        String msg2 = us.cfg().getNoteMaximumPhotoSize();
-        String msg3 = us.cfg().getContinueWithShowPhoto();
+        String msg1 = us.getConfiguration().getOptionsWereSet();
+        String msg2 = us.getConfiguration().getNoteMaximumPhotoSize();
+        String msg3 = us.getConfiguration().getContinueWithShowPhoto();
         us.setThreeLineMessage(msg1, msg2, msg3);
 
         return PartUtil.SHOW_NOTE_PAGE_NAME;

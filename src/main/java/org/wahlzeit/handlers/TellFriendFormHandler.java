@@ -62,13 +62,13 @@ public class TellFriendFormHandler extends AbstractWebFormHandler {
 
         part.maskAndAddStringFromArgsWithDefault(args, EMAIL_FROM, us.getEmailAddressAsString());
         part.maskAndAddStringFromArgs(args, EMAIL_TO);
-        part.maskAndAddStringFromArgsWithDefault(args, EMAIL_SUBJECT, us.cfg().getTellFriendEmailSubject());
+        part.maskAndAddStringFromArgsWithDefault(args, EMAIL_SUBJECT, us.getConfiguration().getTellFriendEmailSubject());
 
-        String emailText = us.cfg().getTellFriendEmailWebsite() + "\n\n" + us.getSiteUrl() + "\n\n";
+        String emailText = us.getConfiguration().getTellFriendEmailWebsite() + "\n\n" + us.getSiteUrl() + "\n\n";
 
         String id = us.getAsString(args, Photo.ID);
         if (!StringUtil.isNullOrEmptyString(id) && PhotoManager.hasPhoto(id)) {
-            emailText += (us.cfg().getTellFriendEmailPhoto() + "\n\n" + us.getSiteUrl() + id + ".html" + "\n\n");
+            emailText += (us.getConfiguration().getTellFriendEmailPhoto() + "\n\n" + us.getSiteUrl() + id + ".html" + "\n\n");
         }
 
         part.addString(Photo.ID, id);
@@ -88,20 +88,20 @@ public class TellFriendFormHandler extends AbstractWebFormHandler {
         String emailBody = us.getAndSaveAsString(args, EMAIL_BODY);
 
         if (StringUtil.isNullOrEmptyString(yourEmailAddress)) {
-            us.setMessage(us.cfg().getEmailAddressIsMissing());
+            us.setMessage(us.getConfiguration().getEmailAddressIsMissing());
             return PartUtil.TELL_FRIEND_PAGE_NAME;
         } else if (!StringUtil.isValidStrictEmailAddress(yourEmailAddress)) {
-            us.setMessage(us.cfg().getEmailAddressIsInvalid());
+            us.setMessage(us.getConfiguration().getEmailAddressIsInvalid());
             return PartUtil.TELL_FRIEND_PAGE_NAME;
         } else if (StringUtil.isNullOrEmptyString(friendsEmailAddress)) {
-            us.setMessage(us.cfg().getEmailAddressIsMissing());
+            us.setMessage(us.getConfiguration().getEmailAddressIsMissing());
             return PartUtil.TELL_FRIEND_PAGE_NAME;
         } else if (!StringUtil.isValidStrictEmailAddress(friendsEmailAddress)) {
-            us.setMessage(us.cfg().getEmailAddressIsInvalid());
+            us.setMessage(us.getConfiguration().getEmailAddressIsInvalid());
             return PartUtil.TELL_FRIEND_PAGE_NAME;
         }
         if ((emailSubject.length() > 128) || (emailBody.length() > 1024)) {
-            us.setMessage(us.cfg().getInputIsTooLong());
+            us.setMessage(us.getConfiguration().getInputIsTooLong());
             return PartUtil.TELL_FRIEND_PAGE_NAME;
         }
 
@@ -109,13 +109,13 @@ public class TellFriendFormHandler extends AbstractWebFormHandler {
         EmailAddress to = EmailAddress.getFromString(friendsEmailAddress);
 
         EmailService emailService = EmailServiceManager.getDefaultService();
-        emailService.sendEmailIgnoreException(from, to, us.cfg().getAuditEmailAddress(), emailSubject, emailBody);
+        emailService.sendEmailIgnoreException(from, to, us.getConfiguration().getAuditEmailAddress(), emailSubject, emailBody);
 
         us.setEmailAddress(from);
 
         UserLog.logPerformedAction("TellFriend");
 
-        us.setTwoLineMessage(us.cfg().getEmailWasSent() + friendsEmailAddress + "! ", us.cfg().getKeepGoing());
+        us.setTwoLineMessage(us.getConfiguration().getEmailWasSent() + friendsEmailAddress + "! ", us.getConfiguration().getKeepGoing());
 
         return PartUtil.TELL_FRIEND_PAGE_NAME;
     }

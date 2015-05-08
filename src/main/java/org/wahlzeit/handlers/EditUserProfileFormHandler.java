@@ -79,10 +79,10 @@ public class EditUserProfileFormHandler extends AbstractWebFormHandler {
         String language = us.getAndSaveAsString(args, User.LANGUAGE);
 
         if (!StringUtil.isValidStrictEmailAddress(emailAddress)) {
-            us.setMessage(us.cfg().getEmailAddressIsInvalid());
+            us.setMessage(us.getConfiguration().getEmailAddressIsInvalid());
             return PartUtil.EDIT_USER_PROFILE_PAGE_NAME;
         } else if (!StringUtil.isValidURL(homePage)) {
-            us.setMessage(us.cfg().getUrlIsInvalid());
+            us.setMessage(us.getConfiguration().getUrlIsInvalid());
             return PartUtil.EDIT_USER_PROFILE_PAGE_NAME;
         }
 
@@ -110,7 +110,7 @@ public class EditUserProfileFormHandler extends AbstractWebFormHandler {
         UserLog.addUpdatedObject(sb, "User", user.getName());
         UserLog.log(sb);
 
-        us.setTwoLineMessage(us.cfg().getProfileUpdateSucceeded(), us.cfg().getContinueWithShowUserHome());
+        us.setTwoLineMessage(us.getConfiguration().getProfileUpdateSucceeded(), us.getConfiguration().getContinueWithShowUserHome());
 
         return PartUtil.SHOW_NOTE_PAGE_NAME;
     }

@@ -51,8 +51,6 @@ public class SignupFormHandler extends AbstractWebFormHandler {
         Map args = us.getSavedArgs();
         part.addStringFromArgs(args, UserSession.MESSAGE);
 
-//		part.addString(WebContext.MESSAGE, ctx.getMessage());
-
         part.addStringFromArgs(args, User.PASSWORD);
         part.addStringFromArgs(args, User.PASSWORD_AGAIN);
 
@@ -71,7 +69,7 @@ public class SignupFormHandler extends AbstractWebFormHandler {
         String terms = us.getAndSaveAsString(args, User.TERMS);
 
         UserManager userManager = UserManager.getInstance();
-        ModelConfig cfg = us.cfg();
+        ModelConfig cfg = us.getConfiguration();
 
         if (StringUtil.isNullOrEmptyString(userName)) {
             us.setMessage(cfg.getFieldIsMissing());
@@ -121,7 +119,7 @@ public class SignupFormHandler extends AbstractWebFormHandler {
         UserLog.addCreatedObject(sb, "User", userName);
         UserLog.log(sb);
 
-        us.setTwoLineMessage(us.cfg().getConfirmationEmailWasSent(), us.cfg().getContinueWithShowUserHome());
+        us.setTwoLineMessage(us.getConfiguration().getConfirmationEmailWasSent(), us.getConfiguration().getContinueWithShowUserHome());
 
         return PartUtil.SHOW_NOTE_PAGE_NAME;
     }

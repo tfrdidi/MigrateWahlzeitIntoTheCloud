@@ -73,7 +73,7 @@ public abstract class AbstractWebPartHandler implements WebPartHandler {
      */
     protected final WebPart createWebPart(UserSession us, String name) {
         WebPartTemplateService wpts = WebPartTemplateService.getInstance();
-        WebPartTemplate tmpl = wpts.getTemplate(us.cfg().getLanguageCode(), name);
+        WebPartTemplate tmpl = wpts.getTemplate(us.getConfiguration().getLanguageCode(), name);
         return new WebPart(tmpl);
     }
 
@@ -86,7 +86,7 @@ public abstract class AbstractWebPartHandler implements WebPartHandler {
             String imageLink = getPhotoAsRelativeResourcePathString(photo, PhotoSize.THUMB);
             result = HtmlUtil.asImg(HtmlUtil.asPath(imageLink), photo.getThumbWidth(), photo.getThumbHeight());
         } else {
-            Language langValue = us.cfg().getLanguage();
+            Language langValue = us.getConfiguration().getLanguage();
             result = HtmlUtil.asImg(getEmptyImageAsRelativeResourcePathString(langValue));
         }
         return result;
@@ -96,14 +96,14 @@ public abstract class AbstractWebPartHandler implements WebPartHandler {
      *
      */
     protected String getPhotoSummary(UserSession us, Photo photo) {
-        return photo.getSummary(us.cfg());
+        return photo.getSummary(us.getConfiguration());
     }
 
     /**
      *
      */
     protected String getPhotoCaption(UserSession us, Photo photo) {
-        return photo.getCaption(us.cfg());
+        return photo.getCaption(us.getConfiguration());
     }
 
     /**
@@ -192,9 +192,9 @@ public abstract class AbstractWebPartHandler implements WebPartHandler {
      *
      */
     protected String getIllegalAccessErrorPage(UserSession us) {
-        us.setHeading(us.cfg().getInformation());
+        us.setHeading(us.getConfiguration().getInformation());
 
-        String msg1 = us.cfg().getIllegalAccessError();
+        String msg1 = us.getConfiguration().getIllegalAccessError();
         us.setMessage(msg1);
 
         return PartUtil.SHOW_NOTE_PAGE_NAME;
@@ -204,12 +204,12 @@ public abstract class AbstractWebPartHandler implements WebPartHandler {
      *
      */
     protected String getIllegalArgumentErrorPage(UserSession us) {
-        us.setHeading(us.cfg().getInformation());
+        us.setHeading(us.getConfiguration().getInformation());
 
-        String msg1 = us.cfg().getIllegalArgumentError();
-        String msg2 = us.cfg().getContinueWithShowPhoto();
+        String msg1 = us.getConfiguration().getIllegalArgumentError();
+        String msg2 = us.getConfiguration().getContinueWithShowPhoto();
         if (us.getClient() instanceof User) {
-            msg2 = us.cfg().getContinueWithShowUserHome();
+            msg2 = us.getConfiguration().getContinueWithShowUserHome();
         }
 
         us.setTwoLineMessage(msg1, msg2);
@@ -221,12 +221,12 @@ public abstract class AbstractWebPartHandler implements WebPartHandler {
      *
      */
     protected String getInternalProcessingErrorPage(UserSession us) {
-        us.setHeading(us.cfg().getInformation());
+        us.setHeading(us.getConfiguration().getInformation());
 
-        String msg1 = us.cfg().getInternalProcessingError();
-        String msg2 = us.cfg().getContinueWithShowPhoto();
+        String msg1 = us.getConfiguration().getInternalProcessingError();
+        String msg2 = us.getConfiguration().getContinueWithShowPhoto();
         if (us.getClient() instanceof User) {
-            msg2 = us.cfg().getContinueWithShowUserHome();
+            msg2 = us.getConfiguration().getContinueWithShowUserHome();
         }
 
         us.setTwoLineMessage(msg1, msg2);

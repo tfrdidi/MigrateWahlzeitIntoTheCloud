@@ -57,9 +57,9 @@ public class LogoutPageHandler extends AbstractWebPageHandler {
      * @methodtype command
      */
     protected void makeWebPageBody(UserSession us, WebPart page) {
-        page.addString("noteHeading", us.cfg().getThankYou());
-        String msg1 = us.cfg().getLogoutSucceeded();
-        String msg2 = us.cfg().getContinueWithTellFriends();
+        page.addString("noteHeading", us.getConfiguration().getThankYou());
+        String msg1 = us.getConfiguration().getLogoutSucceeded();
+        String msg2 = us.getConfiguration().getContinueWithTellFriends();
         page.addString("note", HtmlUtil.asP(msg1) + HtmlUtil.asP(msg2));
     }
 

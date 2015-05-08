@@ -64,12 +64,12 @@ public class EditUserPhotoFormHandler extends AbstractWebFormHandler {
         part.addString(Photo.ID, id);
         part.addString(Photo.THUMB, getPhotoThumb(us, photo));
 
-        part.addString(Photo.PRAISE, photo.getPraiseAsString(us.cfg()));
+        part.addString(Photo.PRAISE, photo.getPraiseAsString(us.getConfiguration()));
         part.maskAndAddString(Photo.TAGS, photo.getTags().asString());
 
         part.addString(Photo.IS_INVISIBLE, HtmlUtil.asCheckboxCheck(photo.getStatus().isInvisible()));
-        part.addString(Photo.STATUS, us.cfg().asValueString(photo.getStatus()));
-        part.addString(Photo.UPLOADED_ON, us.cfg().asDateString(photo.getCreationTime()));
+        part.addString(Photo.STATUS, us.getConfiguration().asValueString(photo.getStatus()));
+        part.addString(Photo.UPLOADED_ON, us.getConfiguration().asDateString(photo.getCreationTime()));
     }
 
     /**
@@ -103,7 +103,7 @@ public class EditUserPhotoFormHandler extends AbstractWebFormHandler {
         UserLog.addUpdatedObject(sb, "Photo", photo.getId().asString());
         UserLog.log(sb);
 
-        us.setTwoLineMessage(us.cfg().getPhotoUpdateSucceeded(), us.cfg().getContinueWithShowUserHome());
+        us.setTwoLineMessage(us.getConfiguration().getPhotoUpdateSucceeded(), us.getConfiguration().getContinueWithShowUserHome());
 
         return PartUtil.SHOW_NOTE_PAGE_NAME;
     }

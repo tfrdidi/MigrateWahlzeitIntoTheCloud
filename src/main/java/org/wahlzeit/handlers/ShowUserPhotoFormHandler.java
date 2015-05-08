@@ -54,16 +54,16 @@ public class ShowUserPhotoFormHandler extends AbstractWebFormHandler {
         part.addString(Photo.ID, id);
         part.addString(Photo.THUMB, getPhotoThumb(us, photo));
 
-        part.addString(Photo.PRAISE, photo.getPraiseAsString(us.cfg()));
+        part.addString(Photo.PRAISE, photo.getPraiseAsString(us.getConfiguration()));
 
         String tags = photo.getTags().asString();
-        tags = !StringUtil.isNullOrEmptyString(tags) ? tags : us.cfg().getNoTags();
+        tags = !StringUtil.isNullOrEmptyString(tags) ? tags : us.getConfiguration().getNoTags();
         part.maskAndAddString(Photo.TAGS, tags);
 
-        String photoStatus = us.cfg().asValueString(photo.getStatus());
+        String photoStatus = us.getConfiguration().asValueString(photo.getStatus());
         part.addString(Photo.STATUS, photoStatus);
 
-        part.addString(Photo.UPLOADED_ON, us.cfg().asDateString(photo.getCreationTime()));
+        part.addString(Photo.UPLOADED_ON, us.getConfiguration().asDateString(photo.getCreationTime()));
         part.addString(Photo.LINK, HtmlUtil.asHref(getResourceAsRelativeHtmlPathString(id)));
     }
 

@@ -20,7 +20,6 @@
 
 package org.wahlzeit.handlers;
 
-import junit.framework.*;
 import org.wahlzeit.services.EmailAddress;
 import org.wahlzeit.webparts.WebPart;
 
@@ -67,7 +66,7 @@ public class TellFriendTest extends HandlerTestCase {
 	public void testTellFriendPost() {
 		EmailAddress from = EmailAddress.getFromString("info@wahlzeit.org");
 		EmailAddress to = EmailAddress.getFromString("fan@yahoo.com");
-		EmailAddress bcc = session.cfg().getAuditEmailAddress();
+		EmailAddress bcc = session.getConfiguration().getAuditEmailAddress();
 		String subject = "Coolest website ever!";
 		String body = "You've got to check this out!";
 

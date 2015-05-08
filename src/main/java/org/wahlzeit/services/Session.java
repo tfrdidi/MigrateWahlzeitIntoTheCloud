@@ -29,6 +29,9 @@ package org.wahlzeit.services;
  */
 public class Session {
 
+    public static final String NAME = "name";
+    public static final String PROCESSING_TIME = "processingTime";
+
     /**
      * Session state
      */
@@ -48,45 +51,67 @@ public class Session {
     }
 
     /**
-     *
+     * @methodtype init
      */
     protected void initialize(String myName) {
         name = myName;
+        notifyNameChanged();
     }
 
     /**
-     *
+     * @methodtype get
      */
     public String getName() {
         return name;
     }
 
     /**
-     *
+     * @methodtype get
      */
     public String getClientName() {
         return "system";
     }
 
     /**
-     *
+     * @methodtype init
      */
     public void resetProcessingTime() {
         processingTime = 0;
+        notifyProcessingTimeChanged();
     }
 
     /**
-     *
+     * @methodtype set
      */
     public void addProcessingTime(long time) {
         processingTime += time;
+        notifyProcessingTimeChanged();
     }
 
     /**
-     *
+     * @methodtype get
      */
     public long getProcessingTime() {
         return processingTime;
+    }
+
+    /**
+     * @methodproperty hook
+     *
+     * Hook method for subclasses to get to know when name changes.
+     * @see #initialize(String)
+     */
+    protected void notifyNameChanged() {
+    }
+
+    /**
+     * @methodproperty hook
+     *
+     * Hook method for subclasses to get to know when processing time changes.
+     * @see #addProcessingTime(long)
+     * @see #resetProcessingTime()
+     */
+    protected void notifyProcessingTimeChanged() {
     }
 
 }

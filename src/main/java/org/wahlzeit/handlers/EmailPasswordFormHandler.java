@@ -62,24 +62,24 @@ public class EmailPasswordFormHandler extends AbstractWebFormHandler {
 
         String userName = us.getAndSaveAsString(args, User.NAME);
         if (StringUtil.isNullOrEmptyString(userName)) {
-            us.setMessage(us.cfg().getFieldIsMissing());
+            us.setMessage(us.getConfiguration().getFieldIsMissing());
             return PartUtil.EMAIL_PASSWORD_PAGE_NAME;
         } else if (!userManager.hasUserByName(userName)) {
-            us.setMessage(us.cfg().getUserNameIsUnknown());
+            us.setMessage(us.getConfiguration().getUserNameIsUnknown());
             return PartUtil.EMAIL_PASSWORD_PAGE_NAME;
         }
 
         User user = userManager.getUserByName(userName);
 
-        EmailAddress from = us.cfg().getModeratorEmailAddress();
+        EmailAddress from = us.getConfiguration().getModeratorEmailAddress();
         EmailAddress to = user.getEmailAddress();
 
         EmailService emailService = EmailServiceManager.getDefaultService();
-        emailService.sendEmailIgnoreException(from, to, us.cfg().getAuditEmailAddress(), us.cfg().getSendPasswordEmailSubject(), user.getPassword());
+        emailService.sendEmailIgnoreException(from, to, us.getConfiguration().getAuditEmailAddress(), us.getConfiguration().getSendPasswordEmailSubject(), user.getPassword());
 
         UserLog.logPerformedAction("EmailPassword");
 
-        us.setTwoLineMessage(us.cfg().getPasswordWasEmailed(), us.cfg().getContinueWithShowPhoto());
+        us.setTwoLineMessage(us.getConfiguration().getPasswordWasEmailed(), us.getConfiguration().getContinueWithShowPhoto());
 
         return PartUtil.SHOW_NOTE_PAGE_NAME;
     }

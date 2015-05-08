@@ -235,36 +235,36 @@ public class UserManager extends ObjectManager {
      *
      */
     public void emailWelcomeMessage(UserSession us, User user) {
-        EmailAddress from = us.cfg().getAdministratorEmailAddress();
+        EmailAddress from = us.getConfiguration().getAdministratorEmailAddress();
         EmailAddress to = user.getEmailAddress();
 
-        String emailSubject = us.cfg().getWelcomeEmailSubject();
-        String emailBody = us.cfg().getWelcomeEmailBody() + "\n\n";
-        emailBody += us.cfg().getWelcomeEmailUserName() + user.getName() + "\n\n";
-        emailBody += us.cfg().getConfirmAccountEmailBody() + "\n\n";
+        String emailSubject = us.getConfiguration().getWelcomeEmailSubject();
+        String emailBody = us.getConfiguration().getWelcomeEmailBody() + "\n\n";
+        emailBody += us.getConfiguration().getWelcomeEmailUserName() + user.getName() + "\n\n";
+        emailBody += us.getConfiguration().getConfirmAccountEmailBody() + "\n\n";
         emailBody += user.getSiteUrlAsString() + "confirm?code=" + user.getConfirmationCode() + "\n\n"; // @TODO Application
-        emailBody += us.cfg().getGeneralEmailRegards() + "\n\n----\n";
-        emailBody += us.cfg().getGeneralEmailFooter() + "\n\n";
+        emailBody += us.getConfiguration().getGeneralEmailRegards() + "\n\n----\n";
+        emailBody += us.getConfiguration().getGeneralEmailFooter() + "\n\n";
 
         EmailService emailService = EmailServiceManager.getDefaultService();
-        emailService.sendEmailIgnoreException(from, to, us.cfg().getAuditEmailAddress(), emailSubject, emailBody);
+        emailService.sendEmailIgnoreException(from, to, us.getConfiguration().getAuditEmailAddress(), emailSubject, emailBody);
     }
 
     /**
      *
      */
     public void emailConfirmationRequest(UserSession us, User user) {
-        EmailAddress from = us.cfg().getAdministratorEmailAddress();
+        EmailAddress from = us.getConfiguration().getAdministratorEmailAddress();
         EmailAddress to = user.getEmailAddress();
 
-        String emailSubject = us.cfg().getConfirmAccountEmailSubject();
-        String emailBody = us.cfg().getConfirmAccountEmailBody() + "\n\n";
+        String emailSubject = us.getConfiguration().getConfirmAccountEmailSubject();
+        String emailBody = us.getConfiguration().getConfirmAccountEmailBody() + "\n\n";
         emailBody += user.getSiteUrlAsString() + "confirm?code=" + user.getConfirmationCode() + "\n\n"; // @TODO Application
-        emailBody += us.cfg().getGeneralEmailRegards() + "\n\n----\n";
-        emailBody += us.cfg().getGeneralEmailFooter() + "\n\n";
+        emailBody += us.getConfiguration().getGeneralEmailRegards() + "\n\n----\n";
+        emailBody += us.getConfiguration().getGeneralEmailFooter() + "\n\n";
 
         EmailService emailService = EmailServiceManager.getDefaultService();
-        emailService.sendEmailIgnoreException(from, to, us.cfg().getAuditEmailAddress(), emailSubject, emailBody);
+        emailService.sendEmailIgnoreException(from, to, us.getConfiguration().getAuditEmailAddress(), emailSubject, emailBody);
     }
 
     /**

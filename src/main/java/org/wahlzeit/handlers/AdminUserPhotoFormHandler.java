@@ -47,17 +47,15 @@ public class AdminUserPhotoFormHandler extends AbstractWebFormHandler {
      *
      */
     protected void doMakeWebPart(UserSession us, WebPart part) {
-        Map<String, Object> args = us.getSavedArgs();
-
-        String photoId = us.getAndSaveAsString(args, "photoId");
+        String photoId = us.getPhotoId();
 
         Photo photo = PhotoManager.getPhoto(photoId);
         part.addString(Photo.THUMB, getPhotoThumb(us, photo));
 
         part.addString("photoId", photoId);
         part.addString(Photo.ID, photo.getId().asString());
-        part.addSelect(Photo.STATUS, PhotoStatus.class, (String) args.get(Photo.STATUS));
-        part.maskAndAddStringFromArgsWithDefault(args, Photo.TAGS, photo.getTags().asString());
+        part.addSelect(Photo.STATUS, PhotoStatus.class, (String) us.getSavedArg(Photo.STATUS));
+        part.maskAndAddStringFromArgsWithDefault(us.getSavedArgs(), Photo.TAGS, photo.getTags().asString());
     }
 
     /**
@@ -79,7 +77,7 @@ public class AdminUserPhotoFormHandler extends AbstractWebFormHandler {
         UserLog.addUpdatedObject(sb, "Photo", photo.getId().asString());
         UserLog.log(sb);
 
-        us.setMessage(us.cfg().getPhotoUpdateSucceeded());
+        us.setMessage(us.getConfiguration().getPhotoUpdateSucceeded());
 
         return PartUtil.SHOW_ADMIN_PAGE_NAME;
     }

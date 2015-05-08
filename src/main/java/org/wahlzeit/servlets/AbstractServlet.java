@@ -91,7 +91,6 @@ public abstract class AbstractServlet extends HttpServlet {
             myGet(request, response);
         }
 
-        request.getSession().setAttribute("session", us);
         SessionManager.dropThreadLocalSession();
     }
 
@@ -118,7 +117,6 @@ public abstract class AbstractServlet extends HttpServlet {
             myPost(request, response);
         }
 
-        request.getSession().setAttribute("session", us);
         SessionManager.dropThreadLocalSession();
     }
 
@@ -140,7 +138,7 @@ public abstract class AbstractServlet extends HttpServlet {
             try {
                 String sessionName = "session" + getNextSessionId();
                 String siteUrl = getSiteUrl(request); // @TODO Application
-                result = new UserSession(sessionName, siteUrl);
+                result = new UserSession(sessionName, siteUrl, httpSession);
                 SysLog.logCreatedObject("UserSession", sessionName);
 
                 // yes, "Referer"; typo in original standard documentation
@@ -154,7 +152,6 @@ public abstract class AbstractServlet extends HttpServlet {
                 SysLog.logThrowable(ex);
             }
 
-            httpSession.setAttribute("session", result);
             httpSession.setMaxInactiveInterval(24 * 60 * 60); // time out after 24h
         }
 

@@ -91,10 +91,10 @@ public class AdminUserProfileFormHandler extends AbstractWebFormHandler {
         String notifyAboutPraise = us.getAndSaveAsString(args, User.NOTIFY_ABOUT_PRAISE);
 
         if (!StringUtil.isValidStrictEmailAddress(emailAddress)) {
-            us.setMessage(us.cfg().getEmailAddressIsInvalid());
+            us.setMessage(us.getConfiguration().getEmailAddressIsInvalid());
             return PartUtil.SHOW_ADMIN_PAGE_NAME;
         } else if (!StringUtil.isValidURL(homePage)) {
-            us.setMessage(us.cfg().getUrlIsInvalid());
+            us.setMessage(us.getConfiguration().getUrlIsInvalid());
             return PartUtil.SHOW_ADMIN_PAGE_NAME;
         }
 
@@ -114,7 +114,7 @@ public class AdminUserProfileFormHandler extends AbstractWebFormHandler {
         UserLog.addUpdatedObject(sb, "User", user.getName());
         UserLog.log(sb);
 
-        us.setMessage(us.cfg().getProfileUpdateSucceeded());
+        us.setMessage(us.getConfiguration().getProfileUpdateSucceeded());
 
         return PartUtil.SHOW_ADMIN_PAGE_NAME;
     }

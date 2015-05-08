@@ -47,7 +47,7 @@ public class HandlerTestSetup extends TestSetup {
 	protected void setUp() throws Exception {
 		super.setUp();
 		
-		userSession = new UserSession("testContext", ""); //@FIXME
+		userSession = new UserSession("testContext", "", null); //@FIXME
 		userSession.setConfiguration(LanguageConfigs.get(Language.ENGLISH));
 
 		SessionManager.setThreadLocalSession(userSession);

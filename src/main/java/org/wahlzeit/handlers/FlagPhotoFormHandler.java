@@ -81,13 +81,13 @@ public class FlagPhotoFormHandler extends AbstractWebFormHandler {
         String explanation = us.getAndSaveAsString(args, PhotoCase.EXPLANATION);
 
         if (StringUtil.isNullOrEmptyString(flagger)) {
-            us.setMessage(us.cfg().getEmailAddressIsMissing());
+            us.setMessage(us.getConfiguration().getEmailAddressIsMissing());
             return PartUtil.FLAG_PHOTO_PAGE_NAME;
         } else if (!StringUtil.isValidStrictEmailAddress(flagger)) {
-            us.setMessage(us.cfg().getEmailAddressIsInvalid());
+            us.setMessage(us.getConfiguration().getEmailAddressIsInvalid());
             return PartUtil.FLAG_PHOTO_PAGE_NAME;
         } else if (explanation.length() > 1024) {
-            us.setMessage(us.cfg().getInputIsTooLong());
+            us.setMessage(us.getConfiguration().getInputIsTooLong());
             return PartUtil.FLAG_PHOTO_PAGE_NAME;
         }
 
@@ -106,14 +106,14 @@ public class FlagPhotoFormHandler extends AbstractWebFormHandler {
         EmailService emailService = EmailServiceManager.getDefaultService();
 
         EmailAddress from = EmailAddress.getFromString(flagger);
-        EmailAddress to = us.cfg().getModeratorEmailAddress();
+        EmailAddress to = us.getConfiguration().getModeratorEmailAddress();
 
         String emailSubject = "Photo: " + id + " of user: " + photo.getOwnerName() + " got flagged";
         String emailBody = "Photo: " + us.getSiteUrl() + id + ".html\n\n";
         emailBody += "Reason: " + reason + "\n\n";
         emailBody += "Explanation: " + explanation + "\n\n";
 
-        emailService.sendEmailIgnoreException(from, to, us.cfg().getAuditEmailAddress(), emailSubject, emailBody);
+        emailService.sendEmailIgnoreException(from, to, us.getConfiguration().getAuditEmailAddress(), emailSubject, emailBody);
 
         us.setEmailAddress(from);
 
@@ -121,7 +121,7 @@ public class FlagPhotoFormHandler extends AbstractWebFormHandler {
         UserLog.addUpdatedObject(sb, "Photo", photo.getId().asString());
         UserLog.log(sb);
 
-        us.setTwoLineMessage(us.cfg().getModeratorWasInformed(), us.cfg().getContinueWithShowPhoto());
+        us.setTwoLineMessage(us.getConfiguration().getModeratorWasInformed(), us.getConfiguration().getContinueWithShowPhoto());
 
         return PartUtil.SHOW_NOTE_PAGE_NAME;
     }

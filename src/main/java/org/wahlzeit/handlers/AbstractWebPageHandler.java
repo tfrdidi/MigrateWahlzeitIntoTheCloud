@@ -63,19 +63,19 @@ public abstract class AbstractWebPageHandler extends AbstractWebPartHandler impl
      *
      */
     protected void makeWebPageFrame(UserSession us, WebPart page) {
-        page.addString("title", us.cfg().getPageTitle());
+        page.addString("title", us.getConfiguration().getPageTitle());
 
         makeWebPageHeading(us, page);
 
-        page.addString("footer", us.cfg().getPageFooter(us.getPhotoSize()));
-        page.addString("mission", us.cfg().getPageMission());
+        page.addString("footer", us.getConfiguration().getPageFooter(us.getPhotoSize()));
+        page.addString("mission", us.getConfiguration().getPageMission());
     }
 
     /**
      *
      */
     protected void makeWebPageHeading(UserSession us, WebPart page) {
-        Language langValue = us.cfg().getLanguage();
+        Language langValue = us.getConfiguration().getLanguage();
         String heading = HtmlUtil.asImg(getHeadingImageAsRelativeResourcePathString(langValue));
         heading = HtmlUtil.asHref(us.getSiteUrl(), heading);
         page.addString("heading", heading);
@@ -96,13 +96,13 @@ public abstract class AbstractWebPageHandler extends AbstractWebPartHandler impl
         String menu = "";
 
         if (client.hasAdministratorRights()) {
-            menu = us.cfg().getAdministratorMenu();
+            menu = us.getConfiguration().getAdministratorMenu();
         } else if (client.hasModeratorRights()) {
-            menu = us.cfg().getModeratorMenu();
+            menu = us.getConfiguration().getModeratorMenu();
         } else if (client.hasUserRights()) {
-            menu = us.cfg().getUserMenu();
+            menu = us.getConfiguration().getUserMenu();
         } else {
-            menu = us.cfg().getGuestMenu();
+            menu = us.getConfiguration().getGuestMenu();
         }
 
         page.addString("menu", menu.toString());

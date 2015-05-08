@@ -87,18 +87,18 @@ public class ConfirmAccountPageHandler extends AbstractWebPageHandler {
         if (client instanceof User) {
             User user = (User) client;
             if (user.isConfirmed()) {
-                heading = us.cfg().getThankYou();
-                msg1 = us.cfg().getConfirmAccountSucceeded();
-                msg2 = us.cfg().getContinueWithShowUserHome();
+                heading = us.getConfiguration().getThankYou();
+                msg1 = us.getConfiguration().getConfirmAccountSucceeded();
+                msg2 = us.getConfiguration().getContinueWithShowUserHome();
             } else {
-                heading = us.cfg().getInformation();
-                msg1 = us.cfg().getConfirmAccountFailed();
-                msg2 = us.cfg().getConfirmationEmailWasSent();
+                heading = us.getConfiguration().getInformation();
+                msg1 = us.getConfiguration().getConfirmAccountFailed();
+                msg2 = us.getConfiguration().getConfirmationEmailWasSent();
             }
             page.addString("note", HtmlUtil.asP(msg1) + HtmlUtil.asP(msg2));
         } else {
-            heading = us.cfg().getInformation();
-            page.addString("note", us.cfg().getNeedToLoginFirst());
+            heading = us.getConfiguration().getInformation();
+            page.addString("note", us.getConfiguration().getNeedToLoginFirst());
         }
 
         page.addString("noteHeading", heading);

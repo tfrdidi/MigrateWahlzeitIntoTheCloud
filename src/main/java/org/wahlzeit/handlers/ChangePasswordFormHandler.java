@@ -62,13 +62,13 @@ public class ChangePasswordFormHandler extends AbstractWebFormHandler {
         String passwordAgain = us.getAndSaveAsString(args, User.PASSWORD_AGAIN);
 
         if (StringUtil.isNullOrEmptyString(password)) {
-            us.setMessage(us.cfg().getFieldIsMissing());
+            us.setMessage(us.getConfiguration().getFieldIsMissing());
             return PartUtil.CHANGE_PASSWORD_PAGE_NAME;
         } else if (!password.equals(passwordAgain)) {
-            us.setMessage(us.cfg().getPasswordsDontMatch());
+            us.setMessage(us.getConfiguration().getPasswordsDontMatch());
             return PartUtil.CHANGE_PASSWORD_PAGE_NAME;
         } else if (!StringUtil.isLegalPassword(password)) {
-            us.setMessage(us.cfg().getInputIsInvalid());
+            us.setMessage(us.getConfiguration().getInputIsInvalid());
             return PartUtil.SIGNUP_PAGE_NAME;
         }
 
@@ -77,7 +77,7 @@ public class ChangePasswordFormHandler extends AbstractWebFormHandler {
 
         UserLog.logPerformedAction("ChangePassword");
 
-        us.setTwoLineMessage(us.cfg().getPasswordChangeSucceeded(), us.cfg().getContinueWithShowUserHome());
+        us.setTwoLineMessage(us.getConfiguration().getPasswordChangeSucceeded(), us.getConfiguration().getContinueWithShowUserHome());
 
         return PartUtil.SHOW_NOTE_PAGE_NAME;
     }

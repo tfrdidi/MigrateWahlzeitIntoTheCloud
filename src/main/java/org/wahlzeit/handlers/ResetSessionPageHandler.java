@@ -51,9 +51,9 @@ public class ResetSessionPageHandler extends AbstractWebPageHandler {
      *
      */
     protected void makeWebPageBody(UserSession us, WebPart page) {
-        page.addString("noteHeading", us.cfg().getThankYou());
-        String msg1 = us.cfg().getResetSession();
-        String msg2 = us.cfg().getContinueWithShowPhoto();
+        page.addString("noteHeading", us.getConfiguration().getThankYou());
+        String msg1 = us.getConfiguration().getResetSession();
+        String msg2 = us.getConfiguration().getContinueWithShowPhoto();
         page.addString("note", HtmlUtil.asP(msg1) + HtmlUtil.asP(msg2));
     }
 

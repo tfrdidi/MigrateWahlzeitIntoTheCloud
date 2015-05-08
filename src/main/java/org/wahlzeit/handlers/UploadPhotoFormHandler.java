@@ -66,7 +66,7 @@ public class UploadPhotoFormHandler extends AbstractWebFormHandler {
         String tags = us.getAndSaveAsString(args, Photo.TAGS);
 
         if (!StringUtil.isLegalTagsString(tags)) {
-            us.setMessage(us.cfg().getInputIsInvalid());
+            us.setMessage(us.getConfiguration().getInputIsInvalid());
             return PartUtil.UPLOAD_PHOTO_PAGE_NAME;
         }
 
@@ -93,10 +93,10 @@ public class UploadPhotoFormHandler extends AbstractWebFormHandler {
             UserLog.addCreatedObject(sb, "Photo", photo.getId().asString());
             UserLog.log(sb);
 
-            us.setTwoLineMessage(us.cfg().getPhotoUploadSucceeded(), us.cfg().getKeepGoing());
+            us.setTwoLineMessage(us.getConfiguration().getPhotoUploadSucceeded(), us.getConfiguration().getKeepGoing());
         } catch (Exception ex) {
             SysLog.logThrowable(ex);
-            us.setMessage(us.cfg().getPhotoUploadFailed());
+            us.setMessage(us.getConfiguration().getPhotoUploadFailed());
         }
 
         return PartUtil.UPLOAD_PHOTO_PAGE_NAME;

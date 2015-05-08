@@ -62,25 +62,25 @@ public class LoginFormHandler extends AbstractWebFormHandler {
         UserManager userManager = UserManager.getInstance();
 
         if (StringUtil.isNullOrEmptyString(userName)) {
-            us.setMessage(us.cfg().getFieldIsMissing());
+            us.setMessage(us.getConfiguration().getFieldIsMissing());
             return PartUtil.LOGIN_PAGE_NAME;
         } else if (!StringUtil.isLegalUserName(userName)) {
-            us.setMessage(us.cfg().getLoginIsIncorrect());
+            us.setMessage(us.getConfiguration().getLoginIsIncorrect());
             return PartUtil.LOGIN_PAGE_NAME;
         } else if (StringUtil.isNullOrEmptyString(password)) {
-            us.setMessage(us.cfg().getFieldIsMissing());
+            us.setMessage(us.getConfiguration().getFieldIsMissing());
             return PartUtil.LOGIN_PAGE_NAME;
         } else if (!userManager.hasUserByName(userName)) {
-            us.setMessage(us.cfg().getLoginIsIncorrect());
+            us.setMessage(us.getConfiguration().getLoginIsIncorrect());
             return PartUtil.LOGIN_PAGE_NAME;
         }
 
         User user = userManager.getUserByName(userName);
         if (!user.hasPassword(password)) {
-            us.setMessage(us.cfg().getLoginIsIncorrect());
+            us.setMessage(us.getConfiguration().getLoginIsIncorrect());
             return PartUtil.LOGIN_PAGE_NAME;
         } else if (user.getStatus().isDisabled()) {
-            us.setMessage(us.cfg().getUserIsDisabled());
+            us.setMessage(us.getConfiguration().getUserIsDisabled());
             return PartUtil.LOGIN_PAGE_NAME;
         }
 
@@ -89,15 +89,15 @@ public class LoginFormHandler extends AbstractWebFormHandler {
             if (us.hasConfirmationCode()) {
                 if (user.getConfirmationCode() == us.getConfirmationCode()) {
                     user.setConfirmed();
-                    us.setTwoLineMessage(us.cfg().getConfirmAccountSucceeded(), us.cfg().getContinueWithShowUserHome());
+                    us.setTwoLineMessage(us.getConfiguration().getConfirmAccountSucceeded(), us.getConfiguration().getContinueWithShowUserHome());
                 } else {
                     UserManager.getInstance().emailConfirmationRequest(us, user);
-                    us.setTwoLineMessage(us.cfg().getConfirmAccountFailed(), us.cfg().getConfirmationEmailWasSent());
+                    us.setTwoLineMessage(us.getConfiguration().getConfirmAccountFailed(), us.getConfiguration().getConfirmationEmailWasSent());
                 }
                 us.clearConfirmationCode();
             } else {
                 UserManager.getInstance().emailConfirmationRequest(us, user);
-                us.setTwoLineMessage(us.cfg().getConfirmationEmailWasSent(), us.cfg().getContinueWithShowUserHome());
+                us.setTwoLineMessage(us.getConfiguration().getConfirmationEmailWasSent(), us.getConfiguration().getContinueWithShowUserHome());
             }
             return PartUtil.SHOW_NOTE_PAGE_NAME;
         }
