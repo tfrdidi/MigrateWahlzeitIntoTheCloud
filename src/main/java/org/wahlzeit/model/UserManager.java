@@ -100,9 +100,11 @@ public class UserManager extends ObjectManager {
         ObjectifyService.run(new Work<Void>() {
             @Override
             public Void run() {
-                if(readObject(Administrator.class, 1L) == null) {
+                Collection<Administrator> admins = new ArrayList<Administrator>();
+                readObjects(admins, Administrator.class);
+                if(admins.size() == 0) {
                     Administrator defaultAdministrator = new Administrator("admin", "admin", "root@localhost", 0);
-                    doAddUser(defaultAdministrator);
+                    addUser(defaultAdministrator);
                     log.info("No default Administrator exists. Created one.");
                 }
                 else {

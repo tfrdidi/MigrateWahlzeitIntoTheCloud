@@ -20,6 +20,7 @@
 
 package org.wahlzeit.handlers;
 
+import org.wahlzeit.agents.AsyncTaskExecutor;
 import org.wahlzeit.model.AccessRights;
 import org.wahlzeit.model.FlagReason;
 import org.wahlzeit.model.Photo;
@@ -93,8 +94,7 @@ public class FlagPhotoFormHandler extends AbstractWebFormHandler {
 
         Photo photo = PhotoManager.getPhoto(id);
         photo.setStatus(photo.getStatus().asFlagged(true));
-        PhotoManager pm = PhotoManager.getInstance();
-        pm.savePhoto(photo);
+        AsyncTaskExecutor.savePhotoAsync(id);
 
         PhotoCase photoCase = new PhotoCase(photo);
         photoCase.setFlagger(flagger);

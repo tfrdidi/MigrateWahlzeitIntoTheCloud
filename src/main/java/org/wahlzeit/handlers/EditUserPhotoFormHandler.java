@@ -20,6 +20,7 @@
 
 package org.wahlzeit.handlers;
 
+import org.wahlzeit.agents.AsyncTaskExecutor;
 import org.wahlzeit.model.AccessRights;
 import org.wahlzeit.model.Photo;
 import org.wahlzeit.model.PhotoManager;
@@ -86,7 +87,6 @@ public class EditUserPhotoFormHandler extends AbstractWebFormHandler {
      */
     protected String doHandlePost(UserSession us, Map args) {
         String id = us.getAndSaveAsString(args, Photo.ID);
-        PhotoManager pm = PhotoManager.getInstance();
         Photo photo = PhotoManager.getPhoto(id);
 
         String tags = us.getAndSaveAsString(args, Photo.TAGS);
@@ -97,7 +97,7 @@ public class EditUserPhotoFormHandler extends AbstractWebFormHandler {
         PhotoStatus ps = photo.getStatus().asInvisible(isInvisible);
         photo.setStatus(ps);
 
-        pm.savePhoto(photo);
+        AsyncTaskExecutor.savePhotoAsync(id);
 
         StringBuffer sb = UserLog.createActionEntry("EditUserPhoto");
         UserLog.addUpdatedObject(sb, "Photo", photo.getId().asString());

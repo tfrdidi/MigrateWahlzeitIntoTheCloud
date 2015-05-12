@@ -23,6 +23,7 @@ package org.wahlzeit.model;
 import com.google.appengine.api.images.Image;
 import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.Work;
+import org.wahlzeit.agents.AsyncTaskExecutor;
 import org.wahlzeit.services.ObjectManager;
 import org.wahlzeit.services.Persistent;
 import org.wahlzeit.services.SysLog;
@@ -148,14 +149,15 @@ public class PhotoManager extends ObjectManager {
     }
 
     /**
-     *
+     * @methodtype command
      */
     public void addPhoto(Photo photo) {
         PhotoId id = photo.getId();
         assertIsNewPhoto(id);
         doAddPhoto(photo);
 
-        writeObject(photo);
+        AsyncTaskExecutor.savePhotoAsync(id.asString());
+        //writeObject(photo);
         GlobalsManager.getInstance().saveGlobals();
     }
 
@@ -168,7 +170,7 @@ public class PhotoManager extends ObjectManager {
     }
 
     /**
-     *
+     * @methodtype command
      */
     public void loadPhotos() {
         Collection<Photo> existingPhotos = ObjectifyService.run(new Work<Collection<Photo>>() {

@@ -22,6 +22,15 @@
 	</servlet-mapping>
 
 	<servlet>
+		<servlet-name>persistPhotos</servlet-name>
+		<servlet-class>org.wahlzeit.servlets.PersistPhotoAsynchronousServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>persistPhotos</servlet-name>
+		<url-pattern>/persistPhoto</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
 		<servlet-name>main</servlet-name>
 		<servlet-class>org.wahlzeit.servlets.MainServlet</servlet-class>
 	</servlet>

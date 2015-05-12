@@ -1,0 +1,37 @@
+package org.wahlzeit.servlets;
+
+import org.wahlzeit.model.Photo;
+import org.wahlzeit.model.PhotoManager;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.logging.Logger;
+
+/**
+ * Servlet to persist Photos that are only in the Cache.
+ * As it has nothing to do with <code>UserSession</code> or UI, it is not implemented
+ * as a Handler or a child of <code>AbstractServlet</code>.
+ *
+ * Created by Lukas Hahmann on 12.05.15.
+ */
+public class PersistPhotoAsynchronousServlet extends HttpServlet {
+
+    private static final Logger log = Logger.getLogger(PersistPhotoAsynchronousServlet.class.getName());
+
+    /**
+     * @methodtype command
+     */
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        String id = request.getParameter(Photo.ID);
+        log.info("Try to persist PhotoId " + id);
+        if(id != null && !"".equals(id)) {
+            Photo photo = PhotoManager.getPhoto(id);
+            PhotoManager.getInstance().savePhoto(photo);
+        }
+    }
+}
