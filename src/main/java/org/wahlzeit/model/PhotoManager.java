@@ -21,11 +21,14 @@
 package org.wahlzeit.model;
 
 import com.google.appengine.api.images.Image;
+import com.googlecode.objectify.ObjectifyService;
+import com.googlecode.objectify.Work;
 import org.wahlzeit.services.ObjectManager;
 import org.wahlzeit.services.Persistent;
 import org.wahlzeit.services.SysLog;
 
-import java.security.InvalidParameterException;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -101,8 +104,16 @@ public class PhotoManager extends ObjectManager {
     }
 
     /**
+     * @methodtype init
+     * Loads all Photos from the Datastore and holds them in the cache
+     */
+    public void init() {
+        loadPhotos();
+    }
+
+    /**
      * @methodtype boolean-query
-     * @methodproperties primitive
+     * @methodproperty primitive
      */
     protected boolean doHasPhoto(PhotoId id) {
         return photoCache.containsKey(id);
@@ -159,11 +170,20 @@ public class PhotoManager extends ObjectManager {
     /**
      *
      */
-    public void loadPhotos(Collection<Photo> result) {
-        readObjects(result, Photo.class);
-        for (Iterator<Photo> i = result.iterator(); i.hasNext(); ) {
-            Photo photo = i.next();
+    public void loadPhotos() {
+        Collection<Photo> existingPhotos = ObjectifyService.run(new Work<Collection<Photo>>() {
+            @Override
+            public Collection<Photo> run() {
+                Collection<Photo> existingPhotos = new ArrayList<Photo>();
+                readObjects(existingPhotos, Photo.class);
+                return existingPhotos;
+            }
+        });
+
+        for (Photo photo : existingPhotos) {
             if (!doHasPhoto(photo.getId())) {
+                loadScaledImages(photo);
+                // Todo: load tags
                 doAddPhoto(photo);
             } else {
                 SysLog.logSysInfo("photo", String.valueOf(photo.getId()), "photo had already been loaded");
@@ -172,6 +192,7 @@ public class PhotoManager extends ObjectManager {
 
         SysLog.logSysInfo("loaded all photos");
     }
+
 
     /**
      *
@@ -182,7 +203,7 @@ public class PhotoManager extends ObjectManager {
 
     @Override
     protected void updateDependents(Persistent obj) {
-        if(obj instanceof  Photo) {
+        if (obj instanceof Photo) {
             Photo photo = (Photo) obj;
             saveScaledImages(photo);
             updateTags(photo);
@@ -190,8 +211,8 @@ public class PhotoManager extends ObjectManager {
     }
 
     /**
-     *  Removes all tags of the Photo (obj) in the datastore that have been removed by the user
-     *  and adds all new tags of the photo to the datastore.
+     * Removes all tags of the Photo (obj) in the datastore that have been removed by the user
+     * and adds all new tags of the photo to the datastore.
      */
     protected void updateTags(Photo photo) {
         // delete all existing tags, for the case that some have been removed
@@ -208,26 +229,49 @@ public class PhotoManager extends ObjectManager {
     }
 
     /**
+     * @methodtype command
+     * <p/>
      * Writes all Images of the different sizes to Google Cloud Storage.
      */
     protected void saveScaledImages(Photo photo) {
         String photoIdAsString = photo.getId().asString();
-        String ending = photo.getEnding();
-        for(PhotoSize photoSize : PhotoSize.values()) {
+        GcsAdapter gcsAdapter = GcsAdapter.getInstance();
+        for (PhotoSize photoSize : PhotoSize.values()) {
             Image image = photo.getImage(photoSize);
-            if(image != null) {
+            if (image != null) {
                 try {
-                    GcsAdapter gcsAdapter = GcsAdapter.getInstance();
-                    if(!gcsAdapter.doesImageExist(photoIdAsString, photoSize.asInt(), ending)) {
-                        gcsAdapter.writeToCloudStorage(image, photoIdAsString, photoSize.asInt(), ending);
+                    if (!gcsAdapter.doesImageExist(photoIdAsString, photoSize.asInt())) {
+                        gcsAdapter.writeToCloudStorage(image, photoIdAsString, photoSize.asInt());
                     }
+                } catch (Exception e) {
+                    log.log(Level.SEVERE, "Could not store Image in Cloud Storage.", e);
                 }
-                catch (Exception e) {
-                    log.log(Level.SEVERE, "Could not store image in Cloud Storage.", e);
-                }
-            }
-            else {
+            } else {
                 log.info("No photo for size '" + photoSize.asString() + "'");
+            }
+        }
+    }
+
+    /**
+     * @methodtype command
+     * <p/>
+     * Loads all scaled Images of this Photo from Google Cloud Storage
+     */
+    protected void loadScaledImages(Photo photo) {
+        String photoIdAsString = photo.getId().asString();
+        GcsAdapter gcsAdapter = GcsAdapter.getInstance();
+
+        for (PhotoSize photoSize : PhotoSize.values()) {
+            if (gcsAdapter.doesImageExist(photoIdAsString, photoSize.asInt())) {
+                try {
+                    Image image = gcsAdapter.readFromCloudStorage(photoIdAsString, photoSize.asInt());
+                    photo.setImage(photoSize, image);
+                    log.info("Loaded Image of size " + photoSize.asString() + " for Photo " + photoIdAsString);
+                } catch (IOException e) {
+                    log.log(Level.SEVERE, "Could not load Image of size " + photoSize.asString() + " for Photo " + photoIdAsString);
+                }
+            } else {
+                log.info("PhotoSize " + photoSize.asString() + " does not exist for Photo " + photoIdAsString);
             }
         }
     }
@@ -298,16 +342,15 @@ public class PhotoManager extends ObjectManager {
         if (noFilterConditions == 0) {
             Collection<PhotoId> candidates = photoCache.keySet();
             int newPhotos = 0;
-            for(PhotoId candidate : candidates) {
-                if(!filter.processedPhotoIds.contains(candidate)) {
+            for (PhotoId candidate : candidates) {
+                if (!filter.processedPhotoIds.contains(candidate)) {
                     result.add(candidate);
                     ++newPhotos;
                 }
             }
 
             log.info(newPhotos + " Photos can now be shown.");
-        }
-        else {
+        } else {
             List<Tag> tags = new LinkedList<Tag>();
             for (String condition : filter.getFilterConditions()) {
                 readObjects(tags, Tag.class, Tag.TEXT, condition);
@@ -315,9 +358,9 @@ public class PhotoManager extends ObjectManager {
             log.info("Number of tags: " + tags.size());
 
             // get the list of all photo ids that correspond to the tags
-            for(Tag tag : tags) {
+            for (Tag tag : tags) {
                 PhotoId photoId = PhotoId.getIdFromString(tag.getPhotoId());
-                if(!filter.isProcessedPhotoId(photoId)) {
+                if (!filter.isProcessedPhotoId(photoId)) {
                     result.add(PhotoId.getIdFromString(tag.getPhotoId()));
                     log.info("Add Photo " + tag.getPhotoId() + " to filter result.");
                 }

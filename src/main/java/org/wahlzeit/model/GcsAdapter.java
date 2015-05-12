@@ -68,16 +68,16 @@ public class GcsAdapter {
      * <p/>
      * Saves the image in the Google Cloud Storage, so you can access it via ownerName, photoId and size again.
      * An existing file of that owner with that file name is overwritten.
-     * @see #readFromCloudStorage(String, int, String)
+     * @see #readFromCloudStorage(String, int)
      */
-    public void writeToCloudStorage(Image image, String photoIdAsString, int size, String ending)
+    public void writeToCloudStorage(Image image, String photoIdAsString, int size)
             throws InvalidParameterException, IOException {
 
         assertValidString(photoIdAsString);
         assertValidSize(size);
         assertValidImage(image);
 
-        GcsFilename gcsFilename = createGcsFileName(photoIdAsString, size, ending);
+        GcsFilename gcsFilename = createGcsFileName(photoIdAsString, size);
         writeToCloudStorage(image, gcsFilename);
     }
 
@@ -117,7 +117,7 @@ public class GcsAdapter {
      * @methodtype command
      * <p/>
      * Reads an image from Google Cloud Storage via ownerName and filename.
-     * @see #writeToCloudStorage(Image, String, int, String)
+     * @see #writeToCloudStorage(Image, String, int)
      */
     public Image readFromCloudStorage(String filename)
             throws IllegalArgumentException, IOException {
@@ -136,16 +136,15 @@ public class GcsAdapter {
      * @throws IOException
      * @throws IllegalArgumentException - one parameter = null or emtpy
      *
-     * @see #writeToCloudStorage(Image, String, int, String)
+     * @see #writeToCloudStorage(Image, String, int)
      */
-    public Image readFromCloudStorage(String photoIdAsString, int size, String ending)
+    public Image readFromCloudStorage(String photoIdAsString, int size)
             throws IllegalArgumentException, IOException {
 
         assertValidString(photoIdAsString);
         assertValidSize(size);
-        assertValidString(ending);
 
-        GcsFilename gcsFilename = createGcsFileName(photoIdAsString, size, ending);
+        GcsFilename gcsFilename = createGcsFileName(photoIdAsString, size);
         return readFromCloudStorage(gcsFilename);
     }
 
@@ -173,13 +172,12 @@ public class GcsAdapter {
      *
      * @throws IllegalArgumentException
      */
-    public boolean doesImageExist(String photoIdAsString, int size, String ending)
+    public boolean doesImageExist(String photoIdAsString, int size)
             throws IllegalArgumentException{
         assertValidString(photoIdAsString);
         assertValidSize(size);
-        assertValidString(ending);
 
-        GcsFilename gcsFilename = createGcsFileName(photoIdAsString, size, ending);
+        GcsFilename gcsFilename = createGcsFileName(photoIdAsString, size);
         try {
             // will be null if file does not exist
             return gcsService.getMetadata(gcsFilename) != null;
@@ -199,10 +197,9 @@ public class GcsAdapter {
      * <p/>
      * BUCKET_NAME - ownerName/fileName/photoIdAsString
      */
-    private GcsFilename createGcsFileName(String photoIdAsString, int size, String ending) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("photos").append("/").append(photoIdAsString).append(size).append(".").append(ending);
-        return new GcsFilename(BUCKET_NAME, stringBuilder.toString());
+    private GcsFilename createGcsFileName(String photoIdAsString, int size) {
+        String filePath = PHOTO_FOLDER + File.separator + photoIdAsString + size;
+        return new GcsFilename(BUCKET_NAME, filePath);
     }
 
     /**
@@ -214,9 +211,8 @@ public class GcsAdapter {
      * BUCKET_NAME - ownerName/fileName
      */
     private GcsFilename createGcsFileName(String fileName) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("photos").append("/").append(fileName);
-        return new GcsFilename(BUCKET_NAME, stringBuilder.toString());
+        String filePath = PHOTO_FOLDER + File.separator + fileName;
+        return new GcsFilename(BUCKET_NAME, filePath);
     }
 
 
@@ -226,7 +222,7 @@ public class GcsAdapter {
      * @methodtype assert
      */
     private void assertValidString(String string) throws IllegalArgumentException {
-        if (string == null || string == "") {
+        if (string == null || "".equals(string)) {
             throw new IllegalArgumentException("Invalid owner name!");
         }
     }

@@ -49,6 +49,7 @@ public abstract class ModelMain extends AbstractMain {
         UserManager.getInstance().init();
 
         PhotoFactory.initialize();
+        PhotoManager.getInstance().init();
     }
 
 
