@@ -132,28 +132,14 @@ public abstract class AbstractServlet extends HttpServlet {
      */
     protected UserSession ensureUserSession(HttpServletRequest request) {
         HttpSession httpSession = request.getSession();
-        log.info("Sessionid: " + httpSession.getId());
-        UserSession result = (UserSession) httpSession.getAttribute("session");
-        if (result == null) {
-            try {
-                String sessionName = "session" + getNextSessionId();
-                String siteUrl = getSiteUrl(request); // @TODO Application
-                result = new UserSession(sessionName, siteUrl, httpSession);
-                SysLog.logCreatedObject("UserSession", sessionName);
+        log.info("HttpSessionId: " + httpSession.getId());
 
-                // yes, "Referer"; typo in original standard documentation
-                String referrer = request.getHeader("Referer");
-                SysLog.logSysInfo("request referrer: " + referrer);
+        String sessionName = "session" + httpSession.getId();
+        String siteUrl = getSiteUrl(request); // @TODO Application
 
-                if (request.getLocale().getLanguage().equals("de")) { // @FIXME
-                    result.setConfiguration(LanguageConfigs.get(Language.GERMAN));
-                }
-            } catch (Exception ex) {
-                SysLog.logThrowable(ex);
-            }
+        UserSession result = new UserSession(sessionName, siteUrl, request);
 
-            httpSession.setMaxInactiveInterval(24 * 60 * 60); // time out after 24h
-        }
+        httpSession.setMaxInactiveInterval(24 * 60 * 60); // time out after 24h
 
         return result;
     }

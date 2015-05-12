@@ -28,6 +28,7 @@ import org.wahlzeit.services.SysLog;
 import org.wahlzeit.utils.HtmlUtil;
 import org.wahlzeit.utils.StringUtil;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -68,17 +69,29 @@ public class UserSession extends Session implements Serializable {
     /**
      *
      */
-    public UserSession(String myName, String mySiteUrl, HttpSession myHttpSession) {
-        httpSession = myHttpSession;
+    public UserSession(String myName, String mySiteUrl, HttpServletRequest myHttpRequest) {
+        httpSession = myHttpRequest.getSession();
         if(httpSession.getAttribute(INITIALIZED) == null) {
             initialize(myName);
             httpSession.setAttribute(SITE_URL, mySiteUrl);
             httpSession.setAttribute(PHOTO_FILTER, PhotoFactory.getInstance().createPhotoFilter());
-            clear();
+
+            Language language;
+            try {
+                language = Language.getFromIsoCode(myHttpRequest.getLocale().getLanguage());
+            } catch (IllegalArgumentException e) {
+                language = Language.ENGLISH;
+            }
+            setConfiguration(LanguageConfigs.get(language));
+
+            initPhotoSize();
+            clearDisplayedPhotos();
+            clearPraisedPhotos();
             clearSavedArgs();
             clearConfirmationCode();
             setClient(new Guest());
             httpSession.setAttribute(INITIALIZED, INITIALIZED);
+
         }
     }
 
