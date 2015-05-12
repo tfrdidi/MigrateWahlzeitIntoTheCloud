@@ -46,6 +46,10 @@ public class EmailAddress implements Serializable {
      */
     public static final EmailAddress EMPTY = doGetFromString(""); // after map initialization...
 
+    private EmailAddress() {
+        // for Objectify to load
+    }
+
     /**
      *
      */

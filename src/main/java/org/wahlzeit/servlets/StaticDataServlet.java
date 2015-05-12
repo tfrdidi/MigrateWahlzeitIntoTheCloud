@@ -2,6 +2,9 @@ package org.wahlzeit.servlets;
 
 import com.google.appengine.api.images.Image;
 import org.wahlzeit.model.GcsAdapter;
+import org.wahlzeit.model.Photo;
+import org.wahlzeit.model.PhotoManager;
+import org.wahlzeit.model.PhotoSize;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,7 +32,18 @@ public class StaticDataServlet extends AbstractServlet {
 
             if (uri.startsWith(GcsAdapter.PHOTO_FOLDER_PATH_WITH_BUCKET)) {
                 String filename = uri.substring(GcsAdapter.PHOTO_FOLDER_PATH_WITH_BUCKET.length());
-                Image image = GcsAdapter.getInstance().readFromCloudStorage(filename);
+                Photo photo = PhotoManager.getPhoto(filename.substring(0, filename.length() - 5));
+                Image image = null;
+                if(photo != null) {
+                    // TODO: think about a better solution
+                    int size = Integer.valueOf(filename.substring(filename.length() - 5, filename.length() - 4));
+                    PhotoSize photoSize = PhotoSize.getFromInt(size);
+                    image = photo.getImage(photoSize);
+                }
+                // if not in cache load from Google Cloud Storage
+                if (image == null) {
+                    image = GcsAdapter.getInstance().readFromCloudStorage(filename);
+                }
                 response.getOutputStream().write(image.getImageData());
                 response.getOutputStream().flush();
             }

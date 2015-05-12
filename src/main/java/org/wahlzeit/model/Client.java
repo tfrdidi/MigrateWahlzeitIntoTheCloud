@@ -20,10 +20,13 @@
 
 package org.wahlzeit.model;
 
+import com.google.appengine.api.datastore.Key;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
+import com.googlecode.objectify.annotation.Parent;
 import org.wahlzeit.services.EmailAddress;
+import org.wahlzeit.services.ObjectManager;
 
 import java.io.Serializable;
 
@@ -36,10 +39,11 @@ import java.io.Serializable;
 @Entity
 public abstract class Client implements Serializable{
 
-    /**
-     *
-     */
-    protected AccessRights rights = AccessRights.NONE;
+    @Id
+    protected Long id;
+
+    @Parent
+    protected Key parent = ObjectManager.applicationRootKey;
 
     /**
      *
@@ -47,8 +51,10 @@ public abstract class Client implements Serializable{
     @Index
     protected EmailAddress emailAddress = EmailAddress.EMPTY;
 
-    @Id
-    protected Long id;
+    /**
+     *
+     */
+    protected AccessRights rights = AccessRights.NONE;
 
     /**
      *

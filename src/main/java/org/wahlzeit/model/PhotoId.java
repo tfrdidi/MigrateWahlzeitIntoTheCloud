@@ -62,6 +62,10 @@ public class PhotoId implements Serializable{
      */
     protected static Random randomNumber = new Random(System.currentTimeMillis());
 
+    private PhotoId() {
+        // do nothing, necessary for Objectify to load PhotoIds
+    }
+
     /**
      *
      */

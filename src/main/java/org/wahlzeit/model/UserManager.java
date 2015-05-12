@@ -28,6 +28,7 @@ import org.wahlzeit.services.SysLog;
 import org.wahlzeit.services.mailing.EmailService;
 import org.wahlzeit.services.mailing.EmailServiceManager;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -58,9 +59,8 @@ public class UserManager extends ObjectManager {
     /**
      *
      */
-    /*private UserManager() {
-        assertAdminExists();
-    }*/
+    private UserManager() {
+    }
 
     /**
      *
@@ -87,6 +87,12 @@ public class UserManager extends ObjectManager {
      */
     protected Random codeGenerator = new Random(System.currentTimeMillis());
 
+
+    public void init() {
+        assertAdminExists();
+        loadExistingUsers();
+    }
+
     /**
      * @methodtype assert
      */
@@ -96,7 +102,7 @@ public class UserManager extends ObjectManager {
             public Void run() {
                 if(readObject(Administrator.class, 1L) == null) {
                     Administrator defaultAdministrator = new Administrator("admin", "admin", "root@localhost", 0);
-                    addUser(defaultAdministrator);
+                    doAddUser(defaultAdministrator);
                     log.info("No default Administrator exists. Created one.");
                 }
                 else {
@@ -143,13 +149,18 @@ public class UserManager extends ObjectManager {
     public User getUserByTag(String tag) {
         assertIsNonNullArgument(tag, "user-by-tag");
 
+        log.info("Try to find user " + tag);
         User result = doGetUserByTag(tag);
 
         if (result == null) {
+            log.info("User " + tag + " is not in cache.");
             result = readObject(User.class, User.NAME_AS_TAG, tag);
             if (result != null) {
                 doAddUser(result);
             }
+        }
+        else {
+            log.info("Loaded user " + tag + " from cache.");
         }
 
         return result;
@@ -186,6 +197,7 @@ public class UserManager extends ObjectManager {
      */
     protected void doAddUser(User user) {
         users.put(user.getNameAsTag(), user);
+        log.info("Added new user " + user.getName() + " to the list of all users.");
     }
 
     /**
@@ -210,18 +222,26 @@ public class UserManager extends ObjectManager {
     /**
      *
      */
-    public void loadUsers(Collection<User> result) {
-        readObjects(result, User.class);
-        for (Iterator<User> i = result.iterator(); i.hasNext(); ) {
-            User user = i.next();
+    public void loadExistingUsers() {
+        Collection<User> existingUser = ObjectifyService.run(new Work<Collection<User>>() {
+            @Override
+            public Collection<User> run() {
+                Collection<User> existingUser = new ArrayList<User>();
+                readObjects(existingUser, User.class);
+                return existingUser;
+            }
+        });
+        log.info(existingUser.size() + " found in the Datastore.");
+
+        for (User user : existingUser) {
             if (!doHasUserByTag(user.getNameAsTag())) {
                 doAddUser(user);
             } else {
-                SysLog.logSysInfo("user", user.getName(), "user had already been loaded");
+                log.info("User " + user.getName() + " has already been loaded.");
             }
         }
 
-        SysLog.logSysInfo("loaded all users");
+        log.info("loaded all users");
     }
 
     /**
