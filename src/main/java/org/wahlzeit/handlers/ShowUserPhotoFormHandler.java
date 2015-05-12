@@ -22,6 +22,7 @@ package org.wahlzeit.handlers;
 
 import org.wahlzeit.model.AccessRights;
 import org.wahlzeit.model.Photo;
+import org.wahlzeit.model.PhotoId;
 import org.wahlzeit.model.PhotoManager;
 import org.wahlzeit.model.User;
 import org.wahlzeit.model.UserLog;
@@ -49,7 +50,8 @@ public class ShowUserPhotoFormHandler extends AbstractWebFormHandler {
      *
      */
     protected void doMakeWebPart(UserSession us, WebPart part) {
-        Photo photo = us.getPhoto();
+        PhotoId photoId = us.getPhotoId();
+        Photo photo = PhotoManager.getPhoto(photoId);
         String id = photo.getId().asString();
         part.addString(Photo.ID, id);
         part.addString(Photo.THUMB, getPhotoThumb(us, photo));
@@ -88,10 +90,10 @@ public class ShowUserPhotoFormHandler extends AbstractWebFormHandler {
         UserManager userManager = UserManager.getInstance();
         User user = userManager.getUserByName(photo.getOwnerName());
         if (us.isFormType(args, "edit")) {
-            us.setPhoto(photo);
+            us.setPhotoId(photo.getId());
             result = PartUtil.EDIT_USER_PHOTO_PAGE_NAME;
         } else if (us.isFormType(args, "tell")) {
-            us.setPhoto(photo);
+            us.setPhotoId(photo.getId());
             result = PartUtil.TELL_FRIEND_PAGE_NAME;
         } else if (us.isFormType(args, "select")) {
             user.setUserPhoto(photo);

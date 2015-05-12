@@ -59,7 +59,7 @@ public class EditUserPhotoFormHandler extends AbstractWebFormHandler {
         part.addStringFromArgs(args, UserSession.MESSAGE);
 
         String id = us.getAsString(args, Photo.ID);
-        Photo photo = us.getPhoto();
+        Photo photo = PhotoManager.getPhoto(id);
 
         part.addString(Photo.ID, id);
         part.addString(Photo.THUMB, getPhotoThumb(us, photo));

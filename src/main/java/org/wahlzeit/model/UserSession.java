@@ -45,7 +45,6 @@ public class UserSession extends Session implements Serializable {
     /**
      * Keys to store the according properties in the <code>HttpSession</code>
      */
-    public static final String PHOTO = "photo";
     public static final String UPLOADED_IMAGE = "uploadedImage";
     public static final String PRIOR_PHOTO = "priorPhoto";
     public static final String PHOTO_CASE = "photoCase";
@@ -354,28 +353,15 @@ public class UserSession extends Session implements Serializable {
     /**
      * @methodtype get
      */
-    public Photo getPhoto() {
-        return (Photo) httpSession.getAttribute(PHOTO);
+    public PhotoId getPhotoId() {
+        return (PhotoId) httpSession.getAttribute(Photo.ID);
     }
 
     /**
      * @methodtype set
      */
-    public void setPhoto(Photo newPhoto) {
-        httpSession.setAttribute(PHOTO, newPhoto);
-    }
-
-    /**
-     * @methodtype get
-     */
-    public String getPhotoId() {
-        Photo photo = getPhoto();
-        if(photo != null) {
-            return getPhoto().getIdAsString();
-        }
-        else {
-            return null;
-        }
+    public void setPhotoId(PhotoId newPhotoId) {
+        httpSession.setAttribute(Photo.ID, newPhotoId);
     }
 
     /**

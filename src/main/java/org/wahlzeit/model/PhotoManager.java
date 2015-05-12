@@ -291,30 +291,39 @@ public class PhotoManager extends ObjectManager {
      */
     protected List<PhotoId> getFilteredPhotoIds(PhotoFilter filter) {
         // get all tags that match the filter conditions
-        List<Tag> tags = new LinkedList<Tag>();
+        List<PhotoId> result = new LinkedList<PhotoId>();
         int noFilterConditions = filter.getFilterConditions().size();
         log.info("Number of filter conditions: " + noFilterConditions);
 
         if (noFilterConditions == 0) {
-            readObjects(tags, Tag.class);
+            Collection<PhotoId> candidates = photoCache.keySet();
+            int newPhotos = 0;
+            for(PhotoId candidate : candidates) {
+                if(!filter.processedPhotoIds.contains(candidate)) {
+                    result.add(candidate);
+                    ++newPhotos;
+                }
+            }
+
+            log.info(newPhotos + " Photos can now be shown.");
         }
         else {
+            List<Tag> tags = new LinkedList<Tag>();
             for (String condition : filter.getFilterConditions()) {
                 readObjects(tags, Tag.class, Tag.TEXT, condition);
             }
-        }
+            log.info("Number of tags: " + tags.size());
 
-        log.info("Number of tags: " + tags.size());
-
-        // get the list of all photo ids that correspond to the tags
-        List<PhotoId> result = new LinkedList<PhotoId>();
-        for(Tag tag : tags) {
-            PhotoId photoId = PhotoId.getIdFromString(tag.getPhotoId());
-            if(!filter.isProcessedPhotoId(photoId)) {
-                result.add(PhotoId.getIdFromString(tag.getPhotoId()));
-                log.info("Add Photo " + tag.getPhotoId() + " to filter result.");
+            // get the list of all photo ids that correspond to the tags
+            for(Tag tag : tags) {
+                PhotoId photoId = PhotoId.getIdFromString(tag.getPhotoId());
+                if(!filter.isProcessedPhotoId(photoId)) {
+                    result.add(PhotoId.getIdFromString(tag.getPhotoId()));
+                    log.info("Add Photo " + tag.getPhotoId() + " to filter result.");
+                }
             }
         }
+
         return result;
     }
 

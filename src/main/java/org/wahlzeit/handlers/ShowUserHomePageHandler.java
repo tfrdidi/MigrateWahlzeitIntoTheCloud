@@ -82,7 +82,7 @@ public class ShowUserHomePageHandler extends AbstractWebPageHandler {
      *
      */
     protected Writable makeUserPhotoForm(UserSession us, Photo photo) {
-        us.setPhoto(photo);
+        us.setPhotoId(photo.getId());
         WebFormHandler handler = getFormHandler(PartUtil.SHOW_USER_PHOTO_FORM_NAME);
         return handler.makeWebPart(us);
     }

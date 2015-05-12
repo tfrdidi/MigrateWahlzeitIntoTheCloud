@@ -22,6 +22,7 @@ package org.wahlzeit.handlers;
 
 import org.wahlzeit.model.AccessRights;
 import org.wahlzeit.model.Photo;
+import org.wahlzeit.model.PhotoId;
 import org.wahlzeit.model.PhotoManager;
 import org.wahlzeit.model.PhotoStatus;
 import org.wahlzeit.model.Tags;
@@ -47,12 +48,11 @@ public class AdminUserPhotoFormHandler extends AbstractWebFormHandler {
      *
      */
     protected void doMakeWebPart(UserSession us, WebPart part) {
-        String photoId = us.getPhotoId();
-
+        PhotoId photoId = us.getPhotoId();
         Photo photo = PhotoManager.getPhoto(photoId);
         part.addString(Photo.THUMB, getPhotoThumb(us, photo));
 
-        part.addString("photoId", photoId);
+        part.addString("photoId", photoId.asString());
         part.addString(Photo.ID, photo.getId().asString());
         part.addSelect(Photo.STATUS, PhotoStatus.class, (String) us.getSavedArg(Photo.STATUS));
         part.maskAndAddStringFromArgsWithDefault(us.getSavedArgs(), Photo.TAGS, photo.getTags().asString());

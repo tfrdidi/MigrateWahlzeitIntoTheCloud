@@ -25,6 +25,7 @@ import org.wahlzeit.agents.AgentManager;
 import org.wahlzeit.agents.NotifyAboutPraiseAgent;
 import org.wahlzeit.model.AccessRights;
 import org.wahlzeit.model.Photo;
+import org.wahlzeit.model.PhotoId;
 import org.wahlzeit.model.PhotoManager;
 import org.wahlzeit.model.UserLog;
 import org.wahlzeit.model.UserSession;
@@ -50,10 +51,9 @@ public class PraisePhotoFormHandler extends AbstractWebFormHandler {
      *
      */
     protected void doMakeWebPart(UserSession us, WebPart part) {
-        Photo photo = us.getPhoto();
-        if (photo != null) {
-            String photoId = photo.getId().asString();
-            part.addString(Photo.ID, photoId);
+        PhotoId photoId = us.getPhotoId();
+        if (photoId != null) {
+            part.addString(Photo.ID, photoId.asString());
         }
     }
 

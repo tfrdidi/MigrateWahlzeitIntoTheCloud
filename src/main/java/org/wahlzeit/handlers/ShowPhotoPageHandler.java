@@ -24,6 +24,7 @@ import org.wahlzeit.model.AccessRights;
 import org.wahlzeit.model.Client;
 import org.wahlzeit.model.Photo;
 import org.wahlzeit.model.PhotoFilter;
+import org.wahlzeit.model.PhotoId;
 import org.wahlzeit.model.PhotoManager;
 import org.wahlzeit.model.PhotoSize;
 import org.wahlzeit.model.Tags;
@@ -75,8 +76,11 @@ public class ShowPhotoPageHandler extends AbstractWebPageHandler implements WebF
             }
         }
 
-        us.setPhoto(photo);
-
+        if (photo != null) {
+            us.setPhotoId(photo.getId());
+        } else {
+            us.setPhotoId(null);
+        }
         return link;
     }
 
@@ -91,7 +95,8 @@ public class ShowPhotoPageHandler extends AbstractWebPageHandler implements WebF
      *
      */
     protected void makeWebPageBody(UserSession us, WebPart page) {
-        Photo photo = us.getPhoto();
+        PhotoId photoId = us.getPhotoId();
+        Photo photo = PhotoManager.getPhoto(photoId);
 
         makeLeftSidebar(us, page);
 
@@ -101,14 +106,13 @@ public class ShowPhotoPageHandler extends AbstractWebPageHandler implements WebF
             makePhotoCaption(us, page);
             makeEngageGuest(us, page);
 
-            String photoId = photo.getId().asString();
-            page.addString(Photo.ID, photoId);
+            page.addString(Photo.ID, photoId.asString());
 
             Tags tags = photo.getTags();
             page.addString(Photo.DESCRIPTION, getPhotoSummary(us, photo));
             page.addString(Photo.KEYWORDS, tags.asString(false, ','));
 
-            log.info("addProcessedPhoto: " + photo.getId().asString());
+            log.info("addProcessedPhoto: " + photoId.asString());
             us.addDisplayedPhoto(photo);
         }
 
@@ -143,7 +147,9 @@ public class ShowPhotoPageHandler extends AbstractWebPageHandler implements WebF
     protected void makePhoto(UserSession us, WebPart page) {
         PhotoSize pagePhotoSize = us.getPhotoSize();
 
-        Photo photo = us.getPhoto();
+        PhotoId photoId = us.getPhotoId();
+        Photo photo = PhotoManager.getPhoto(photoId);
+
         if (photo == null) {
             page.addString("mainWidth", String.valueOf(pagePhotoSize.getMaxPhotoWidth()));
             WebPart done = createWebPart(us, PartUtil.DONE_INFO_FILE);
@@ -169,8 +175,8 @@ public class ShowPhotoPageHandler extends AbstractWebPageHandler implements WebF
      *
      */
     protected void makePhotoCaption(UserSession us, WebPart page) {
-        Photo photo = us.getPhoto();
-        // String photoId = photo.getId().asString();
+        PhotoId photoId = us.getPhotoId();
+        Photo photo = PhotoManager.getPhoto(photoId);
 
         WebPart caption = createWebPart(us, PartUtil.CAPTION_INFO_FILE);
         caption.addString(Photo.CAPTION, getPhotoCaption(us, photo));
@@ -181,12 +187,11 @@ public class ShowPhotoPageHandler extends AbstractWebPageHandler implements WebF
      *
      */
     protected void makeEngageGuest(UserSession us, WebPart page) {
-        Photo photo = us.getPhoto();
-        String photoId = photo.getId().asString();
+        PhotoId photoId = us.getPhotoId();
 
         WebPart engageGuest = createWebPart(us, PartUtil.ENGAGE_GUEST_FORM_FILE);
-        engageGuest.addString(Photo.LINK, HtmlUtil.asHref(getResourceAsRelativeHtmlPathString(photoId)));
-        engageGuest.addString(Photo.ID, photoId);
+        engageGuest.addString(Photo.LINK, HtmlUtil.asHref(getResourceAsRelativeHtmlPathString(photoId.asString())));
+        engageGuest.addString(Photo.ID, photoId.asString());
 
         page.addWritable("engageGuest", engageGuest);
     }
@@ -196,7 +201,8 @@ public class ShowPhotoPageHandler extends AbstractWebPageHandler implements WebF
      */
     protected void makeRightSidebar(UserSession us, WebPart page) {
         String handlerName = PartUtil.NULL_FORM_NAME;
-        Photo photo = us.getPhoto();
+        PhotoId photoId = us.getPhotoId();
+        Photo photo = PhotoManager.getPhoto(photoId);
         if (photo != null) {
             handlerName = PartUtil.PRAISE_PHOTO_FORM_NAME;
         }
@@ -214,7 +220,6 @@ public class ShowPhotoPageHandler extends AbstractWebPageHandler implements WebF
         WebPart result = createWebPart(us, PartUtil.PHOTO_INFO_FILE);
 
         Photo photo = us.getPriorPhoto();
-        // String id = photo.getId().asString();
 
         result.addString(Photo.PRAISE, photo.getPraiseAsString(us.getConfiguration()));
         result.addString(Photo.THUMB, getPhotoThumb(us, photo));
