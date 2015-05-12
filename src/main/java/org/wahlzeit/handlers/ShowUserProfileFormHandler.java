@@ -57,7 +57,7 @@ public class ShowUserProfileFormHandler extends AbstractWebFormHandler {
         part.addString(User.MEMBER_SINCE, us.getConfiguration().asDateString(user.getCreationTime()));
         part.addString(User.NOTIFY_ABOUT_PRAISE, us.getConfiguration().asYesOrNoString(user.getNotifyAboutPraise()));
         part.addString(User.HOME_PAGE, HtmlUtil.asHref(user.getHomePage().toString()));
-        part.addString(User.NO_PHOTOS, String.valueOf(user.getNoPhotos()));
+        part.addString(User.NO_PHOTOS, String.valueOf(user.getNoOfPhotos()));
         part.addString(User.GENDER, us.getConfiguration().asValueString(user.getGender()));
         part.addString(User.LANGUAGE, us.getConfiguration().asValueString(user.getLanguage()));
     }

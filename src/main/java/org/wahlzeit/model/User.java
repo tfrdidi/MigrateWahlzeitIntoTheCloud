@@ -21,6 +21,7 @@
 package org.wahlzeit.model;
 
 import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Subclass;
 import org.wahlzeit.services.EmailAddress;
@@ -28,12 +29,16 @@ import org.wahlzeit.services.Language;
 import org.wahlzeit.services.Persistent;
 import org.wahlzeit.utils.StringUtil;
 
+import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpSessionBindingEvent;
+import javax.servlet.http.HttpSessionBindingListener;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  * A User is a client that is logged-in, that is, has registered with the system.
@@ -44,7 +49,7 @@ import java.util.Set;
  * @author dirkriehle
  */
 @Subclass(index=true)
-public class User extends Client implements Persistent {
+public class User extends Client implements Persistent, HttpSessionBindingListener {
 
     /**
      *
@@ -68,6 +73,8 @@ public class User extends Client implements Persistent {
     public static final String HOME_PAGE = "homePage";
     public static final String MEMBER_SINCE = "memberSince";
     public static final String NO_PHOTOS = "noPhotos";
+
+    protected static final Logger log = Logger.getLogger(User.class.getName());
 
     /**
      * 0 is never returned, first value is 1
@@ -128,6 +135,9 @@ public class User extends Client implements Persistent {
      */
     protected long creationTime = System.currentTimeMillis();
 
+    @Ignore
+    transient protected HttpSession httpSession = null;
+
     /**
      *
      */
@@ -176,35 +186,36 @@ public class User extends Client implements Persistent {
     }
 
     /**
-     *
+     * @methodtype boolean query
      */
     public boolean isDirty() {
         return writeCount != 0;
     }
 
     /**
-     *
+     * @methodtype set
      */
     public final void incWriteCount() {
         writeCount++;
+        notifyHttpSession();
     }
 
     /**
-     *
+     * @methodtype set
      */
     public void resetWriteCount() {
         writeCount = 0;
     }
 
     /**
-     *
+     * @methodtype get
      */
     public String getIdAsString() {
         return String.valueOf(id);
     }
 
     /**
-     *
+     * @methodtype set
      */
     public void setEmailAddress(EmailAddress myEmailAddress) {
         super.setEmailAddress(myEmailAddress);
@@ -217,28 +228,28 @@ public class User extends Client implements Persistent {
     }
 
     /**
-     *
+     * @methodtype get
      */
     public String getName() {
         return name;
     }
 
     /**
-     *
+     * @methodtype get
      */
     public String getNameAsTag() {
         return nameAsTag;
     }
 
     /**
-     *
+     * @methodtype get
      */
     public String getPassword() {
         return password;
     }
 
     /**
-     *
+     * @methodtype set
      */
     public void setPassword(String newPassword) {
         password = newPassword;
@@ -246,21 +257,21 @@ public class User extends Client implements Persistent {
     }
 
     /**
-     *
+     * @methodtype boolean query
      */
     public boolean hasPassword(String otherPassword) {
         return password.equals(otherPassword);
     }
 
     /**
-     *
+     * @methodtype get
      */
     public Language getLanguage() {
         return language;
     }
 
     /**
-     *
+     * @methodtype set
      */
     public void setLanguage(Language newLanguage) {
         language = newLanguage;
@@ -273,82 +284,84 @@ public class User extends Client implements Persistent {
     }
 
     /**
-     *
+     * @methodtype get
      */
     public long getConfirmationCode() {
         return confirmationCode;
     }
 
     /**
-     *
+     * @methodtype boolean query
      */
     public boolean needsConfirmation() {
         return confirmationCode != 0;
     }
 
     /**
-     *
+     * @methodtype boolean query
      */
     public boolean getNotifyAboutPraise() {
         return notifyAboutPraise;
     }
 
     /**
-     *
+     * @methodtype set
      */
     public void setNotifyAboutPraise(boolean notify) {
         notifyAboutPraise = notify;
-        incWriteCount();
 
         for (Iterator<Photo> i = photos.iterator(); i.hasNext(); ) {
             Photo photo = i.next();
             photo.setOwnerNotifyAboutPraise(notifyAboutPraise);
         }
+
+        incWriteCount();
     }
 
     /**
-     *
+     * @methodtype get
      */
     public URL getHomePage() {
         return homePage;
     }
 
     /**
-     *
+     * @methodtype set
      */
     public void setHomePage(URL newHomePage) {
         homePage = newHomePage;
-        incWriteCount();
 
         for (Iterator<Photo> i = photos.iterator(); i.hasNext(); ) {
             Photo photo = i.next();
             photo.setOwnerHomePage(homePage);
         }
+
+        incWriteCount();
     }
 
     /**
-     *
+     * @methodtype get
      */
     public String getSiteUrlAsString() {
         return "http://wahlzeit.org/";
     }
 
     /**
-     *
+     * @methodtype get
      */
     public URL getDefaultHomePage() {
         return StringUtil.asUrl(getSiteUrlAsString() + "filter?userName=" + name); // @TODO Application
     }
 
     /**
-     *
+     * @methodtype get
      */
     public Gender getGender() {
         return gender;
     }
 
     /**
-     *
+     * @methodtype set
      */
     public void setGender(Gender newGender) {
         gender = newGender;
@@ -356,7 +369,7 @@ public class User extends Client implements Persistent {
     }
 
     /**
-     *
+     * @methodtype get
      */
     public UserStatus getStatus() {
         return status;
@@ -371,14 +384,14 @@ public class User extends Client implements Persistent {
     }
 
     /**
-     *
+     * @methodtype boolean query
      */
     public boolean isConfirmed() {
         return getStatus().isConfirmed();
     }
 
     /**
-     *
+     * @methodtype set
      */
     public void setConfirmed() {
         setStatus(status.asConfirmed());
@@ -386,40 +399,40 @@ public class User extends Client implements Persistent {
     }
 
     /**
-     *
+     * @methodtype boolean query
      */
     public boolean hasUserPhoto() {
         return userPhoto != null;
     }
 
     /**
-     *
+     * @methodtype get
      */
     public Photo getUserPhoto() {
         return userPhoto;
     }
 
     /**
-     *
+     * @methodtype set
      */
     public void setUserPhoto(Photo newPhoto) {
         userPhoto = newPhoto;
+        log.info("SetUserPhoto: " + newPhoto.getIdAsString());
         incWriteCount();
     }
 
     /**
-     *
+     * @methodtype get
      */
     public long getCreationTime() {
         return creationTime;
     }
 
     /**
-     *
+     * @methodtype set
      */
     public void addPhoto(Photo newPhoto) {
         photos.add(newPhoto);
-        incWriteCount();
 
         newPhoto.setOwnerId(id);
         newPhoto.setOwnerName(name);
@@ -427,10 +440,12 @@ public class User extends Client implements Persistent {
         newPhoto.setOwnerEmailAddress(emailAddress);
         newPhoto.setOwnerLanguage(language);
         newPhoto.setOwnerHomePage(homePage);
+
+        incWriteCount();
     }
 
     /**
-     *
+     * @methodtype set
      */
     public void removePhoto(Photo notMyPhoto) {
         photos.remove(notMyPhoto);
@@ -438,21 +453,21 @@ public class User extends Client implements Persistent {
     }
 
     /**
-     *
+     * @methodtype get
      */
-    public int getNoPhotos() {
+    public int getNoOfPhotos() {
         return photos.size();
     }
 
     /**
-     *
+     * @methodtype get
      */
     public Photo[] getPhotos() {
         return getPhotosReverseOrderedByPraise();
     }
 
     /**
-     *
+     * @methodtype conversion
      */
     public Photo[] getPhotosReverseOrderedByPraise() {
         Photo[] result = photos.toArray(new Photo[0]);
@@ -461,7 +476,7 @@ public class User extends Client implements Persistent {
     }
 
     /**
-     *
+     * @methodtype get
      */
     public static Comparator<Photo> getPhotoByPraiseReverseComparator() {
         return new Comparator<Photo>() {
@@ -479,6 +494,28 @@ public class User extends Client implements Persistent {
                 }
             }
         };
+    }
+
+
+    @Override
+    public void valueBound(HttpSessionBindingEvent event) {
+        log.info("User bound to HttpSession.");
+        httpSession = event.getSession();
+    }
+
+    @Override
+    public void valueUnbound(HttpSessionBindingEvent event) {
+        log.info("User unbound from HttpSession.");
+        httpSession = null;
+    }
+
+    /**
+     * @methodtype command
+     */
+    protected void notifyHttpSession() {
+        if(httpSession != null) {
+            httpSession.setAttribute(UserSession.CLIENT, this);
+        }
     }
 
 }

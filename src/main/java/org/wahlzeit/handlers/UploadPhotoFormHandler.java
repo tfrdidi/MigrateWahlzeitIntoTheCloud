@@ -76,18 +76,12 @@ public class UploadPhotoFormHandler extends AbstractWebFormHandler {
             Image uploadedImage = us.getUploadedImage();
             Photo photo = pm.createPhoto(fileName, uploadedImage);
 
-            // TODO: think about backup
-            //String targetFileName = SysConfig.getBackupDir().asString() + photo.getId().asString();
-            //createBackup(fileName, targetFileName);
-
             User user = (User) us.getClient();
             user.addPhoto(photo);
 
             log.info("Tags: " + tags);
             photo.setTags(new Tags(tags));
             log.info("Tags of photo: " + photo.getTags().asString());
-
-            pm.savePhoto(photo);
 
             StringBuffer sb = UserLog.createActionEntry("UploadPhoto");
             UserLog.addCreatedObject(sb, "Photo", photo.getId().asString());
@@ -101,20 +95,4 @@ public class UploadPhotoFormHandler extends AbstractWebFormHandler {
 
         return PartUtil.UPLOAD_PHOTO_PAGE_NAME;
     }
-
-    /**
-     *
-     *//*
-    protected void createBackup(String sourceName, String targetName) {
-        try {
-            File sourceFile = new File(sourceName);
-            InputStream inputStream = new FileInputStream(sourceFile);
-            File targetFile = new File(targetName);
-            //OutputStream outputStream = new FileOutputStream(targetFile);
-            // @FIXME IO.copy(inputStream, outputStream);
-        } catch (Exception ex) {
-            SysLog.logSysInfo("could not create backup file of photo");
-            SysLog.logThrowable(ex);
-        }
-    }*/
 }
