@@ -66,16 +66,6 @@ public class SysLog extends Log {
     /**
      *
      */
-    public static final void logQuery(String s) {
-        StringBuffer sb = createSysLogEntry();
-        addLogType(sb, "info");
-        addField(sb, "query", s);
-        log(sb);
-    }
-
-    /**
-     *
-     */
     public static final void logThrowable(Throwable t) {
         Throwable cause = t.getCause();
         if (cause != null) {

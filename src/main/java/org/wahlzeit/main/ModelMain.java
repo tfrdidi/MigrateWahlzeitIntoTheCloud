@@ -21,7 +21,6 @@
 package org.wahlzeit.main;
 
 import org.wahlzeit.model.GlobalsManager;
-import org.wahlzeit.model.Photo;
 import org.wahlzeit.model.PhotoCaseManager;
 import org.wahlzeit.model.PhotoFactory;
 import org.wahlzeit.model.PhotoManager;
@@ -30,26 +29,33 @@ import org.wahlzeit.model.UserManager;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.logging.Logger;
 
 /**
- * A single-threaded Main class with database connection.
- * Can be used by tools that don't want to start a server.
+ * A single-threaded Main class with database connection. Can be used by tools that don't want to start a server.
  *
  * @author dirkriehle
  */
 public abstract class ModelMain extends AbstractMain {
+
+    private static final Logger log = Logger.getLogger(ModelMain.class.getName());
 
     /**
      *
      */
     protected void startUp(String rootDir) throws Exception {
         super.startUp(rootDir);
+        log.info("AbstractMain.startUp completed");
 
         GlobalsManager.getInstance().loadGlobals();
+        log.info("Globals loaded");
         UserManager.getInstance().init();
+        log.info("All users have been loaded.");
 
         PhotoFactory.initialize();
+        log.info("PhotoFactory initialized.");
         PhotoManager.getInstance().init();
+        log.info("All Photos have been loaded.");
     }
 
 
