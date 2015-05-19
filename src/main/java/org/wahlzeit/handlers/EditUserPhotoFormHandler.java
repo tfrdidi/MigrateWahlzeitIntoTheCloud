@@ -32,11 +32,15 @@ import org.wahlzeit.utils.HtmlUtil;
 import org.wahlzeit.webparts.WebPart;
 
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * @author dirkriehle
  */
 public class EditUserPhotoFormHandler extends AbstractWebFormHandler {
+
+    private static final Logger log = Logger.getLogger(EditUserPhotoFormHandler.class.getName());
+
 
     /**
      *
@@ -101,7 +105,7 @@ public class EditUserPhotoFormHandler extends AbstractWebFormHandler {
 
         StringBuffer sb = UserLog.createActionEntry("EditUserPhoto");
         UserLog.addUpdatedObject(sb, "Photo", photo.getId().asString());
-        UserLog.log(sb);
+        log.info(sb.toString());
 
         us.setTwoLineMessage(us.getConfiguration().getPhotoUpdateSucceeded(), us.getConfiguration().getContinueWithShowUserHome());
 

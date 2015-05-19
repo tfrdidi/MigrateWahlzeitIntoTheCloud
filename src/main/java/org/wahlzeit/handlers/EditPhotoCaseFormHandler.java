@@ -33,12 +33,16 @@ import org.wahlzeit.utils.StringUtil;
 import org.wahlzeit.webparts.WebPart;
 
 import java.util.Map;
+import java.util.logging.Logger;
 
 
 /**
  * @author dirkriehle
  */
 public class EditPhotoCaseFormHandler extends AbstractWebFormHandler {
+
+    private static final Logger log = Logger.getLogger(EditPhotoCaseFormHandler.class.getName());
+
 
     /**
      *
@@ -96,14 +100,14 @@ public class EditPhotoCaseFormHandler extends AbstractWebFormHandler {
 
         StringBuffer sb = UserLog.createActionEntry("EditPhotoCase");
         UserLog.addUpdatedObject(sb, "Photo", photo.getId().asString());
-        UserLog.log(sb);
+        log.info(sb.toString());
 
         photoCase.setDecided();
         pcm.removePhotoCase(photoCase);
 
         sb = UserLog.createActionEntry("EditPhotoCase");
         UserLog.addUpdatedObject(sb, "PhotoCase", String.valueOf(photoCase.getId()));
-        UserLog.log(sb);
+        log.info(sb.toString());
 
         return PartUtil.SHOW_PHOTO_CASES_PAGE_NAME;
     }

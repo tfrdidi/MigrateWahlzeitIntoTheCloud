@@ -34,6 +34,7 @@ import org.wahlzeit.handlers.WebPageHandler;
 import org.wahlzeit.handlers.WebPartHandlerManager;
 import org.wahlzeit.model.UserLog;
 import org.wahlzeit.model.UserSession;
+import org.wahlzeit.services.SessionManager;
 import org.wahlzeit.services.SysLog;
 import org.wahlzeit.webparts.WebPart;
 
@@ -63,8 +64,8 @@ public class MainServlet extends AbstractServlet {
      */
     public void myGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         long startTime = System.currentTimeMillis();
-        UserSession us = ensureUserSession(request);
 
+        UserSession us = (UserSession) SessionManager.getThreadLocalSession();
         String link = request.getRequestURI();
         int linkStart = link.lastIndexOf("/") + 1;
         int linkEnd = link.indexOf(".html");
@@ -94,6 +95,7 @@ public class MainServlet extends AbstractServlet {
             redirectRequest(response, newLink);
             us.addProcessingTime(System.currentTimeMillis() - startTime);
         }
+        SessionManager.dropThreadLocalSession();
     }
 
     /**
@@ -101,8 +103,8 @@ public class MainServlet extends AbstractServlet {
      */
     public void myPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         long startTime = System.currentTimeMillis();
-        UserSession us = ensureUserSession(request);
 
+        UserSession us = (UserSession) SessionManager.getThreadLocalSession();
         String link = request.getRequestURI();
         int linkStart = link.lastIndexOf("/") + 1;
         int linkEnd = link.indexOf(".form");
@@ -123,6 +125,7 @@ public class MainServlet extends AbstractServlet {
         }
 
         redirectRequest(response, link);
+        SessionManager.dropThreadLocalSession();
         us.addProcessingTime(System.currentTimeMillis() - startTime);
     }
 

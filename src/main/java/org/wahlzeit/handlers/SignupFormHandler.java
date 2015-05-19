@@ -30,12 +30,16 @@ import org.wahlzeit.utils.StringUtil;
 import org.wahlzeit.webparts.WebPart;
 
 import java.util.Map;
+import java.util.logging.Logger;
 
 
 /**
  * @author dirkriehle
  */
 public class SignupFormHandler extends AbstractWebFormHandler {
+
+    private static final Logger log = Logger.getLogger(SignupFormHandler.class.getName());
+
 
     /**
      *
@@ -117,7 +121,7 @@ public class SignupFormHandler extends AbstractWebFormHandler {
 
         StringBuffer sb = UserLog.createActionEntry("Signup");
         UserLog.addCreatedObject(sb, "User", userName);
-        UserLog.log(sb);
+        log.info(sb.toString());
 
         us.setTwoLineMessage(us.getConfiguration().getConfirmationEmailWasSent(), us.getConfiguration().getContinueWithShowUserHome());
 

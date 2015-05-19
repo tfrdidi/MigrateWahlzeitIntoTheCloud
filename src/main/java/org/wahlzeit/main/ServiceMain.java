@@ -20,7 +20,6 @@
 
 package org.wahlzeit.main;
 
-import org.wahlzeit.agents.AgentManager;
 import org.wahlzeit.handlers.*;
 import org.wahlzeit.model.AccessRights;
 import org.wahlzeit.model.EnglishModelConfig;

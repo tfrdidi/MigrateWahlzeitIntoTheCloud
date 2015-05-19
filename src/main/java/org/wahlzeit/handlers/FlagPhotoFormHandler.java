@@ -36,11 +36,15 @@ import org.wahlzeit.utils.StringUtil;
 import org.wahlzeit.webparts.WebPart;
 
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * @author dirkriehle
  */
 public class FlagPhotoFormHandler extends AbstractWebFormHandler {
+
+    private static final Logger log = Logger.getLogger(FlagPhotoFormHandler.class.getName());
+
 
     /**
      *
@@ -119,7 +123,7 @@ public class FlagPhotoFormHandler extends AbstractWebFormHandler {
 
         StringBuffer sb = UserLog.createActionEntry("FlagPhoto");
         UserLog.addUpdatedObject(sb, "Photo", photo.getId().asString());
-        UserLog.log(sb);
+        log.info(sb.toString());
 
         us.setTwoLineMessage(us.getConfiguration().getModeratorWasInformed(), us.getConfiguration().getContinueWithShowPhoto());
 

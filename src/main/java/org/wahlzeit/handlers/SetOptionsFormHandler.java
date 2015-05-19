@@ -29,6 +29,7 @@ import org.wahlzeit.services.Language;
 import org.wahlzeit.webparts.WebPart;
 
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * @author dirkriehle
@@ -40,6 +41,8 @@ public class SetOptionsFormHandler extends AbstractWebFormHandler {
      */
     public static final String LANGUAGE = "language";
     public static final String PHOTO_SIZE = "photoSize";
+
+    private static final Logger log = Logger.getLogger(SetOptionsFormHandler.class.getName());
 
     /**
      *
@@ -76,7 +79,7 @@ public class SetOptionsFormHandler extends AbstractWebFormHandler {
         StringBuffer sb = UserLog.createActionEntry("SetOptions");
         UserLog.addField(sb, "language", language);
         UserLog.addField(sb, "photoSize", photoSize);
-        UserLog.log(sb);
+        log.info(sb.toString());
 
         String msg1 = us.getConfiguration().getOptionsWereSet();
         String msg2 = us.getConfiguration().getNoteMaximumPhotoSize();

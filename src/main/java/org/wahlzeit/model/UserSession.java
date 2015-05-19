@@ -70,8 +70,8 @@ public class UserSession extends Session implements Serializable {
      */
     public UserSession(String myName, String mySiteUrl, HttpServletRequest myHttpRequest) {
         httpSession = myHttpRequest.getSession();
+        initialize(myName);
         if(httpSession.getAttribute(INITIALIZED) == null) {
-            initialize(myName);
             httpSession.setAttribute(SITE_URL, mySiteUrl);
             httpSession.setAttribute(PHOTO_FILTER, PhotoFactory.getInstance().createPhotoFilter());
 

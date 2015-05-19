@@ -134,7 +134,7 @@ public abstract class AbstractServlet extends HttpServlet {
         HttpSession httpSession = request.getSession();
         log.info("HttpSessionId: " + httpSession.getId());
 
-        String sessionName = "session" + httpSession.getId();
+        String sessionName = httpSession.getId();
         String siteUrl = getSiteUrl(request); // @TODO Application
 
         UserSession result = new UserSession(sessionName, siteUrl, request);

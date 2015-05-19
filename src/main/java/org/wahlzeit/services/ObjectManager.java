@@ -28,20 +28,24 @@ import java.util.List;
 import java.util.logging.Logger;
 
 /**
- * An ObjectManager creates/reads/updates/deletes Persistent (objects) from Google Datastore.
- * It is an abstract superclass that relies an inheritance interface and the Persistent interface.
+ * An ObjectManager creates/reads/updates/deletes Persistent (objects) from Google Datastore. It is an abstract
+ * superclass that relies an inheritance interface and the Persistent interface.
  *
  * @author dirkriehle
  */
 public abstract class ObjectManager {
 
-    protected static final Logger log = Logger.getLogger(ObjectManager.class.getName());
+    /**
+     * All objects are now saved under this root key. In case of multitenancy this may change to several keys.
+     */
     public static final Key applicationRootKey = KeyFactory.createKey("Application", "Wahlzeit");
 
+    protected static final Logger log = Logger.getLogger(ObjectManager.class.getName());
+
     /**
-     *  Finds the first Entity with the given key
+     * Reads the first Entity with the given key in the Datastore
      */
-    protected <E> E readObject(Class<E> type, Long id) {
+    protected <E> E readObject(Class<E> type, Long id) throws IllegalArgumentException {
         assertIsNonNullArgument(type, "type");
         assertIsNonNullArgument(id, "id");
 
@@ -50,8 +54,8 @@ public abstract class ObjectManager {
     }
 
     /**
-     * Reads an Entity of the specified type where the wanted parameter has the given name,
-     * e.g. readObject(User.class, "emailAddress", "name@provider.com").
+     * Reads an Entity of the specified type where the wanted parameter has the given name, e.g. readObject(User.class,
+     * "emailAddress", "name@provider.com").
      */
     protected <E> E readObject(Class<E> type, String parameterName, Object value) {
         assertIsNonNullArgument(type, "type");
@@ -63,8 +67,7 @@ public abstract class ObjectManager {
     }
 
     /**
-     * Reads all Entities of the specified type,
-     * e.g. readObject(User.class) to get a list of all users
+     * Reads all Entities of the specified type, e.g. readObject(User.class) to get a list of all users
      */
     protected <E> void readObjects(Collection<E> result, Class<E> type) {
         assertIsNonNullArgument(result, "result");
@@ -75,8 +78,8 @@ public abstract class ObjectManager {
     }
 
     /**
-     * Reads all Entities of the specified type, where the given property matches the wanted value
-     * e.g. readObject(User.class) to get a list of all users
+     * Reads all Entities of the specified type, where the given property matches the wanted value e.g.
+     * readObject(User.class) to get a list of all users
      */
     protected <E> void readObjects(Collection<E> result, Class<E> type, String propertyName, Object value) {
         assertIsNonNullArgument(result, "result");
@@ -94,13 +97,12 @@ public abstract class ObjectManager {
     protected void writeObject(Persistent object) {
         assertIsNonNullArgument(object, "object");
 
-        if(object.isDirty()) {
+        if (object.isDirty()) {
             log.info("Write Entity  " + object.toString() + " into the datastore.");
             OfyService.ofy().save().entity(object).now();
             updateDependents(object);
             object.resetWriteCount();
-        }
-        else {
+        } else {
             log.info("No need to update object " + object.toString() + " in the datastore.");
         }
     }
@@ -116,7 +118,7 @@ public abstract class ObjectManager {
      * Updates all entities of the given collection in the datastore.
      */
     protected void updateObjects(Collection<? extends Persistent> collection) {
-        for(Persistent object : collection) {
+        for (Persistent object : collection) {
             updateObject(object);
         }
     }
@@ -139,8 +141,8 @@ public abstract class ObjectManager {
     }
 
     /**
-     * Deletes all entities of the type that have a property with the specified value,
-     * e.g. deleteObjects(PhotoCase.class, "wasDecided", true) to delete all cases that have been decided.
+     * Deletes all entities of the type that have a property with the specified value, e.g.
+     * deleteObjects(PhotoCase.class, "wasDecided", true) to delete all cases that have been decided.
      */
     protected <E> void deleteObjects(Class<E> type, String propertyName, Object value) {
         assertIsNonNullArgument(type, "type");

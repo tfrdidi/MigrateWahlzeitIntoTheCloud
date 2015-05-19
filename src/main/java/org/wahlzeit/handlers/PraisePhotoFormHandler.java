@@ -20,9 +20,6 @@
 
 package org.wahlzeit.handlers;
 
-import org.wahlzeit.agents.Agent;
-import org.wahlzeit.agents.AgentManager;
-import org.wahlzeit.agents.NotifyAboutPraiseAgent;
 import org.wahlzeit.model.AccessRights;
 import org.wahlzeit.model.Photo;
 import org.wahlzeit.model.PhotoId;
@@ -81,11 +78,6 @@ public class PraisePhotoFormHandler extends AbstractWebFormHandler {
                 photo.addToPraise(value);
                 us.addPraisedPhoto(photo);
                 wasPraised = true;
-//                if (photo.getOwnerNotifyAboutPraise()) {
-//                    Agent agent = AgentManager.getInstance().getAgent(NotifyAboutPraiseAgent.NAME);
-//                    NotifyAboutPraiseAgent notify = (NotifyAboutPraiseAgent) agent;
-//                    notify.addForNotify(photo);
-//                }
             }
         }
 

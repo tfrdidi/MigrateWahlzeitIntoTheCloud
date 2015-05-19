@@ -34,11 +34,14 @@ import org.wahlzeit.utils.StringUtil;
 import org.wahlzeit.webparts.WebPart;
 
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * @author dirkriehle
  */
 public class EditUserProfileFormHandler extends AbstractWebFormHandler {
+
+    private static final Logger log = Logger.getLogger(EditUserProfileFormHandler.class.getName());
 
     /**
      *
@@ -108,7 +111,7 @@ public class EditUserProfileFormHandler extends AbstractWebFormHandler {
 
         StringBuffer sb = UserLog.createActionEntry("EditUserProfile");
         UserLog.addUpdatedObject(sb, "User", user.getName());
-        UserLog.log(sb);
+        log.info(sb.toString());
 
         us.setTwoLineMessage(us.getConfiguration().getProfileUpdateSucceeded(), us.getConfiguration().getContinueWithShowUserHome());
 

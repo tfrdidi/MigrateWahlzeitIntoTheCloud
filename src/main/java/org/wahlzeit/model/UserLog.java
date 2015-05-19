@@ -33,29 +33,29 @@ public class UserLog extends Log {
     /**
      *
      */
-    public static void logUserInfo(String s) {
-        Log.logInfo("ul", s);
+    public static StringBuffer logUserInfo(String s) {
+        return Log.logInfo("ul", s);
     }
 
     /**
      *
      */
-    public static void logUserInfo(String type, String value) {
-        Log.logInfo("ul", type, value);
+    public static StringBuffer logUserInfo(String type, String value) {
+        return Log.logInfo("ul", type, value);
     }
 
     /**
      *
      */
-    public static void logUserInfo(String type, String value, String info) {
-        Log.logInfo("ul", type, value, info);
+    public static StringBuffer logUserInfo(String type, String value, String info) {
+        return Log.logInfo("ul", type, value, info);
     }
 
     /**
      *
      */
-    public static void logUserError(String s) {
-        Log.logError("ul", s);
+    public static StringBuffer logUserError(String s) {
+        return Log.logError("ul", s);
     }
 
     /**
@@ -68,8 +68,8 @@ public class UserLog extends Log {
     /**
      *
      */
-    public static void logPerformedAction(String action) {
-        log(createActionEntry(action));
+    public static StringBuffer logPerformedAction(String action) {
+        return createActionEntry(action);
     }
 
     /**
@@ -77,7 +77,6 @@ public class UserLog extends Log {
      */
     public static StringBuffer createActionEntry(String action) {
         StringBuffer sb = createUserLogEntry();
-        addLogType(sb, "info");
         addField(sb, "action", action);
         return sb;
     }
