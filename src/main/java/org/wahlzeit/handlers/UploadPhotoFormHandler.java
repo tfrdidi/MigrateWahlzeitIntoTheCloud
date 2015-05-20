@@ -89,7 +89,8 @@ public class UploadPhotoFormHandler extends AbstractWebFormHandler {
             log.info(sb.toString());
 
             us.setTwoLineMessage(us.getConfiguration().getPhotoUploadSucceeded(), us.getConfiguration().getKeepGoing());
-            AsyncTaskExecutor.savePhotoAsync(photo.getIdAsString());
+            log.info("Calling asynct task to save ID " + photo.getId().asString());
+            AsyncTaskExecutor.savePhotoAsync(photo.getId().asString());
         } catch (Exception ex) {
             SysLog.logThrowable(ex);
             us.setMessage(us.getConfiguration().getPhotoUploadFailed());

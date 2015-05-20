@@ -151,7 +151,7 @@ public abstract class ObjectManager {
 
         log.info("Delete entities of type " + type + " where property " + propertyName + " == " + value.toString() + " from datastore.");
         List<com.googlecode.objectify.Key<E>> keys = OfyService.ofy().load().type(type).ancestor(applicationRootKey).filter(propertyName, value).keys().list();
-        OfyService.ofy().delete().type(type).ids(keys);
+        OfyService.ofy().delete().keys(keys);
     }
 
     /**

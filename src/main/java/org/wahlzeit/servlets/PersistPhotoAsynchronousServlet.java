@@ -31,7 +31,14 @@ public class PersistPhotoAsynchronousServlet extends HttpServlet {
         log.info("Try to persist PhotoId " + id);
         if(id != null && !"".equals(id)) {
             Photo photo = PhotoManager.getPhoto(id);
-            PhotoManager.getInstance().savePhoto(photo);
+            if(photo != null) {
+                PhotoManager.getInstance().savePhoto(photo);
+            }
+            else {
+                response.setStatus(299);
+                throw new IllegalArgumentException("Could not find Photo with ID " + id);
+            }
         }
+        response.setStatus(200);
     }
 }
