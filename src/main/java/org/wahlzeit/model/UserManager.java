@@ -32,11 +32,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.logging.Logger;
+//import java.util.logging.Logger;
+
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
 /**
  * The UserManager provides access to and manages Users (including Moderators and Administrators).
@@ -68,7 +70,8 @@ public class UserManager extends ObjectManager {
     protected static UserManager instance = new UserManager();
 
     private static final Long DEFAULT_ADMIN_ID = 1L;
-    private static final Logger log = Logger.getLogger(UserManager.class.getName());
+    //private static final Logger log = LoggerFactory.getLogger(UserManager.class);
+    //static final Logger logger = LogManager.getLogger(UserManager.class.getName());
 
     /**
      *
@@ -151,18 +154,17 @@ public class UserManager extends ObjectManager {
     public User getUserByTag(String tag) {
         assertIsNonNullArgument(tag, "user-by-tag");
 
-        log.info("Try to find user " + tag);
         User result = doGetUserByTag(tag);
 
         if (result == null) {
-            log.info("User " + tag + " is not in cache.");
+            log.info(SysLog.logSysInfo("User not in cache", tag).toString());
             result = readObject(User.class, User.NAME_AS_TAG, tag);
             if (result != null) {
                 doAddUser(result);
             }
         }
         else {
-            log.info("Loaded user " + tag + " from cache.");
+            log.info(SysLog.logSysInfo("User loaded from cache", tag).toString());
         }
 
         return result;

@@ -20,13 +20,13 @@
 
 package org.wahlzeit.model;
 
-import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Subclass;
 import org.wahlzeit.services.EmailAddress;
 import org.wahlzeit.services.Language;
 import org.wahlzeit.services.Persistent;
+import org.wahlzeit.services.SysLog;
 import org.wahlzeit.utils.StringUtil;
 
 import javax.servlet.http.HttpSession;
@@ -41,14 +41,13 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 /**
- * A User is a client that is logged-in, that is, has registered with the system.
- * A user has a fair amount of information associated with it, most notably his/her photos.
- * Also, his/her contact information and whether the account has been confirmed.
- * Users can have a home page which may be elsewhere on the net.
+ * A User is a client that is logged-in, that is, has registered with the system. A user has a fair amount of
+ * information associated with it, most notably his/her photos. Also, his/her contact information and whether the
+ * account has been confirmed. Users can have a home page which may be elsewhere on the net.
  *
  * @author dirkriehle
  */
-@Subclass(index=true)
+@Subclass(index = true)
 public class User extends Client implements Persistent, HttpSessionBindingListener {
 
     /**
@@ -111,7 +110,8 @@ public class User extends Client implements Persistent, HttpSessionBindingListen
      *
      */
     protected String name;
-    @Index protected String nameAsTag;
+    @Index
+    protected String nameAsTag;
     protected String password;
 
     /**
@@ -499,13 +499,13 @@ public class User extends Client implements Persistent, HttpSessionBindingListen
 
     @Override
     public void valueBound(HttpSessionBindingEvent event) {
-        log.info("User bound to HttpSession.");
+        log.info(SysLog.logSysInfo("User bound to HttpSession.").toString());
         httpSession = event.getSession();
     }
 
     @Override
     public void valueUnbound(HttpSessionBindingEvent event) {
-        log.info("User unbound from HttpSession.");
+        log.info(SysLog.logSysInfo("User unbound from HttpSession.").toString());
         httpSession = null;
     }
 
@@ -513,7 +513,7 @@ public class User extends Client implements Persistent, HttpSessionBindingListen
      * @methodtype command
      */
     protected void notifyHttpSession() {
-        if(httpSession != null) {
+        if (httpSession != null) {
             httpSession.setAttribute(UserSession.CLIENT, this);
         }
     }

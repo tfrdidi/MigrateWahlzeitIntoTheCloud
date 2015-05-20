@@ -51,10 +51,8 @@ public class AdminServlet extends AbstractServlet {
             ServiceMain.getInstance().requestStop();
             displayNullPage(request, response);
         } else if (link.length() == "/admin".length()) {
-            SysLog.logSysInfo("redirect", PartUtil.DEFAULT_PAGE_NAME);
             redirectRequest(response, PartUtil.DEFAULT_PAGE_NAME);
         } else {
-            SysLog.logSysInfo("redirect", "../" + PartUtil.DEFAULT_PAGE_NAME);
             redirectRequest(response, "../" + PartUtil.DEFAULT_PAGE_NAME);
         }
     }

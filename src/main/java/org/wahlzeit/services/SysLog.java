@@ -31,6 +31,7 @@ public class SysLog extends Log {
     /**
      *
      */
+    @Deprecated
     public static StringBuffer logSysInfo(String s) {
         return Log.logInfo("sl", s);
     }
@@ -38,6 +39,7 @@ public class SysLog extends Log {
     /**
      *
      */
+    @Deprecated
     public static StringBuffer logSysInfo(String type, String value) {
         return Log.logInfo("sl", type, value);
     }
@@ -45,6 +47,7 @@ public class SysLog extends Log {
     /**
      *
      */
+    @Deprecated
     public static StringBuffer logSysInfo(String type, String value, String info) {
         return Log.logInfo("sl", type, value, info);
     }
@@ -52,6 +55,7 @@ public class SysLog extends Log {
     /**
      *
      */
+    @Deprecated
     public static StringBuffer logCreatedObject(String type, String object) {
         return Log.logCreatedObject("sl", type, object);
     }
@@ -59,6 +63,7 @@ public class SysLog extends Log {
     /**
      *
      */
+    @Deprecated
     public static StringBuffer logSysError(String s) {
         return Log.logError("sl", s);
     }
@@ -66,6 +71,7 @@ public class SysLog extends Log {
     /**
      *
      */
+    @Deprecated
     public static StringBuffer logThrowable(Throwable t) {
         Throwable cause = t.getCause();
         if (cause != null) {
@@ -81,6 +87,7 @@ public class SysLog extends Log {
     /**
      *
      */
+    @Deprecated
     protected static StringBuffer createSysLogEntry() {
         return createLogEntry("sl");
     }

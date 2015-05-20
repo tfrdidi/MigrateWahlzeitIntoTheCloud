@@ -90,8 +90,7 @@ public class Log {
      */
     protected static final StringBuffer createLogEntry(String level) {
         StringBuffer sb = new StringBuffer(256);
-
-        addField(sb, "level", level);
+        sb.append("level=" + level);
         addSession(sb);
         return sb;
     }

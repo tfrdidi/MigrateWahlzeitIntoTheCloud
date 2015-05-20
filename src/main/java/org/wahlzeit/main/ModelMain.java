@@ -29,7 +29,10 @@ import org.wahlzeit.model.UserManager;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.logging.Handler;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
+import java.util.logging.StreamHandler;
 
 /**
  * A single-threaded Main class with database connection. Can be used by tools that don't want to start a server.
@@ -55,7 +58,6 @@ public abstract class ModelMain extends AbstractMain {
         PhotoFactory.initialize();
         log.info("PhotoFactory initialized.");
         PhotoManager.getInstance().init();
-        log.info("All Photos have been loaded.");
     }
 
 

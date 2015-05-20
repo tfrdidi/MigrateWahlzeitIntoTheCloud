@@ -132,7 +132,6 @@ public abstract class AbstractServlet extends HttpServlet {
      */
     protected UserSession ensureUserSession(HttpServletRequest request) {
         HttpSession httpSession = request.getSession();
-        log.info("HttpSessionId: " + httpSession.getId());
 
         String sessionName = httpSession.getId();
         String siteUrl = getSiteUrl(request); // @TODO Application
@@ -162,8 +161,9 @@ public abstract class AbstractServlet extends HttpServlet {
      */
     protected void redirectRequest(HttpServletResponse response, String link) throws IOException {
         response.setContentType("text/html");
-        log.info("Link: " + link);
-        response.sendRedirect("/" + link + ".html");
+        String newTarget = new String("/" + link + ".html");
+        log.info(SysLog.logSysInfo("Redirect to", newTarget).toString());
+        response.sendRedirect(newTarget);
     }
 
     /**
@@ -172,7 +172,7 @@ public abstract class AbstractServlet extends HttpServlet {
     protected void configureResponse(Session ctx, HttpServletResponse response, WebPart result) throws IOException {
         long processingTime = ctx.getProcessingTime();
         result.addString("processingTime", StringUtil.asStringInSeconds((processingTime == 0) ? 1 : processingTime));
-        SysLog.logSysInfo("proctime", String.valueOf(processingTime));
+        log.info(SysLog.logSysInfo("proctime", String.valueOf(processingTime)).toString());
 
         response.setContentType("text/html");
 

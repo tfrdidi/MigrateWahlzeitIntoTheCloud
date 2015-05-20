@@ -1,7 +1,7 @@
 apply plugin: 'war'
 apply plugin: 'appengine'
 
-def appengineVersion = "1.9.18"
+def appengineVersion = "1.9.20"
 
 buildscript {
     repositories {
@@ -9,7 +9,7 @@ buildscript {
     }
 
     dependencies {
-        classpath "com.google.appengine:gradle-appengine-plugin:1.9.18"
+        classpath "com.google.appengine:gradle-appengine-plugin:1.9.20"
     }
 }
 
@@ -33,13 +33,7 @@ appengine {
     jvmFlags = ['-Xdebug', '-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8000']
 
     appcfg {
-        if(project.hasProperty("wahlzeit.signing")
-                && new File(project.property("wahlzeit.signing") + ".gradle").exists()) {
-            apply from: project.property("wahlzeit.signing") + ".gradle";
-
-            email = uploadUser
-            password = uploadPass
-        }
-        noCookies = true
+        oauth2 = true
+        noCookies = false
     }
 }

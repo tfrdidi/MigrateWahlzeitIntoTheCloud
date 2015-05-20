@@ -47,6 +47,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -58,6 +60,9 @@ public class MainServlet extends AbstractServlet {
      *
      */
     private static final long serialVersionUID = 42L; // any one does; class never serialized
+
+    protected static final Logger log = Logger.getLogger(MainServlet.class.getName());
+
 
     /**
      *
@@ -74,13 +79,13 @@ public class MainServlet extends AbstractServlet {
         }
 
         link = link.substring(linkStart, linkEnd);
-        UserLog.logUserInfo("requested", link);
+        log.info(UserLog.logUserInfo("requested URI", request.getRequestURI()).toString());
 
         WebPageHandler handler = WebPartHandlerManager.getWebPageHandler(link);
         String newLink = PartUtil.DEFAULT_PAGE_NAME;
         if (handler != null) {
             Map args = getRequestArgs(request, us);
-            SysLog.logSysInfo("GET arguments: " + getRequestArgsAsString(us, args));
+            log.info(SysLog.logSysInfo("GET arguments: " + getRequestArgsAsString(us, args)).toString());
             newLink = handler.handleGet(us, link, args);
         }
 
@@ -91,7 +96,6 @@ public class MainServlet extends AbstractServlet {
             us.clearSavedArgs(); // saved args go from post to next get
             us.resetProcessingTime();
         } else {
-            SysLog.logSysInfo("redirect", newLink);
             redirectRequest(response, newLink);
             us.addProcessingTime(System.currentTimeMillis() - startTime);
         }
@@ -113,10 +117,10 @@ public class MainServlet extends AbstractServlet {
         } else {
             link = PartUtil.NULL_FORM_NAME;
         }
-        UserLog.logUserInfo("postedto", link);
+        log.info(UserLog.logUserInfo("postedto", link).toString());
 
         Map args = getRequestArgs(request, us);
-        SysLog.logSysInfo("POST arguments: " + getRequestArgsAsString(us, args));
+        log.info(SysLog.logSysInfo("POST arguments: " + getRequestArgsAsString(us, args)).toString());
 
         WebFormHandler formHandler = WebPartHandlerManager.getWebFormHandler(link);
         link = PartUtil.DEFAULT_PAGE_NAME;
@@ -148,9 +152,6 @@ public class MainServlet extends AbstractServlet {
     protected Map getMultiPartRequestArgs(HttpServletRequest request, UserSession us) throws IOException, ServletException {
         Map<String, String> result = new HashMap<String, String>();
         result.putAll(request.getParameterMap());
-        for(Map.Entry<String, String> entry : result.entrySet()) {
-            log.info("Result entry: " + entry.getKey() + " - " + entry.getValue());
-        }
         try {
             ServletFileUpload upload = new ServletFileUpload();
             FileItemIterator iterator = upload.getItemIterator(request);
@@ -164,12 +165,16 @@ public class MainServlet extends AbstractServlet {
                     Image image = getImage(inputStream);
                     us.setUploadedImage(image);
                     result.put("fileName", filename);
+                    log.info(SysLog.logSysInfo("Uploaded image", filename).toString());
                 }
                 else {
                     String key = fileItemStream.getFieldName();
                     InputStream is = fileItemStream.openStream();
                     String value = CharStreams.toString(new InputStreamReader(is, Charsets.UTF_8));
                     result.put(key, value);
+                    StringBuffer logMessage = SysLog.logSysInfo("Key of uploaded parameter", key);
+                    SysLog.addField(logMessage, "value", value);
+                    log.info(logMessage.toString());
                 }
             }
         } catch (Exception ex) {

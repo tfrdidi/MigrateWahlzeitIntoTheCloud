@@ -24,6 +24,7 @@ import com.google.appengine.api.images.Image;
 import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.Work;
 import org.wahlzeit.agents.AsyncTaskExecutor;
+import org.wahlzeit.services.EmailAddress;
 import org.wahlzeit.services.ObjectManager;
 import org.wahlzeit.services.Persistent;
 import org.wahlzeit.services.SysLog;
@@ -157,7 +158,6 @@ public class PhotoManager extends ObjectManager {
         doAddPhoto(photo);
 
         AsyncTaskExecutor.savePhotoAsync(id.asString());
-        //writeObject(photo);
         GlobalsManager.getInstance().saveGlobals();
     }
 
@@ -182,17 +182,27 @@ public class PhotoManager extends ObjectManager {
             }
         });
 
+        log.info(SysLog.logSysInfo("Number of photos found in datastore", String.valueOf(existingPhotos.size())).toString());
         for (Photo photo : existingPhotos) {
             if (!doHasPhoto(photo.getId())) {
+                log.config(SysLog.logSysInfo("Load Photo with ID", photo.getIdAsString()).toString());
                 loadScaledImages(photo);
                 // Todo: load tags
                 doAddPhoto(photo);
+                EmailAddress emailAddress = photo.getOwnerEmailAddress();
+                User user = UserManager.getInstance().getUserByEmailAddress(emailAddress);
+                if(user != null) {
+                    user.addPhoto(photo);
+                }
+                else {
+                    log.warning(SysLog.logSysInfo("No user found for", emailAddress.asString()).toString());
+                }
             } else {
-                SysLog.logSysInfo("photo", String.valueOf(photo.getId()), "photo had already been loaded");
+                log.config(SysLog.logSysInfo("Already loaded Photo", photo.getIdAsString()).toString());
             }
         }
 
-        SysLog.logSysInfo("loaded all photos");
+        log.info(SysLog.logSysInfo("All photos loaded.").toString());
     }
 
 
@@ -339,7 +349,7 @@ public class PhotoManager extends ObjectManager {
         // get all tags that match the filter conditions
         List<PhotoId> result = new LinkedList<PhotoId>();
         int noFilterConditions = filter.getFilterConditions().size();
-        log.info("Number of filter conditions: " + noFilterConditions);
+        log.info(SysLog.logSysInfo("Number of filter conditions", String.valueOf(noFilterConditions)).toString());
 
         if (noFilterConditions == 0) {
             Collection<PhotoId> candidates = photoCache.keySet();
@@ -351,20 +361,20 @@ public class PhotoManager extends ObjectManager {
                 }
             }
 
-            log.info(newPhotos + " Photos can now be shown.");
+            log.info(SysLog.logSysInfo("Photos to show", String.valueOf(newPhotos)).toString());
         } else {
             List<Tag> tags = new LinkedList<Tag>();
             for (String condition : filter.getFilterConditions()) {
                 readObjects(tags, Tag.class, Tag.TEXT, condition);
             }
-            log.info("Number of tags: " + tags.size());
+            log.info(SysLog.logSysInfo("Number of Tags", String.valueOf(tags.size())).toString());
 
             // get the list of all photo ids that correspond to the tags
             for (Tag tag : tags) {
                 PhotoId photoId = PhotoId.getIdFromString(tag.getPhotoId());
                 if (!filter.isProcessedPhotoId(photoId)) {
                     result.add(PhotoId.getIdFromString(tag.getPhotoId()));
-                    log.info("Add Photo " + tag.getPhotoId() + " to filter result.");
+                    log.config(SysLog.logSysInfo("Photo ID", tag.getPhotoId(), "Add photo to filter-result.").toString());
                 }
             }
         }
