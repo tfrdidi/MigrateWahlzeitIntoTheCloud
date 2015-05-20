@@ -21,6 +21,7 @@
 package org.wahlzeit.handlers;
 
 import com.google.appengine.api.images.Image;
+import org.wahlzeit.agents.AsyncTaskExecutor;
 import org.wahlzeit.model.AccessRights;
 import org.wahlzeit.model.Photo;
 import org.wahlzeit.model.PhotoManager;
@@ -88,6 +89,7 @@ public class UploadPhotoFormHandler extends AbstractWebFormHandler {
             log.info(sb.toString());
 
             us.setTwoLineMessage(us.getConfiguration().getPhotoUploadSucceeded(), us.getConfiguration().getKeepGoing());
+            AsyncTaskExecutor.savePhotoAsync(photo.getIdAsString());
         } catch (Exception ex) {
             SysLog.logThrowable(ex);
             us.setMessage(us.getConfiguration().getPhotoUploadFailed());

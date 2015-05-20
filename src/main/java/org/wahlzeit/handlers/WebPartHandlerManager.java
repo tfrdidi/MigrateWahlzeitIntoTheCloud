@@ -22,12 +22,16 @@ package org.wahlzeit.handlers;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
  * @author dirkriehle
  */
 public class WebPartHandlerManager {
+
+    private static final Logger log = Logger.getLogger(WebPartHandler.class.getName());
 
     /**
      *
@@ -96,6 +100,7 @@ public class WebPartHandlerManager {
      */
     public WebPartHandler addWebPartHandler(String name, WebPartHandler myHandler) {
         handler.put(name, myHandler);
+        log.log(Level.INFO, "Added Handler {0} for link {1}", new Object[]{myHandler, name});
         return myHandler;
     }
 

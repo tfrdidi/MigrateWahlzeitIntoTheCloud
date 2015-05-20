@@ -157,7 +157,7 @@ public class PhotoManager extends ObjectManager {
         assertIsNewPhoto(id);
         doAddPhoto(photo);
 
-        AsyncTaskExecutor.savePhotoAsync(id.asString());
+        //AsyncTaskExecutor.savePhotoAsync(id.asString());
         GlobalsManager.getInstance().saveGlobals();
     }
 
@@ -189,13 +189,19 @@ public class PhotoManager extends ObjectManager {
                 loadScaledImages(photo);
                 // Todo: load tags
                 doAddPhoto(photo);
-                EmailAddress emailAddress = photo.getOwnerEmailAddress();
-                User user = UserManager.getInstance().getUserByEmailAddress(emailAddress);
-                if(user != null) {
-                    user.addPhoto(photo);
+                try {
+                    String ownerName = photo.getOwnerName();
+                    log.log(Level.INFO, "Owner of photo {0} is {1}.", new Object[]{photo.getIdAsString(), ownerName});
+                    User user = UserManager.getInstance().getUserByName(ownerName);
+                    if (user != null) {
+                        user.addPhoto(photo);
+                        log.info(SysLog.logSysInfo("found user").toString());
+                    } else {
+                        log.warning(SysLog.logSysInfo("No user found").toString());
+                    }
                 }
-                else {
-                    log.warning(SysLog.logSysInfo("No user found for", emailAddress.asString()).toString());
+                catch (Exception e) {
+                    log.log(Level.WARNING, "problem when loading owner: ", e);
                 }
             } else {
                 log.config(SysLog.logSysInfo("Already loaded Photo", photo.getIdAsString()).toString());

@@ -30,12 +30,16 @@ import org.wahlzeit.services.Language;
 import org.wahlzeit.services.SysConfig;
 import org.wahlzeit.webparts.WebPartTemplateService;
 
+import java.util.logging.Logger;
+
 /**
  * A Main class that runs a Wahlzeit web server.
  *
  * @author dirkriehle
  */
 public class ServiceMain extends ModelMain {
+
+    private static final Logger log = Logger.getLogger(ServiceMain.class.getName());
 
     /**
      *
@@ -88,11 +92,16 @@ public class ServiceMain extends ModelMain {
     public void startUp(boolean inProduction, String rootDir) throws Exception {
         isInProduction = inProduction;
 
+        log.info("Entering");
         super.startUp(rootDir);
+        log.info("super startUp completed");
 
         configureWebPartTemplateService();
+        log.info("configureWebPartTemplateService completed");
         configureWebPartHandlers();
+        log.info("configureWebPartHandlers completed");
         configureLanguageModels();
+        log.info("configureLanguageModels completed");
 
         //AgentManager am = AgentManager.getInstance();
         //am.startAllThreads();

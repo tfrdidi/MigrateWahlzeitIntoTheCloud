@@ -251,8 +251,6 @@ public class GcsAdapter {
     private void assertValidFileName(String fileName) throws IllegalArgumentException {
         if (fileName == null || "".equals(fileName)) {
             throw new IllegalArgumentException("Invalid file name!");
-        } else if (!fileName.contains(".")) {
-            throw new IllegalArgumentException("Invalid file name, name must contain an ending!");
         }
     }
 }
