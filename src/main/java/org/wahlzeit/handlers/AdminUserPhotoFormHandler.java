@@ -53,11 +53,11 @@ public class AdminUserPhotoFormHandler extends AbstractWebFormHandler {
      *
      */
     protected void doMakeWebPart(UserSession us, WebPart part) {
-        PhotoId photoId = us.getPhotoId();
+        String photoId = (String)us.getSavedArg("photoId");
         Photo photo = PhotoManager.getPhoto(photoId);
         part.addString(Photo.THUMB, getPhotoThumb(us, photo));
 
-        part.addString("photoId", photoId.asString());
+        part.addString("photoId", photoId);
         part.addString(Photo.ID, photo.getId().asString());
         part.addSelect(Photo.STATUS, PhotoStatus.class, (String) us.getSavedArg(Photo.STATUS));
         part.maskAndAddStringFromArgsWithDefault(us.getSavedArgs(), Photo.TAGS, photo.getTags().asString());

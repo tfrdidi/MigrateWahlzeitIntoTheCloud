@@ -33,11 +33,14 @@ import org.wahlzeit.webparts.WebPart;
 import org.wahlzeit.webparts.Writable;
 
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * @author dirkriehle
  */
 public class ShowAdminPageHandler extends AbstractWebPageHandler implements WebFormHandler {
+
+    private static Logger log = Logger.getLogger(ShowAdminPageHandler.class.getName());
 
     /**
      *
@@ -74,7 +77,9 @@ public class ShowAdminPageHandler extends AbstractWebPageHandler implements WebF
 
         String userId = us.getSavedArg("userId").toString();
         User user = UserManager.getInstance().getUserByName(userId);
+        log.config("UserId: " + userId);
         if (user != null) {
+            log.config("User = null");
             handler = getFormHandler(PartUtil.ADMIN_USER_PROFILE_FORM_NAME);
         }
 
@@ -125,8 +130,10 @@ public class ShowAdminPageHandler extends AbstractWebPageHandler implements WebF
      */
     protected String performAdminUserProfileRequest(UserSession us, Map args) {
         String userId = us.getAndSaveAsString(args, "userId");
+        log.config("UserId: " + userId);
         User user = UserManager.getInstance().getUserByName(userId);
         if (user == null) {
+            log.config("User = null");
             us.setMessage(us.getConfiguration().getUserNameIsUnknown());
         }
 
