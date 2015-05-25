@@ -52,7 +52,7 @@ public class PhotoFilter implements Serializable {
     /**
      *
      */
-    protected List<PhotoId> displayablePhotoIds = Collections.EMPTY_LIST;
+    protected List<PhotoId> displayablePhotoIds;
     protected List<PhotoId> processedPhotoIds = new LinkedList<PhotoId>();
 
     /**
@@ -64,7 +64,7 @@ public class PhotoFilter implements Serializable {
      *
      */
     public PhotoFilter() {
-        // do nothing
+        resetDisplayablePhotoIds();
     }
 
     /**
@@ -164,7 +164,7 @@ public class PhotoFilter implements Serializable {
      *
      */
     public void resetDisplayablePhotoIds() {
-        displayablePhotoIds = Collections.EMPTY_LIST;
+        displayablePhotoIds = new ArrayList<PhotoId>();
     }
 
     /**
