@@ -35,10 +35,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-//import java.util.logging.Logger;
+import java.util.logging.Logger;
 
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
 
 /**
  * The UserManager provides access to and manages Users (including Moderators and Administrators).
@@ -70,8 +68,7 @@ public class UserManager extends ObjectManager {
     protected static UserManager instance = new UserManager();
 
     private static final Long DEFAULT_ADMIN_ID = 1L;
-    //private static final Logger log = LoggerFactory.getLogger(UserManager.class);
-    //static final Logger logger = LogManager.getLogger(UserManager.class.getName());
+    private static final Logger log = Logger.getLogger(UserManager.class.getName());
 
     /**
      *
