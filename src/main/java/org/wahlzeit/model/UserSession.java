@@ -68,8 +68,8 @@ public class UserSession extends Session implements Serializable {
     /**
      *
      */
-    public UserSession(String myName, String mySiteUrl, HttpServletRequest myHttpRequest) {
-        httpSession = myHttpRequest.getSession();
+    public UserSession(String myName, String mySiteUrl, HttpSession myHttpSession, String myLanguage) {
+        httpSession = myHttpSession;
         initialize(myName);
         if(httpSession.getAttribute(INITIALIZED) == null) {
             httpSession.setAttribute(SITE_URL, mySiteUrl);
@@ -77,7 +77,7 @@ public class UserSession extends Session implements Serializable {
 
             Language language;
             try {
-                language = Language.getFromIsoCode(myHttpRequest.getLocale().getLanguage());
+                language = Language.getFromIsoCode(myLanguage);
             } catch (IllegalArgumentException e) {
                 language = Language.ENGLISH;
             }

@@ -141,7 +141,8 @@ public enum PhotoStatus implements EnumValue {
     }
 
     /**
-     *
+     * 1 & 1 -> true (invisible)
+     * x & 1 -> false (visible)
      */
     public boolean isInvisible() {
         return (value & (1 << INVISIBLE_BIT)) != 0;
