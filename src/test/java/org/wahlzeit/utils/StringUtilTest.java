@@ -20,28 +20,23 @@
 
 package org.wahlzeit.utils;
 
-import junit.framework.*;
+import org.junit.Test;
 
 import java.io.File;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  *
  * @author dirkriehle
  *
  */
-public class StringUtilTest extends TestCase {
-
-	/**
-	 * 
-	 * @param name
-	 */
-	public StringUtilTest(String name) {
-		super(name);
-	}
+public class StringUtilTest {
 
 	/**
 	 * 
 	 */
+	@Test
 	public void testPathAsUrlString() {
 		String path1 = "folder" + File.separator + "subfolder" + File.separator + "file.test";
 		String url1 = StringUtil.pathAsUrlString(path1);
