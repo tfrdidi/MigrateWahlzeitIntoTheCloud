@@ -31,6 +31,7 @@ public class Session {
 
     public static final String NAME = "name";
     public static final String PROCESSING_TIME = "processingTime";
+    public static final String NO_SESSION = "no sessioin";
 
     /**
      * Session state
@@ -59,6 +60,15 @@ public class Session {
     }
 
     /**
+     * @methodproperty hook
+     *
+     * Hook method for subclasses to get to know when name changes.
+     * @see #initialize(String)
+     */
+    protected void notifyNameChanged() {
+    }
+
+    /**
      * @methodtype get
      */
     public String getName() {
@@ -81,6 +91,16 @@ public class Session {
     }
 
     /**
+     * @methodproperty hook
+     *
+     * Hook method for subclasses to get to know when processing time changes.
+     * @see #addProcessingTime(long)
+     * @see #resetProcessingTime()
+     */
+    protected void notifyProcessingTimeChanged() {
+    }
+
+    /**
      * @methodtype set
      */
     public void addProcessingTime(long time) {
@@ -93,25 +113,6 @@ public class Session {
      */
     public long getProcessingTime() {
         return processingTime;
-    }
-
-    /**
-     * @methodproperty hook
-     *
-     * Hook method for subclasses to get to know when name changes.
-     * @see #initialize(String)
-     */
-    protected void notifyNameChanged() {
-    }
-
-    /**
-     * @methodproperty hook
-     *
-     * Hook method for subclasses to get to know when processing time changes.
-     * @see #addProcessingTime(long)
-     * @see #resetProcessingTime()
-     */
-    protected void notifyProcessingTimeChanged() {
     }
 
 }

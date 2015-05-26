@@ -28,7 +28,6 @@ import org.wahlzeit.services.SysLog;
 import org.wahlzeit.utils.HtmlUtil;
 import org.wahlzeit.utils.StringUtil;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -59,6 +58,7 @@ public class UserSession extends Session implements Serializable {
     public static final String CONFIRMATION_CODE = "confirmationCode";
     public static final String SAVED_ARGS = "savedArgs";
     public static final String INITIALIZED = "initialized";
+    public static final String ANONYMOUS_CLIENT = "anon";
 
 
     private static Logger log = Logger.getLogger(UserSession.class.getName());
@@ -71,7 +71,7 @@ public class UserSession extends Session implements Serializable {
     public UserSession(String myName, String mySiteUrl, HttpSession myHttpSession, String myLanguage) {
         httpSession = myHttpSession;
         initialize(myName);
-        if(httpSession.getAttribute(INITIALIZED) == null) {
+        if (httpSession.getAttribute(INITIALIZED) == null) {
             httpSession.setAttribute(SITE_URL, mySiteUrl);
             httpSession.setAttribute(PHOTO_FILTER, PhotoFactory.getInstance().createPhotoFilter());
 
@@ -97,11 +97,59 @@ public class UserSession extends Session implements Serializable {
     /**
      * @methodtype init
      */
+    protected void initPhotoSize() {
+        setPhotoSize(PhotoSize.MEDIUM);
+    }
+
+    /**
+     *
+     */
+    public void clearDisplayedPhotos() {
+        PhotoFilter photoFilter = (PhotoFilter) httpSession.getAttribute(PHOTO_FILTER);
+        if (photoFilter != null) {
+            photoFilter.clear();
+            httpSession.setAttribute(PHOTO_FILTER, photoFilter);
+        } else {
+            log.warning("No PhotoFilter found in HttpSession to clear.");
+        }
+    }
+
+    /**
+     *
+     */
+    public void clearPraisedPhotos() {
+        httpSession.setAttribute(PRAISED_PHOTOS, new HashSet<Photo>());
+    }
+
+    /**
+     * @methodtype init
+     */
+    public void clearSavedArgs() {
+        httpSession.setAttribute(SAVED_ARGS, new HashMap<String, Object>());
+    }
+
+    /**
+     * @methodtype init
+     */
+    public void clearConfirmationCode() {
+        setConfirmationCode(-1L);
+    }
+
+    /**
+     * @methodtype init
+     */
     public void clear() {
         initConfiguration();
         initPhotoSize();
         clearDisplayedPhotos();
         clearPraisedPhotos();
+    }
+
+    /**
+     * @methodtype init
+     */
+    protected void initConfiguration() {
+        setConfiguration(LanguageConfigs.get(Language.ENGLISH));
     }
 
     /**
@@ -125,26 +173,16 @@ public class UserSession extends Session implements Serializable {
         return (String) httpSession.getAttribute(SITE_URL);
     }
 
-    /**
-     * @methodtype get
-     */
-    public Client getClient() {
-        return (Client) httpSession.getAttribute(CLIENT);
+    @Override
+    protected void notifyNameChanged() {
+        httpSession.setAttribute(Session.NAME, super.getName());
     }
 
     /**
-     * @methodtype set
-     */
-    public void setClient(Client newClient) {
-        httpSession.setAttribute(CLIENT, newClient);
-    }
-
-    /**
-     * @methodtype convert
-     * Returns some signifier of current user
+     * @methodtype convert Returns some signifier of current user
      */
     public String getClientName() {
-        String result = "anon";
+        String result = ANONYMOUS_CLIENT;
         if (!StringUtil.isNullOrEmptyString(getEmailAddressAsString())) {
             result = getEmailAddressAsString();
             Client client = getClient();
@@ -166,6 +204,25 @@ public class UserSession extends Session implements Serializable {
             result = client.getEmailAddress().asString();
         }
         return result;
+    }
+
+    /**
+     * @methodtype get
+     */
+    public Client getClient() {
+        return (Client) httpSession.getAttribute(CLIENT);
+    }
+
+    /**
+     * @methodtype set
+     */
+    public void setClient(Client newClient) {
+        httpSession.setAttribute(CLIENT, newClient);
+    }
+
+    @Override
+    protected void notifyProcessingTimeChanged() {
+        httpSession.setAttribute(Session.PROCESSING_TIME, super.getProcessingTime());
     }
 
     /**
@@ -196,21 +253,13 @@ public class UserSession extends Session implements Serializable {
     }
 
     /**
-     * @methodtype init
-     */
-    protected void initPhotoSize() {
-        setPhotoSize(PhotoSize.MEDIUM);
-    }
-
-    /**
      * @methodtype boolean query
      */
     public boolean hasConfirmationCode() {
         Long confirmationCode = getConfirmationCode();
-        if(confirmationCode != null) {
+        if (confirmationCode != null) {
             return confirmationCode != -1;
-        }
-        else {
+        } else {
             log.warning("No configuration code found.");
             return false;
         }
@@ -231,13 +280,6 @@ public class UserSession extends Session implements Serializable {
     }
 
     /**
-     * @methodtype init
-     */
-    public void clearConfirmationCode() {
-        setConfirmationCode(-1L);
-    }
-
-    /**
      *
      */
     public PhotoFilter getPhotoFilter() {
@@ -249,10 +291,9 @@ public class UserSession extends Session implements Serializable {
      */
     public boolean hasPraisedPhoto(Photo photo) {
         Set praisedPhotos = (Set) httpSession.getAttribute(PRAISED_PHOTOS);
-        if(praisedPhotos != null) {
+        if (praisedPhotos != null) {
             return praisedPhotos.contains(photo);
-        }
-        else {
+        } else {
             log.warning("Found no set of praised Photos to search for Photo.");
             return false;
         }
@@ -263,11 +304,10 @@ public class UserSession extends Session implements Serializable {
      */
     public void addPraisedPhoto(Photo photo) {
         Set<Photo> praisedPhotos = (Set<Photo>) httpSession.getAttribute(PRAISED_PHOTOS);
-        if(praisedPhotos != null) {
+        if (praisedPhotos != null) {
             praisedPhotos.add(photo);
             httpSession.setAttribute(PRAISED_PHOTOS, praisedPhotos);
-        }
-        else {
+        } else {
             log.warning("Found no set of praised Photos to add Photo.");
         }
         addDisplayedPhoto(photo);
@@ -276,35 +316,13 @@ public class UserSession extends Session implements Serializable {
     /**
      *
      */
-    public void clearPraisedPhotos() {
-        httpSession.setAttribute(PRAISED_PHOTOS, new HashSet<Photo>());
-    }
-
-    /**
-     *
-     */
     public void addDisplayedPhoto(Photo photo) {
         PhotoFilter photoFilter = (PhotoFilter) httpSession.getAttribute(PHOTO_FILTER);
-        if(photoFilter != null) {
+        if (photoFilter != null) {
             photoFilter.addProcessedPhoto(photo);
             httpSession.setAttribute(PHOTO_FILTER, photoFilter);
-        }
-        else {
+        } else {
             log.warning("No PhotoFilter found in HttpSession to add Photo.");
-        }
-    }
-
-    /**
-     *
-     */
-    public void clearDisplayedPhotos() {
-        PhotoFilter photoFilter = (PhotoFilter) httpSession.getAttribute(PHOTO_FILTER);
-        if(photoFilter != null) {
-            photoFilter.clear();
-            httpSession.setAttribute(PHOTO_FILTER, photoFilter);
-        }
-        else {
-            log.warning("No PhotoFilter found in HttpSession to clear.");
         }
     }
 
@@ -428,34 +446,20 @@ public class UserSession extends Session implements Serializable {
     }
 
     /**
-     * @methodtype set
-     */
-    public void setSavedArg(String key, Object value) {
-        Map<String, Object> savedArgs = getSavedArgs();
-        savedArgs.put(key, value);
-        httpSession.setAttribute(SAVED_ARGS, savedArgs);
-    }
-
-    /**
-     * @methodtype get
-     */
-    public Map<String, Object> getSavedArgs() {
-        return (Map<String, Object>) httpSession.getAttribute(SAVED_ARGS);
-    }
-
-    /**
-     * @methodtype init
-     */
-    public void clearSavedArgs() {
-        httpSession.setAttribute(SAVED_ARGS, new HashMap<String, Object>());
-    }
-
-    /**
      * @methodtype boolean query
      */
     public boolean isFormType(Map args, String type) {
         Object value = args.get(type);
         return (value != null) && !value.equals("");
+    }
+
+    /**
+     * @methodtype set, get
+     */
+    public String getAndSaveAsString(Map args, String key) {
+        String result = getAsString(args, key);
+        setSavedArg(key, result);
+        return result;
     }
 
     /**
@@ -480,28 +484,18 @@ public class UserSession extends Session implements Serializable {
     }
 
     /**
-     * @methodtype set, get
+     * @methodtype set
      */
-    public String getAndSaveAsString(Map args, String key) {
-        String result = getAsString(args, key);
-        setSavedArg(key, result);
-        return result;
+    public void setSavedArg(String key, Object value) {
+        Map<String, Object> savedArgs = getSavedArgs();
+        savedArgs.put(key, value);
+        httpSession.setAttribute(SAVED_ARGS, savedArgs);
     }
 
     /**
-     * @methodtype init
+     * @methodtype get
      */
-    protected void initConfiguration() {
-        setConfiguration(LanguageConfigs.get(Language.ENGLISH));
-    }
-
-    @Override
-    protected void notifyNameChanged() {
-        httpSession.setAttribute(Session.NAME, super.getName());
-    }
-
-    @Override
-    protected void notifyProcessingTimeChanged() {
-        httpSession.setAttribute(Session.PROCESSING_TIME, super.getProcessingTime());
+    public Map<String, Object> getSavedArgs() {
+        return (Map<String, Object>) httpSession.getAttribute(SAVED_ARGS);
     }
 }
