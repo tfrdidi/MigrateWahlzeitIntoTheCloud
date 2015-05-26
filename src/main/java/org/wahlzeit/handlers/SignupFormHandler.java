@@ -23,9 +23,9 @@ package org.wahlzeit.handlers;
 import org.wahlzeit.model.AccessRights;
 import org.wahlzeit.model.ModelConfig;
 import org.wahlzeit.model.User;
-import org.wahlzeit.model.UserLog;
 import org.wahlzeit.model.UserManager;
 import org.wahlzeit.model.UserSession;
+import org.wahlzeit.services.LogBuilder;
 import org.wahlzeit.utils.StringUtil;
 import org.wahlzeit.webparts.WebPart;
 
@@ -39,7 +39,6 @@ import java.util.logging.Logger;
 public class SignupFormHandler extends AbstractWebFormHandler {
 
     private static final Logger log = Logger.getLogger(SignupFormHandler.class.getName());
-
 
     /**
      *
@@ -119,9 +118,7 @@ public class SignupFormHandler extends AbstractWebFormHandler {
 
         userManager.saveUser(user);
 
-        StringBuffer sb = UserLog.createActionEntry("Signup");
-        UserLog.addCreatedObject(sb, "User", userName);
-        log.info(sb.toString());
+        log.info(LogBuilder.createUserMessage().addAction("Signup").toString());
 
         us.setTwoLineMessage(us.getConfiguration().getConfirmationEmailWasSent(), us.getConfiguration().getContinueWithShowUserHome());
 

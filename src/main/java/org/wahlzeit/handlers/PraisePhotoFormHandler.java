@@ -24,18 +24,22 @@ import org.wahlzeit.model.AccessRights;
 import org.wahlzeit.model.Photo;
 import org.wahlzeit.model.PhotoId;
 import org.wahlzeit.model.PhotoManager;
-import org.wahlzeit.model.UserLog;
 import org.wahlzeit.model.UserSession;
+import org.wahlzeit.services.LogBuilder;
 import org.wahlzeit.utils.StringUtil;
 import org.wahlzeit.webparts.WebPart;
 
 import java.util.Map;
+import java.util.logging.Logger;
 
 
 /**
  * @author dirkriehle
  */
 public class PraisePhotoFormHandler extends AbstractWebFormHandler {
+
+    private static final Logger log = Logger.getLogger(PraisePhotoFormHandler.class.getName());
+
 
     /**
      *
@@ -83,7 +87,7 @@ public class PraisePhotoFormHandler extends AbstractWebFormHandler {
 
         us.setPriorPhoto(photo);
 
-        UserLog.logPerformedAction(wasPraised ? "PraisePhoto" : "SkipPhoto");
+        log.info(LogBuilder.createUserMessage().addAction(wasPraised ? "PraisePhoto" : "SkipPhoto").toString());
 
         return PartUtil.SHOW_PHOTO_PAGE_NAME;
     }

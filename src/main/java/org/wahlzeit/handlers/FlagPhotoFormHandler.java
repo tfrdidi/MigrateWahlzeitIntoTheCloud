@@ -27,9 +27,9 @@ import org.wahlzeit.model.Photo;
 import org.wahlzeit.model.PhotoCase;
 import org.wahlzeit.model.PhotoCaseManager;
 import org.wahlzeit.model.PhotoManager;
-import org.wahlzeit.model.UserLog;
 import org.wahlzeit.model.UserSession;
 import org.wahlzeit.services.EmailAddress;
+import org.wahlzeit.services.LogBuilder;
 import org.wahlzeit.services.mailing.EmailService;
 import org.wahlzeit.services.mailing.EmailServiceManager;
 import org.wahlzeit.utils.StringUtil;
@@ -121,9 +121,9 @@ public class FlagPhotoFormHandler extends AbstractWebFormHandler {
 
         us.setEmailAddress(from);
 
-        StringBuffer sb = UserLog.createActionEntry("FlagPhoto");
-        UserLog.addUpdatedObject(sb, "Photo", photo.getId().asString());
-        log.info(sb.toString());
+        log.info(LogBuilder.createUserMessage()
+                .addAction("Flag Photo")
+                .addParameter("Photo", photo.getId().asString()).toString());
 
         us.setTwoLineMessage(us.getConfiguration().getModeratorWasInformed(), us.getConfiguration().getContinueWithShowPhoto());
 

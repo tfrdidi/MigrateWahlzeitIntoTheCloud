@@ -25,10 +25,10 @@ import org.wahlzeit.model.Gender;
 import org.wahlzeit.model.LanguageConfigs;
 import org.wahlzeit.model.Photo;
 import org.wahlzeit.model.User;
-import org.wahlzeit.model.UserLog;
 import org.wahlzeit.model.UserSession;
 import org.wahlzeit.services.EmailAddress;
 import org.wahlzeit.services.Language;
+import org.wahlzeit.services.LogBuilder;
 import org.wahlzeit.utils.HtmlUtil;
 import org.wahlzeit.utils.StringUtil;
 import org.wahlzeit.webparts.WebPart;
@@ -92,26 +92,30 @@ public class EditUserProfileFormHandler extends AbstractWebFormHandler {
         User user = (User) us.getClient();
 
         user.setEmailAddress(EmailAddress.getFromString(emailAddress));
+        log.info(LogBuilder.createUserMessage().
+                addParameter("E-Mail address", emailAddress).toString());
 
         String status = us.getAndSaveAsString(args, User.NOTIFY_ABOUT_PRAISE);
         boolean notify = (status != null) && status.equals("on");
         user.setNotifyAboutPraise(notify);
 
         user.setHomePage(StringUtil.asUrl(homePage));
+        log.info(LogBuilder.createUserMessage().
+                addParameter("Homepage", homePage).toString());
 
         if (!StringUtil.isNullOrEmptyString(gender)) {
             user.setGender(Gender.getFromString(gender));
+            log.info(LogBuilder.createUserMessage().
+                    addParameter("Gender", gender).toString());
         }
 
         if (!StringUtil.isNullOrEmptyString(language)) {
             Language langValue = Language.getFromString(language);
             us.setConfiguration(LanguageConfigs.get(langValue));
             user.setLanguage(langValue);
+            log.info(LogBuilder.createUserMessage().
+                    addParameter("Language", langValue.asString()).toString());
         }
-
-        StringBuffer sb = UserLog.createActionEntry("EditUserProfile");
-        UserLog.addUpdatedObject(sb, "User", user.getName());
-        log.info(sb.toString());
 
         us.setTwoLineMessage(us.getConfiguration().getProfileUpdateSucceeded(), us.getConfiguration().getContinueWithShowUserHome());
 

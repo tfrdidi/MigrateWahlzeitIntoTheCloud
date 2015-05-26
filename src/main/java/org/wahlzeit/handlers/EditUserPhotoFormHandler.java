@@ -26,8 +26,8 @@ import org.wahlzeit.model.Photo;
 import org.wahlzeit.model.PhotoManager;
 import org.wahlzeit.model.PhotoStatus;
 import org.wahlzeit.model.Tags;
-import org.wahlzeit.model.UserLog;
 import org.wahlzeit.model.UserSession;
+import org.wahlzeit.services.LogBuilder;
 import org.wahlzeit.utils.HtmlUtil;
 import org.wahlzeit.webparts.WebPart;
 
@@ -103,9 +103,9 @@ public class EditUserPhotoFormHandler extends AbstractWebFormHandler {
 
         AsyncTaskExecutor.savePhotoAsync(id);
 
-        StringBuffer sb = UserLog.createActionEntry("EditUserPhoto");
-        UserLog.addUpdatedObject(sb, "Photo", photo.getId().asString());
-        log.info(sb.toString());
+        log.info(LogBuilder.createUserMessage().
+                addAction("EditUserPhoto").
+                addParameter("Photo", photo.getId().asString()).toString());
 
         us.setTwoLineMessage(us.getConfiguration().getPhotoUpdateSucceeded(), us.getConfiguration().getContinueWithShowUserHome());
 

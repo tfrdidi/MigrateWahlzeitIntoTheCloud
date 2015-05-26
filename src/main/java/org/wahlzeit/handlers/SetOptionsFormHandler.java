@@ -23,9 +23,9 @@ package org.wahlzeit.handlers;
 import org.wahlzeit.model.AccessRights;
 import org.wahlzeit.model.LanguageConfigs;
 import org.wahlzeit.model.PhotoSize;
-import org.wahlzeit.model.UserLog;
 import org.wahlzeit.model.UserSession;
 import org.wahlzeit.services.Language;
+import org.wahlzeit.services.LogBuilder;
 import org.wahlzeit.webparts.WebPart;
 
 import java.util.Map;
@@ -76,10 +76,10 @@ public class SetOptionsFormHandler extends AbstractWebFormHandler {
         PhotoSize photoValue = PhotoSize.getFromString(photoSize);
         us.setPhotoSize(photoValue);
 
-        StringBuffer sb = UserLog.createActionEntry("SetOptions");
-        UserLog.addField(sb, "language", language);
-        UserLog.addField(sb, "photoSize", photoSize);
-        log.info(sb.toString());
+        log.info(LogBuilder.createUserMessage().
+                addAction("Set options").
+                addParameter("language", language).
+                addParameter("photo size", photoSize).toString());
 
         String msg1 = us.getConfiguration().getOptionsWereSet();
         String msg2 = us.getConfiguration().getNoteMaximumPhotoSize();

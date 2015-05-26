@@ -153,12 +153,12 @@ public class LogBuilderTest {
     @Test
     public void testAddPerformedAction() {
         String action = "Build your own lightsaber";
-        LogBuilder logBuilder = LogBuilder.createUserMessage().addPerformedAction(action);
+        LogBuilder logBuilder = LogBuilder.createUserMessage().addAction(action);
         String logMessage = logBuilder.toString();
         String expectedLogMessage = EXPECTED_USER_MESSAGE + INFO_SEPARATOR + ACTION + NAME_VALUE_SEPARATOR + action;
         assertEquals(expectedLogMessage, logMessage);
 
-        logBuilder.addPerformedAction(null);
+        logBuilder.addAction(null);
         logMessage = logBuilder.toString();
         expectedLogMessage = expectedLogMessage + INFO_SEPARATOR + ACTION + NAME_VALUE_SEPARATOR + null;
         assertEquals(expectedLogMessage, logMessage);

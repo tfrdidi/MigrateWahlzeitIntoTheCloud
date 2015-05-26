@@ -24,12 +24,12 @@ import org.wahlzeit.model.AccessRights;
 import org.wahlzeit.model.Gender;
 import org.wahlzeit.model.Photo;
 import org.wahlzeit.model.User;
-import org.wahlzeit.model.UserLog;
 import org.wahlzeit.model.UserManager;
 import org.wahlzeit.model.UserSession;
 import org.wahlzeit.model.UserStatus;
 import org.wahlzeit.services.EmailAddress;
 import org.wahlzeit.services.Language;
+import org.wahlzeit.services.LogBuilder;
 import org.wahlzeit.utils.HtmlUtil;
 import org.wahlzeit.utils.StringUtil;
 import org.wahlzeit.webparts.WebPart;
@@ -113,9 +113,9 @@ public class AdminUserProfileFormHandler extends AbstractWebFormHandler {
         user = um.getUserByName(userId);
         us.setSavedArg("userId", userId);
 
-        StringBuffer sb = UserLog.createActionEntry("AdminUserProfile");
-        UserLog.addUpdatedObject(sb, "User", user.getName());
-        log.info(sb.toString());
+        log.info(LogBuilder.createUserMessage().
+                addAction("AdminUserProfile").
+                addParameter("User", user.getName()).toString());
 
         us.setMessage(us.getConfiguration().getProfileUpdateSucceeded());
 

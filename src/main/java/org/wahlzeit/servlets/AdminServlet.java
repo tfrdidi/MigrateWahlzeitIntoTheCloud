@@ -22,8 +22,7 @@ package org.wahlzeit.servlets;
 
 import org.wahlzeit.handlers.PartUtil;
 import org.wahlzeit.main.ServiceMain;
-import org.wahlzeit.model.UserLog;
-import org.wahlzeit.services.SysLog;
+import org.wahlzeit.services.LogBuilder;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -46,7 +45,7 @@ public class AdminServlet extends AbstractServlet {
      */
     public void myGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String link = request.getRequestURI();
-        UserLog.logUserInfo("requested", link);
+        log.info(LogBuilder.createUserMessage().addParameter("requested URI", link).toString());
         if (isLocalHost(request)) {
             ServiceMain.getInstance().requestStop();
             displayNullPage(request, response);

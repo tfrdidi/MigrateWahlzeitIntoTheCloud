@@ -22,21 +22,24 @@ package org.wahlzeit.handlers;
 
 import org.wahlzeit.model.AccessRights;
 import org.wahlzeit.model.User;
-import org.wahlzeit.model.UserLog;
 import org.wahlzeit.model.UserManager;
 import org.wahlzeit.model.UserSession;
 import org.wahlzeit.services.EmailAddress;
+import org.wahlzeit.services.LogBuilder;
 import org.wahlzeit.services.mailing.EmailService;
 import org.wahlzeit.services.mailing.EmailServiceManager;
 import org.wahlzeit.utils.StringUtil;
 import org.wahlzeit.webparts.WebPart;
 
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * @author dirkriehle
  */
 public class EmailPasswordFormHandler extends AbstractWebFormHandler {
+
+    private static final Logger log = Logger.getLogger(EmailPasswordFormHandler.class.getName());
 
     /**
      *
@@ -77,7 +80,9 @@ public class EmailPasswordFormHandler extends AbstractWebFormHandler {
         EmailService emailService = EmailServiceManager.getDefaultService();
         emailService.sendEmailIgnoreException(from, to, us.getConfiguration().getAuditEmailAddress(), us.getConfiguration().getSendPasswordEmailSubject(), user.getPassword());
 
-        UserLog.logPerformedAction("EmailPassword");
+        log.info(LogBuilder.createUserMessage().
+                addAction("Password send per E-Mail").
+                addParameter("Target address", to.asString()).toString());
 
         us.setTwoLineMessage(us.getConfiguration().getPasswordWasEmailed(), us.getConfiguration().getContinueWithShowPhoto());
 

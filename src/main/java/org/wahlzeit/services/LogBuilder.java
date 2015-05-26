@@ -163,7 +163,7 @@ public class LogBuilder {
      * <p/>
      * Adds the info that the action is performed the log message: "action=<action>".
      */
-    public LogBuilder addPerformedAction(String action) {
+    public LogBuilder addAction(String action) {
         add(ACTION + NAME_VALUE_SEPARATOR + action);
         return this;
     }

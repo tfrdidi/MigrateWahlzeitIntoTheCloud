@@ -22,21 +22,25 @@ package org.wahlzeit.handlers;
 
 import org.wahlzeit.model.AccessRights;
 import org.wahlzeit.model.User;
-import org.wahlzeit.model.UserLog;
 import org.wahlzeit.model.UserManager;
 import org.wahlzeit.model.UserSession;
 import org.wahlzeit.services.EmailAddress;
+import org.wahlzeit.services.LogBuilder;
 import org.wahlzeit.services.mailing.EmailService;
 import org.wahlzeit.services.mailing.EmailServiceManager;
 import org.wahlzeit.utils.StringUtil;
 import org.wahlzeit.webparts.WebPart;
 
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * @author dirkriehle
  */
 public class EmailUserNameFormHandler extends AbstractWebFormHandler {
+
+    private static final Logger log = Logger.getLogger(EmailUserNameFormHandler.class.getName());
+
 
     /**
      *
@@ -80,7 +84,9 @@ public class EmailUserNameFormHandler extends AbstractWebFormHandler {
         EmailAddress to = user.getEmailAddress();
         emailService.sendEmailIgnoreException(from, to, us.getConfiguration().getAuditEmailAddress(), us.getConfiguration().getSendUserNameEmailSubject(), user.getName());
 
-        UserLog.logPerformedAction("EmailUserName");
+        log.info(LogBuilder.createUserMessage().
+                addAction("Username send per E-Mail").
+                addParameter("Target address", to.asString()).toString());
 
         us.setTwoLineMessage(us.getConfiguration().getUserNameWasEmailed(), us.getConfiguration().getContinueWithShowPhoto());
 

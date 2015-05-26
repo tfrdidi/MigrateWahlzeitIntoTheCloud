@@ -26,8 +26,8 @@ import org.wahlzeit.model.PhotoCase;
 import org.wahlzeit.model.PhotoCaseManager;
 import org.wahlzeit.model.PhotoId;
 import org.wahlzeit.model.PhotoStatus;
-import org.wahlzeit.model.UserLog;
 import org.wahlzeit.model.UserSession;
+import org.wahlzeit.services.LogBuilder;
 import org.wahlzeit.utils.HtmlUtil;
 import org.wahlzeit.utils.StringUtil;
 import org.wahlzeit.webparts.WebPart;
@@ -98,16 +98,16 @@ public class EditPhotoCaseFormHandler extends AbstractWebFormHandler {
 
         photo.setStatus(status);
 
-        StringBuffer sb = UserLog.createActionEntry("EditPhotoCase");
-        UserLog.addUpdatedObject(sb, "Photo", photo.getId().asString());
-        log.info(sb.toString());
+        log.info(LogBuilder.createUserMessage().
+                addAction("EditPhotoCase").
+                addParameter("Photo", photo.getId().asString()).toString());
 
         photoCase.setDecided();
         pcm.removePhotoCase(photoCase);
 
-        sb = UserLog.createActionEntry("EditPhotoCase");
-        UserLog.addUpdatedObject(sb, "PhotoCase", String.valueOf(photoCase.getId()));
-        log.info(sb.toString());
+        log.info(LogBuilder.createUserMessage().
+                addAction("EditPhotoCase").
+                addParameter("PhotoCase", photoCase.getId()).toString());
 
         return PartUtil.SHOW_PHOTO_CASES_PAGE_NAME;
     }

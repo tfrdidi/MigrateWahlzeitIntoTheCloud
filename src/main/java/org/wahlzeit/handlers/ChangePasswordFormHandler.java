@@ -22,18 +22,21 @@ package org.wahlzeit.handlers;
 
 import org.wahlzeit.model.AccessRights;
 import org.wahlzeit.model.User;
-import org.wahlzeit.model.UserLog;
 import org.wahlzeit.model.UserSession;
+import org.wahlzeit.services.LogBuilder;
 import org.wahlzeit.utils.StringUtil;
 import org.wahlzeit.webparts.WebPart;
 
 import java.util.Map;
+import java.util.logging.Logger;
 
 
 /**
  * @author dirkriehle
  */
 public class ChangePasswordFormHandler extends AbstractWebFormHandler {
+
+    private static Logger log = Logger.getLogger(ChangePasswordFormHandler.class.getName());
 
     /**
      *
@@ -75,7 +78,7 @@ public class ChangePasswordFormHandler extends AbstractWebFormHandler {
         User user = (User) us.getClient();
         user.setPassword(password);
 
-        UserLog.logPerformedAction("ChangePassword");
+        log.info(LogBuilder.createUserMessage().addAction("ChangePassword").toString());
 
         us.setTwoLineMessage(us.getConfiguration().getPasswordChangeSucceeded(), us.getConfiguration().getContinueWithShowUserHome());
 

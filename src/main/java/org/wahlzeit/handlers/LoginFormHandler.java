@@ -22,19 +22,23 @@ package org.wahlzeit.handlers;
 
 import org.wahlzeit.model.AccessRights;
 import org.wahlzeit.model.User;
-import org.wahlzeit.model.UserLog;
 import org.wahlzeit.model.UserManager;
 import org.wahlzeit.model.UserSession;
+import org.wahlzeit.services.LogBuilder;
 import org.wahlzeit.utils.StringUtil;
 import org.wahlzeit.webparts.WebPart;
 
 import java.util.Map;
+import java.util.logging.Logger;
 
 
 /**
  * @author dirkriehle
  */
 public class LoginFormHandler extends AbstractWebFormHandler {
+
+    private static final Logger log = Logger.getLogger(LoginFormHandler.class.getName());
+
 
     /**
      *
@@ -102,7 +106,7 @@ public class LoginFormHandler extends AbstractWebFormHandler {
             return PartUtil.SHOW_NOTE_PAGE_NAME;
         }
 
-        UserLog.logPerformedAction("Login");
+        log.info(LogBuilder.createUserMessage().addAction("Login").toString());
 
         return PartUtil.SHOW_USER_HOME_PAGE_NAME;
     }

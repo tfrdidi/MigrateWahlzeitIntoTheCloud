@@ -23,12 +23,11 @@ package org.wahlzeit.handlers;
 import org.wahlzeit.agents.AsyncTaskExecutor;
 import org.wahlzeit.model.AccessRights;
 import org.wahlzeit.model.Photo;
-import org.wahlzeit.model.PhotoId;
 import org.wahlzeit.model.PhotoManager;
 import org.wahlzeit.model.PhotoStatus;
 import org.wahlzeit.model.Tags;
-import org.wahlzeit.model.UserLog;
 import org.wahlzeit.model.UserSession;
+import org.wahlzeit.services.LogBuilder;
 import org.wahlzeit.webparts.WebPart;
 
 import java.util.Map;
@@ -77,9 +76,9 @@ public class AdminUserPhotoFormHandler extends AbstractWebFormHandler {
 
         AsyncTaskExecutor.savePhotoAsync(id);
 
-        StringBuffer sb = UserLog.createActionEntry("AdminUserPhoto");
-        UserLog.addUpdatedObject(sb, "Photo", photo.getId().asString());
-        log.info(sb.toString());
+        log.info(LogBuilder.createUserMessage().
+                addAction("AdminUserPhoto").
+                addParameter("Photo", photo.getId().asString()).toString());
 
         us.setMessage(us.getConfiguration().getPhotoUpdateSucceeded());
 

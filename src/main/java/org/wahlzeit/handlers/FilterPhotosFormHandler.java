@@ -23,17 +23,21 @@ package org.wahlzeit.handlers;
 import org.wahlzeit.model.AccessRights;
 import org.wahlzeit.model.PhotoFilter;
 import org.wahlzeit.model.Tags;
-import org.wahlzeit.model.UserLog;
 import org.wahlzeit.model.UserSession;
+import org.wahlzeit.services.LogBuilder;
 import org.wahlzeit.utils.StringUtil;
 import org.wahlzeit.webparts.WebPart;
 
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * @author dirkriehle
  */
 public class FilterPhotosFormHandler extends AbstractWebFormHandler {
+
+    private static final Logger log = Logger.getLogger(FilterPhotosFormHandler.class.getName());
+
 
     /**
      *
@@ -68,7 +72,10 @@ public class FilterPhotosFormHandler extends AbstractWebFormHandler {
             filter.setTags(new Tags(tags));
         }
 
-        UserLog.logPerformedAction("FilterPhotos");
+        log.info(LogBuilder.createUserMessage().
+                addAction("Filter Photos").
+                addParameter("Tags", filter.getTags().asString()).toString());
+
 
         return PartUtil.SHOW_PHOTO_PAGE_NAME;
     }

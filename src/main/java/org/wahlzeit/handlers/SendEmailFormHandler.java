@@ -24,14 +24,15 @@ import org.wahlzeit.model.AccessRights;
 import org.wahlzeit.model.Photo;
 import org.wahlzeit.model.PhotoManager;
 import org.wahlzeit.model.User;
-import org.wahlzeit.model.UserLog;
 import org.wahlzeit.model.UserManager;
 import org.wahlzeit.model.UserSession;
+import org.wahlzeit.services.LogBuilder;
 import org.wahlzeit.services.mailing.EmailService;
 import org.wahlzeit.services.mailing.EmailServiceManager;
 import org.wahlzeit.webparts.WebPart;
 
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * @author dirkriehle
@@ -45,6 +46,8 @@ public class SendEmailFormHandler extends AbstractWebFormHandler {
     public static final String USER_LANGUAGE = "userLanguage";
     public static final String EMAIL_SUBJECT = "emailSubject";
     public static final String EMAIL_BODY = "emailBody";
+
+    private static final Logger log = Logger.getLogger(SendEmailFormHandler.class.getName());
 
     /**
      *
@@ -125,7 +128,9 @@ public class SendEmailFormHandler extends AbstractWebFormHandler {
         EmailService emailService = EmailServiceManager.getDefaultService();
         emailService.sendEmailIgnoreException(fromUser.getEmailAddress(), toUser.getEmailAddress(), us.getConfiguration().getAuditEmailAddress(), emailSubject, emailBody);
 
-        UserLog.logPerformedAction("SendEmail");
+        log.info(LogBuilder.createUserMessage().
+                addAction("Send E-Mail").
+                addParameter("Recipient", toUser.getName()).toString());
 
         us.setMessage(us.getConfiguration().getEmailWasSent() + toUser.getName() + "!");
 

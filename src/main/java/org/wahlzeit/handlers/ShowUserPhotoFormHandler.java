@@ -25,19 +25,23 @@ import org.wahlzeit.model.Photo;
 import org.wahlzeit.model.PhotoId;
 import org.wahlzeit.model.PhotoManager;
 import org.wahlzeit.model.User;
-import org.wahlzeit.model.UserLog;
 import org.wahlzeit.model.UserManager;
 import org.wahlzeit.model.UserSession;
+import org.wahlzeit.services.LogBuilder;
 import org.wahlzeit.utils.HtmlUtil;
 import org.wahlzeit.utils.StringUtil;
 import org.wahlzeit.webparts.WebPart;
 
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * @author dirkriehle
  */
 public class ShowUserPhotoFormHandler extends AbstractWebFormHandler {
+
+    private static final Logger log = Logger.getLogger(ShowUserPhotoFormHandler.class.getName());
+
 
     /**
      *
@@ -98,7 +102,9 @@ public class ShowUserPhotoFormHandler extends AbstractWebFormHandler {
         } else if (us.isFormType(args, "select")) {
             user.setUserPhoto(photo);
             userManager.saveUser(user);
-            UserLog.logPerformedAction("SelectUserPhoto");
+            log.info(LogBuilder.createUserMessage().
+                    addAction("Select user photo").
+                    addParameter("Photo", id).toString());
         } else if (us.isFormType(args, "delete")) {
             photo.setStatus(photo.getStatus().asDeleted(true));
             PhotoManager.getInstance().savePhoto(photo);
@@ -106,7 +112,8 @@ public class ShowUserPhotoFormHandler extends AbstractWebFormHandler {
                 user.setUserPhoto(null);
                 userManager.saveUser(user);
             }
-            UserLog.logPerformedAction("DeleteUserPhoto");
+            log.info(LogBuilder.createUserMessage().
+                    addAction("Deselect user photo").toString());
         }
 
         return result;

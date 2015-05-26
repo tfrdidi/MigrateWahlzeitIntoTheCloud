@@ -27,8 +27,8 @@ import org.wahlzeit.model.Photo;
 import org.wahlzeit.model.PhotoManager;
 import org.wahlzeit.model.Tags;
 import org.wahlzeit.model.User;
-import org.wahlzeit.model.UserLog;
 import org.wahlzeit.model.UserSession;
+import org.wahlzeit.services.LogBuilder;
 import org.wahlzeit.services.SysLog;
 import org.wahlzeit.utils.StringUtil;
 import org.wahlzeit.webparts.WebPart;
@@ -80,16 +80,18 @@ public class UploadPhotoFormHandler extends AbstractWebFormHandler {
             User user = (User) us.getClient();
             user.addPhoto(photo);
 
-            log.info("Tags: " + tags);
             photo.setTags(new Tags(tags));
-            log.info("Tags of photo: " + photo.getTags().asString());
 
-            StringBuffer sb = UserLog.createActionEntry("UploadPhoto");
-            UserLog.addCreatedObject(sb, "Photo", photo.getId().asString());
-            log.info(sb.toString());
+            log.info(LogBuilder.createUserMessage().
+                    addAction("Upload Photo").
+                    addParameter("Photo", photo.getId().asString()).
+                    addParameter("tags", photo.getTags().asString()).toString());
 
             us.setTwoLineMessage(us.getConfiguration().getPhotoUploadSucceeded(), us.getConfiguration().getKeepGoing());
-            log.info("Calling asynct task to save ID " + photo.getId().asString());
+            log.info(LogBuilder.createSystemMessage().
+                    addAction("Calling async task to save Photo").
+                    addParameter("ID", photo.getId().asString()).toString());
+
             AsyncTaskExecutor.savePhotoAsync(photo.getId().asString());
         } catch (Exception ex) {
             SysLog.logThrowable(ex);
