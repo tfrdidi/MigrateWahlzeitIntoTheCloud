@@ -20,95 +20,94 @@
 
 package org.wahlzeit.utils;
 
-import junit.framework.*;
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
- * 
  * @author dirkriehle
- * 
  */
-public class SafeInputTest extends TestCase {
+public class SafeInputTest {
 
-	/**
-	 * 
-	 * @param name
-	 */
-	public SafeInputTest(String name) {
-		super(name);
-	}
+    /**
+     *
+     */
+    @Test
+    public void testIsLegalUserName() {
+        assertTrue(StringUtil.isLegalUserName("abcd"));
+        assertTrue(StringUtil.isLegalUserName("ab cd"));
+        assertTrue(StringUtil.isLegalUserName("._ _. !@#$%^*()"));
 
-	/**
-	 * 
-	 */
-	public void testIsLegalUserName() {
-		assertTrue(StringUtil.isLegalUserName("abcd"));
-		assertTrue(StringUtil.isLegalUserName("ab cd"));
-		assertTrue(StringUtil.isLegalUserName("._ _. !@#$%^*()"));
-		
-		assertFalse(StringUtil.isLegalUserName("a<>b"));
-		assertFalse(StringUtil.isLegalUserName("a&b"));
-		assertFalse(StringUtil.isLegalUserName("a\\b"));
-		assertFalse(StringUtil.isLegalUserName("a\"b"));
-		assertFalse(StringUtil.isLegalUserName("a\\'b"));
-		assertFalse(StringUtil.isLegalUserName("a`b"));
-		assertFalse(StringUtil.isLegalUserName("a\\`b"));
-		
-		assertFalse(StringUtil.isLegalUserName(""));
-	}
+        assertFalse(StringUtil.isLegalUserName("a<>b"));
+        assertFalse(StringUtil.isLegalUserName("a&b"));
+        assertFalse(StringUtil.isLegalUserName("a\\b"));
+        assertFalse(StringUtil.isLegalUserName("a\"b"));
+        assertFalse(StringUtil.isLegalUserName("a\\'b"));
+        assertFalse(StringUtil.isLegalUserName("a`b"));
+        assertFalse(StringUtil.isLegalUserName("a\\`b"));
 
-	/**
-	 * 
-	 */
-	public void testIsLegalPassword() {
-		assertTrue(StringUtil.isLegalPassword("abcd"));
-		assertTrue(StringUtil.isLegalPassword("ab cd"));
-		assertTrue(StringUtil.isLegalPassword("._ _. !@#$%^*()"));
-		
-		assertFalse(StringUtil.isLegalPassword(""));
-	}
+        assertFalse(StringUtil.isLegalUserName(""));
+    }
 
-	/**
-	 * 
-	 */
-	public void testIsValidStrictEmailAddress() {
-		assertTrue(StringUtil.isValidStrictEmailAddress("admin@wahlzeit.org"));
-		assertTrue(StringUtil.isValidStrictEmailAddress("a@b2.com"));
-		assertTrue(StringUtil.isValidStrictEmailAddress("a@b2.de"));
+    /**
+     *
+     */
+    @Test
+    public void testIsLegalPassword() {
+        assertTrue(StringUtil.isLegalPassword("abcd"));
+        assertTrue(StringUtil.isLegalPassword("ab cd"));
+        assertTrue(StringUtil.isLegalPassword("._ _. !@#$%^*()"));
 
-		assertFalse(StringUtil.isValidStrictEmailAddress("a b@b2.com"));
-		assertFalse(StringUtil.isValidStrictEmailAddress("@."));
-		assertFalse(StringUtil.isValidStrictEmailAddress("a@be.c"));		
-		assertFalse(StringUtil.isValidStrictEmailAddress("a@.com"));		
-		assertFalse(StringUtil.isValidStrictEmailAddress("a@domain.c"));
+        assertFalse(StringUtil.isLegalPassword(""));
+    }
 
-		assertFalse(StringUtil.isValidStrictEmailAddress("a<!>@b2.com"));
-		assertFalse(StringUtil.isValidStrictEmailAddress("a`@b2.com"));
-		assertFalse(StringUtil.isValidStrictEmailAddress("a\'@b2.com"));
-		assertFalse(StringUtil.isValidStrictEmailAddress("a\\@b2.com"));
-		assertFalse(StringUtil.isValidStrictEmailAddress("a\\'@b2.com"));
-		assertFalse(StringUtil.isValidStrictEmailAddress("a\\\\@b2.com"));
-	}
+    /**
+     *
+     */
+    @Test
+    public void testIsValidStrictEmailAddress() {
+        assertTrue(StringUtil.isValidStrictEmailAddress("admin@wahlzeit.org"));
+        assertTrue(StringUtil.isValidStrictEmailAddress("a@b2.com"));
+        assertTrue(StringUtil.isValidStrictEmailAddress("a@b2.de"));
 
-	/**
-	 * 
-	 */
-	public void testIsLegalCharacterName() {
-		// same as user name
-	}
+        assertFalse(StringUtil.isValidStrictEmailAddress("a b@b2.com"));
+        assertFalse(StringUtil.isValidStrictEmailAddress("@."));
+        assertFalse(StringUtil.isValidStrictEmailAddress("a@be.c"));
+        assertFalse(StringUtil.isValidStrictEmailAddress("a@.com"));
+        assertFalse(StringUtil.isValidStrictEmailAddress("a@domain.c"));
 
-	/**
-	 * 
-	 */
-	public void testIsLegalSeriesName() {
-		// same as user name
-	}
+        assertFalse(StringUtil.isValidStrictEmailAddress("a<!>@b2.com"));
+        assertFalse(StringUtil.isValidStrictEmailAddress("a`@b2.com"));
+        assertFalse(StringUtil.isValidStrictEmailAddress("a\'@b2.com"));
+        assertFalse(StringUtil.isValidStrictEmailAddress("a\\@b2.com"));
+        assertFalse(StringUtil.isValidStrictEmailAddress("a\\'@b2.com"));
+        assertFalse(StringUtil.isValidStrictEmailAddress("a\\\\@b2.com"));
+    }
 
-	/**
-	 * 
-	 */
-	public void testIsLegalTagsString() {
-		// same as user name
-	}
+    /**
+     *
+     */
+    @Test
+    public void testIsLegalCharacterName() {
+        // same as user name
+    }
+
+    /**
+     *
+     */
+    @Test
+    public void testIsLegalSeriesName() {
+        // same as user name
+    }
+
+    /**
+     *
+     */
+    @Test
+    public void testIsLegalTagsString() {
+        // same as user name
+    }
 
 }
 
