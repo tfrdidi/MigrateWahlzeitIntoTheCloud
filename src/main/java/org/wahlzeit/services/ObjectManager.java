@@ -42,6 +42,7 @@ public abstract class ObjectManager {
 
     private static final Logger log = Logger.getLogger(ObjectManager.class.getName());
 
+    
     /**
      * Reads the first Entity with the given key in the Datastore
      */
