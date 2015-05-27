@@ -21,7 +21,6 @@
 package org.wahlzeit.model;
 
 import org.wahlzeit.services.ObjectManager;
-import org.wahlzeit.services.SysLog;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -40,19 +39,11 @@ public class PhotoCaseManager extends ObjectManager {
     /**
      *
      */
-    protected Map<CaseId, PhotoCase> openPhotoCases = new HashMap<CaseId, PhotoCase>();
-
+    protected static final PhotoCaseManager instance = new PhotoCaseManager();
     /**
      *
      */
-    protected static final PhotoCaseManager instance = new PhotoCaseManager();
-
-    /**
-     * @methodtype get
-     */
-    public static final PhotoCaseManager getInstance() {
-        return instance;
-    }
+    protected Map<CaseId, PhotoCase> openPhotoCases = new HashMap<CaseId, PhotoCase>();
 
     /**
      * @methodtype constructor
@@ -75,6 +66,20 @@ public class PhotoCaseManager extends ObjectManager {
     }
 
     /**
+     * @methodtype command
+     */
+    public void loadOpenPhotoCases(Collection<PhotoCase> result) {
+        readObjects(result, PhotoCase.class, PhotoCase.WAS_DECIDED, false);
+    }
+
+    /**
+     * @methodtype get
+     */
+    public static final PhotoCaseManager getInstance() {
+        return instance;
+    }
+
+    /**
      * @methodtype get
      */
     public PhotoCase getPhotoCase(PhotoId id) {
@@ -91,7 +96,7 @@ public class PhotoCaseManager extends ObjectManager {
      */
     public void addPhotoCase(PhotoCase myCase) {
         openPhotoCases.put(myCase.getId(), myCase);
-        if(myCase.isDirty()) {
+        if (myCase.isDirty()) {
             writeObject(myCase);
         }
         // @FIXME Main.saveGlobals();
@@ -108,16 +113,8 @@ public class PhotoCaseManager extends ObjectManager {
     /**
      * @methodtype command
      */
-    public void loadOpenPhotoCases(Collection<PhotoCase> result) {
-        readObjects(result, PhotoCase.class, PhotoCase.WAS_DECIDED, false);
-        SysLog.logSysInfo("loaded all open photo cases");
-    }
-
-    /**
-     * @methodtype command
-     */
     public void savePhotoCases() {
-        if(openPhotoCases != null && openPhotoCases.size() > 0) {
+        if (openPhotoCases != null && openPhotoCases.size() > 0) {
             updateObjects(openPhotoCases.values());
         }
     }

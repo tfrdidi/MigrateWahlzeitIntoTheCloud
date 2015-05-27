@@ -27,7 +27,7 @@ import org.wahlzeit.model.PhotoManager;
 import org.wahlzeit.model.User;
 import org.wahlzeit.model.UserManager;
 import org.wahlzeit.model.UserSession;
-import org.wahlzeit.services.SysLog;
+import org.wahlzeit.services.LogBuilder;
 import org.wahlzeit.utils.StringUtil;
 import org.wahlzeit.webparts.WebPart;
 import org.wahlzeit.webparts.Writable;
@@ -106,7 +106,8 @@ public class ShowAdminPageHandler extends AbstractWebPageHandler implements WebF
      */
     public String handlePost(UserSession us, Map args) {
         if (!hasAccessRights(us, args)) {
-            SysLog.logSysInfo("insufficient rights for POST from: " + us.getEmailAddressAsString());
+            log.warning(LogBuilder.createSystemMessage().
+                    addParameter("insufficient rights for POST from", us.getEmailAddressAsString()).toString());
             return getIllegalAccessErrorPage(us);
         }
 
@@ -156,32 +157,31 @@ public class ShowAdminPageHandler extends AbstractWebPageHandler implements WebF
     /**
      *
      */
-    protected String performShutdownRequest(UserSession us) {
-        SysLog.logSysInfo("shutting down");
+    protected String performSaveAllRequest(UserSession us) {
+        log.info(LogBuilder.createSystemMessage().addAction("save all objects").toString());
 
         try {
-            ServiceMain.getInstance().requestStop();
+            ServiceMain.getInstance().saveAll();
         } catch (Exception ex) {
-            SysLog.logThrowable(ex);
+            log.warning(LogBuilder.createSystemMessage().addException("saving all objects failed", ex).toString());
         }
 
-        us.setMessage("Shutting down...");
+        us.setMessage("Saved objects...");
         return PartUtil.SHOW_NOTE_PAGE_NAME;
     }
 
     /**
      *
      */
-    protected String performSaveAllRequest(UserSession us) {
-        SysLog.logSysInfo("saving objects");
-
+    protected String performShutdownRequest(UserSession us) {
+        log.info(LogBuilder.createSystemMessage().addAction("shutting system down").toString());
         try {
-            ServiceMain.getInstance().saveAll();
+            ServiceMain.getInstance().requestStop();
         } catch (Exception ex) {
-            SysLog.logThrowable(ex);
+            log.warning(LogBuilder.createSystemMessage().addException("requesting stop failed", ex).toString());
         }
 
-        us.setMessage("Saved objects...");
+        us.setMessage("Shutting down...");
         return PartUtil.SHOW_NOTE_PAGE_NAME;
     }
 

@@ -25,8 +25,8 @@ import org.wahlzeit.services.AbstractConfig;
 import org.wahlzeit.services.ConfigDir;
 import org.wahlzeit.services.EmailAddress;
 import org.wahlzeit.services.Language;
+import org.wahlzeit.services.LogBuilder;
 import org.wahlzeit.services.SysConfig;
-import org.wahlzeit.services.SysLog;
 import org.wahlzeit.utils.EnumValue;
 
 import java.io.File;
@@ -35,15 +35,17 @@ import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.logging.Logger;
 
 /**
- * A generic implementation of ModelConfig.
- * Subclasses provide the parameters and language-specific handling of text and data.
+ * A generic implementation of ModelConfig. Subclasses provide the parameters and language-specific handling of text and
+ * data.
  *
  * @author dirkriehle
  */
 public abstract class AbstractModelConfig extends AbstractConfig implements ModelConfig, Serializable {
 
+    private static final Logger log = Logger.getLogger(AbstractModelConfig.class.getName());
     /**
      *
      */
@@ -81,7 +83,7 @@ public abstract class AbstractModelConfig extends AbstractConfig implements Mode
                 loadProperties(absoluteCustomFileName);
             }
         } catch (IOException ioex) {
-            SysLog.logThrowable(ioex);
+            log.warning(LogBuilder.createSystemMessage().addException("initializing directories failed", ioex).toString());
         }
 
         String menuDash = "&nbsp;" + doGetValue("MenuDash") + "&nbsp;";
@@ -263,15 +265,15 @@ public abstract class AbstractModelConfig extends AbstractConfig implements Mode
     /**
      *
      */
-    public String getEmailAddressIsInvalid() {
-        return doGetValue("EmailAddressIsInvalid");
+    public String getEmailAddressIsMissing() {
+        return doGetValue("EmailAddressIsMissing");
     }
 
     /**
      *
      */
-    public String getEmailAddressIsMissing() {
-        return doGetValue("EmailAddressIsMissing");
+    public String getEmailAddressIsInvalid() {
+        return doGetValue("EmailAddressIsInvalid");
     }
 
     /**
@@ -291,6 +293,13 @@ public abstract class AbstractModelConfig extends AbstractConfig implements Mode
     /**
      *
      */
+    public String getContinueWithTellFriends() {
+        return doGetValue("ContinueWithTellFriends");
+    }
+
+    /**
+     *
+     */
     public String getContinueWithShowPhoto() {
         return doGetValue("ContinueWithShowPhoto");
     }
@@ -300,13 +309,6 @@ public abstract class AbstractModelConfig extends AbstractConfig implements Mode
      */
     public String getContinueWithShowUserHome() {
         return doGetValue("ContinueWithShowUserHome");
-    }
-
-    /**
-     *
-     */
-    public String getContinueWithTellFriends() {
-        return doGetValue("ContinueWithTellFriends");
     }
 
     /**
@@ -354,13 +356,6 @@ public abstract class AbstractModelConfig extends AbstractConfig implements Mode
     /**
      *
      */
-    public String getOptionsWereSet() {
-        return doGetValue("OptionsWereSet");
-    }
-
-    /**
-     *
-     */
     public String getNeedToSignupFirst() {
         return doGetValue("NeedToSignupFirst");
     }
@@ -368,8 +363,22 @@ public abstract class AbstractModelConfig extends AbstractConfig implements Mode
     /**
      *
      */
+    public String getOptionsWereSet() {
+        return doGetValue("OptionsWereSet");
+    }
+
+    /**
+     *
+     */
     public String getUserAlreadyExists() {
         return doGetValue("UserAlreadyExists");
+    }
+
+    /**
+     *
+     */
+    public String getUserNameIsReserved() {
+        return doGetValue("UserNameIsReserved");
     }
 
     /**
@@ -438,15 +447,15 @@ public abstract class AbstractModelConfig extends AbstractConfig implements Mode
     /**
      *
      */
-    public String getUserNameWasEmailed() {
-        return doGetValue("UserNameWasEmailed");
+    public String getSendUserNameEmailSubject() {
+        return doGetValue("EmailUserNameSubject");
     }
 
     /**
      *
      */
-    public String getSendUserNameEmailSubject() {
-        return doGetValue("EmailUserNameSubject");
+    public String getUserNameWasEmailed() {
+        return doGetValue("UserNameWasEmailed");
     }
 
     /**
@@ -459,8 +468,8 @@ public abstract class AbstractModelConfig extends AbstractConfig implements Mode
     /**
      *
      */
-    public String getUserNameIsReserved() {
-        return doGetValue("UserNameIsReserved");
+    public String getSendPasswordEmailSubject() {
+        return doGetValue("EmailPasswordSubject");
     }
 
     /**
@@ -468,13 +477,6 @@ public abstract class AbstractModelConfig extends AbstractConfig implements Mode
      */
     public String getPasswordWasEmailed() {
         return doGetValue("PasswordWasEmailed");
-    }
-
-    /**
-     *
-     */
-    public String getSendPasswordEmailSubject() {
-        return doGetValue("EmailPasswordSubject");
     }
 
     /**

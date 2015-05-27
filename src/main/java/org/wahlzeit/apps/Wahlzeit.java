@@ -21,12 +21,13 @@
 package org.wahlzeit.apps;
 
 import org.wahlzeit.main.ServiceMain;
-import org.wahlzeit.services.SysLog;
+import org.wahlzeit.services.LogBuilder;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import java.io.File;
+import java.util.logging.Logger;
 
 /**
  * A simple ServletContextListener to startup and shutdown the Flowers application.
@@ -34,6 +35,8 @@ import java.io.File;
  * @author dirkriehle
  */
 public class Wahlzeit implements ServletContextListener {
+
+    private static final Logger log = Logger.getLogger(Wahlzeit.class.getName());
 
     /**
      *
@@ -45,16 +48,19 @@ public class Wahlzeit implements ServletContextListener {
             // configures logging
             String contextPath = sc.getContextPath();
             System.setProperty("contextPath", contextPath);
-            SysLog.logSysInfo("context-path", contextPath);
+            log.config(LogBuilder.createSystemMessage().
+                    addParameter("System property context path", contextPath).toString());
 
             // determines file system root path to resources
             File dummyFile = new File(sc.getRealPath("dummy.txt"));
             String rootDir = dummyFile.getParent();
-            SysLog.logSysInfo("root-directory", rootDir);
+            log.config(LogBuilder.createSystemMessage().
+                    addParameter("Root directory", rootDir).toString());
 
             ServiceMain.getInstance().startUp(false, rootDir);
         } catch (Exception ex) {
-            SysLog.logThrowable(ex);
+            log.warning(LogBuilder.createSystemMessage().
+                    addException("Initializing context failed", ex).toString());
         }
     }
 
@@ -65,7 +71,8 @@ public class Wahlzeit implements ServletContextListener {
         try {
             ServiceMain.getInstance().shutDown();
         } catch (Exception ex) {
-            SysLog.logThrowable(ex);
+            log.warning(LogBuilder.createSystemMessage().
+                    addException("Shutting instance down failed", ex).toString());
         }
     }
 

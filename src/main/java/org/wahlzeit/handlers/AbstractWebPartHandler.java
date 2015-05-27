@@ -27,8 +27,8 @@ import org.wahlzeit.model.PhotoSize;
 import org.wahlzeit.model.User;
 import org.wahlzeit.model.UserSession;
 import org.wahlzeit.services.Language;
+import org.wahlzeit.services.LogBuilder;
 import org.wahlzeit.services.SysConfig;
-import org.wahlzeit.services.SysLog;
 import org.wahlzeit.utils.HtmlUtil;
 import org.wahlzeit.utils.StringUtil;
 import org.wahlzeit.webparts.WebPart;
@@ -37,17 +37,18 @@ import org.wahlzeit.webparts.WebPartTemplateService;
 
 import java.io.File;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * @author dirkriehle
  */
 public abstract class AbstractWebPartHandler implements WebPartHandler {
 
+    private static final Logger log = Logger.getLogger(AbstractWebPartHandler.class.getName());
     /**
      *
      */
     protected String tmplName;
-
     /**
      *
      */
@@ -95,6 +96,22 @@ public abstract class AbstractWebPartHandler implements WebPartHandler {
     /**
      *
      */
+    protected String getPhotoAsRelativeResourcePathString(Photo photo, PhotoSize size) {
+        String resName = photo.getId().asString() + size.asInt();
+        return SysConfig.getPhotosDir().getRelativeDir() + '/' + resName;
+    }
+
+    /**
+     *
+     */
+    protected String getEmptyImageAsRelativeResourcePathString(Language lang) {
+        String resName = lang.asIsoCode() + File.separator + "empty.png";
+        return HtmlUtil.asPath(SysConfig.getStaticDir().getRelativeConfigFileName(resName));
+    }
+
+    /**
+     *
+     */
     protected String getPhotoSummary(UserSession us, Photo photo) {
         return photo.getSummary(us.getConfiguration());
     }
@@ -111,27 +128,6 @@ public abstract class AbstractWebPartHandler implements WebPartHandler {
      */
     protected final WebFormHandler getFormHandler(String name) {
         return WebPartHandlerManager.getWebFormHandler(name);
-    }
-
-    /**
-     *
-     */
-    public final AccessRights getNeededRights() {
-        return neededRights;
-    }
-
-    /**
-     *
-     */
-    protected boolean hasAccessRights(UserSession us, Map args) {
-        return us.getClient().hasRights(getNeededRights());
-    }
-
-    /**
-     *
-     */
-    protected boolean isWellFormedGet(UserSession us, String link, Map args) {
-        return true;
     }
 
     /**
@@ -163,12 +159,14 @@ public abstract class AbstractWebPartHandler implements WebPartHandler {
      */
     public final String handleGet(UserSession us, String link, Map args) {
         if (!hasAccessRights(us, args)) {
-            SysLog.logSysInfo("insufficient rights for GET from: " + us.getEmailAddressAsString());
+            log.warning(LogBuilder.createSystemMessage().
+                    addParameter("insufficient rights for GET from", us.getEmailAddressAsString()).toString());
             return getIllegalAccessErrorPage(us);
         }
 
         if (!isWellFormedGet(us, link, args)) {
-            SysLog.logSysInfo("received ill-formed GET from: " + us.getEmailAddressAsString());
+            log.warning(LogBuilder.createSystemMessage().
+                    addParameter("received ill-formed GET from", us.getEmailAddressAsString()).toString());
             return getIllegalArgumentErrorPage(us);
         }
 
@@ -176,16 +174,16 @@ public abstract class AbstractWebPartHandler implements WebPartHandler {
             // may throw Exception
             return doHandleGet(us, link, args);
         } catch (Throwable t) {
-            SysLog.logThrowable(t);
+            log.warning(LogBuilder.createSystemMessage().addException("Handle get failed", t).toString());
             return getInternalProcessingErrorPage(us);
         }
     }
 
     /**
-     * @param args TODO
+     *
      */
-    protected String doHandleGet(UserSession us, String link, Map args) {
-        return link;
+    protected boolean hasAccessRights(UserSession us, Map args) {
+        return us.getClient().hasRights(getNeededRights());
     }
 
     /**
@@ -203,6 +201,13 @@ public abstract class AbstractWebPartHandler implements WebPartHandler {
     /**
      *
      */
+    protected boolean isWellFormedGet(UserSession us, String link, Map args) {
+        return true;
+    }
+
+    /**
+     *
+     */
     protected String getIllegalArgumentErrorPage(UserSession us) {
         us.setHeading(us.getConfiguration().getInformation());
 
@@ -215,6 +220,13 @@ public abstract class AbstractWebPartHandler implements WebPartHandler {
         us.setTwoLineMessage(msg1, msg2);
 
         return PartUtil.SHOW_NOTE_PAGE_NAME;
+    }
+
+    /**
+     * @param args TODO
+     */
+    protected String doHandleGet(UserSession us, String link, Map args) {
+        return link;
     }
 
     /**
@@ -237,9 +249,8 @@ public abstract class AbstractWebPartHandler implements WebPartHandler {
     /**
      *
      */
-    protected String getEmptyImageAsRelativeResourcePathString(Language lang) {
-        String resName = lang.asIsoCode() + File.separator + "empty.png";
-        return HtmlUtil.asPath(SysConfig.getStaticDir().getRelativeConfigFileName(resName));
+    public final AccessRights getNeededRights() {
+        return neededRights;
     }
 
     /**
@@ -255,14 +266,6 @@ public abstract class AbstractWebPartHandler implements WebPartHandler {
      */
     protected String getResourceAsRelativeHtmlPathString(String resource) {
         return resource + ".html";
-    }
-
-    /**
-     *
-     */
-    protected String getPhotoAsRelativeResourcePathString(Photo photo, PhotoSize size) {
-        String resName = photo.getId().asString() + size.asInt();
-        return SysConfig.getPhotosDir().getRelativeDir() + '/' + resName;
     }
 
 }

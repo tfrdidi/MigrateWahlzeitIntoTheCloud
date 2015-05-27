@@ -147,10 +147,10 @@ public class LogBuilder {
      * <p/>
      * Adds the stacktrace and the <code>exceptionMessage</code> to the log message.
      */
-    public LogBuilder addException(String exceptionMessage, Exception exception) {
+    public LogBuilder addException(String exceptionMessage, Throwable throwable) {
         add(EXCEPTION_REASON + NAME_VALUE_SEPARATOR + exceptionMessage);
         StringWriter sw = new StringWriter();
-        exception.printStackTrace(new PrintWriter(sw));
+        throwable.printStackTrace(new PrintWriter(sw));
         add(STACKTRACE + NAME_VALUE_SEPARATOR + sw.toString());
         return this;
     }

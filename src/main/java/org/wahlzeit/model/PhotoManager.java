@@ -23,8 +23,6 @@ package org.wahlzeit.model;
 import com.google.appengine.api.images.Image;
 import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.Work;
-import org.wahlzeit.agents.AsyncTaskExecutor;
-import org.wahlzeit.services.EmailAddress;
 import org.wahlzeit.services.ObjectManager;
 import org.wahlzeit.services.Persistent;
 import org.wahlzeit.services.SysLog;
@@ -40,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A photo manager provides access to and manages photos.
@@ -53,6 +52,8 @@ public class PhotoManager extends ObjectManager {
      */
     protected static final PhotoManager instance = new PhotoManager();
 
+    private static final Logger log = Logger.getLogger(PhotoManager.class.getName());
+
     /**
      * In-memory cache for photos
      */
@@ -62,6 +63,13 @@ public class PhotoManager extends ObjectManager {
      *
      */
     protected PhotoTagCollector photoTagCollector = null;
+
+    /**
+     *
+     */
+    public PhotoManager() {
+        photoTagCollector = PhotoFactory.getInstance().createPhotoTagCollector();
+    }
 
     /**
      *
@@ -87,38 +95,8 @@ public class PhotoManager extends ObjectManager {
     /**
      *
      */
-    public static final Photo getPhoto(String id) {
-        return getPhoto(PhotoId.getIdFromString(id));
-    }
-
-    /**
-     *
-     */
     public static final Photo getPhoto(PhotoId id) {
         return instance.getPhotoFromId(id);
-    }
-
-    /**
-     *
-     */
-    public PhotoManager() {
-        photoTagCollector = PhotoFactory.getInstance().createPhotoTagCollector();
-    }
-
-    /**
-     * @methodtype init
-     * Loads all Photos from the Datastore and holds them in the cache
-     */
-    public void init() {
-        loadPhotos();
-    }
-
-    /**
-     * @methodtype boolean-query
-     * @methodproperty primitive
-     */
-    protected boolean doHasPhoto(PhotoId id) {
-        return photoCache.containsKey(id);
     }
 
     /**
@@ -151,22 +129,25 @@ public class PhotoManager extends ObjectManager {
 
     /**
      * @methodtype command
-     */
-    public void addPhoto(Photo photo) {
-        PhotoId id = photo.getId();
-        assertIsNewPhoto(id);
-        doAddPhoto(photo);
-
-        //AsyncTaskExecutor.savePhotoAsync(id.asString());
-        GlobalsManager.getInstance().saveGlobals();
-    }
-
-    /**
-     * @methodtype command
      * @methodproperties primitive
      */
     protected void doAddPhoto(Photo myPhoto) {
         photoCache.put(myPhoto.getId(), myPhoto);
+    }
+
+    /**
+     *
+     */
+    public static final Photo getPhoto(String id) {
+        return getPhoto(PhotoId.getIdFromString(id));
+    }
+
+    /**
+     * @methodtype init
+     * Loads all Photos from the Datastore and holds them in the cache
+     */
+    public void init() {
+        loadPhotos();
     }
 
     /**
@@ -199,8 +180,7 @@ public class PhotoManager extends ObjectManager {
                     } else {
                         log.warning(SysLog.logSysInfo("No user found").toString());
                     }
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     log.log(Level.WARNING, "problem when loading owner: ", e);
                 }
             } else {
@@ -211,6 +191,37 @@ public class PhotoManager extends ObjectManager {
         log.info(SysLog.logSysInfo("All photos loaded.").toString());
     }
 
+    /**
+     * @methodtype boolean-query
+     * @methodproperty primitive
+     */
+    protected boolean doHasPhoto(PhotoId id) {
+        return photoCache.containsKey(id);
+    }
+
+    /**
+     * @methodtype command
+     * <p/>
+     * Loads all scaled Images of this Photo from Google Cloud Storage
+     */
+    protected void loadScaledImages(Photo photo) {
+        String photoIdAsString = photo.getId().asString();
+        GcsAdapter gcsAdapter = GcsAdapter.getInstance();
+
+        for (PhotoSize photoSize : PhotoSize.values()) {
+            if (gcsAdapter.doesImageExist(photoIdAsString, photoSize.asInt())) {
+                try {
+                    Image image = gcsAdapter.readFromCloudStorage(photoIdAsString, photoSize.asInt());
+                    photo.setImage(photoSize, image);
+                    log.info("Loaded Image of size " + photoSize.asString() + " for Photo " + photoIdAsString);
+                } catch (IOException e) {
+                    log.log(Level.SEVERE, "Could not load Image of size " + photoSize.asString() + " for Photo " + photoIdAsString);
+                }
+            } else {
+                log.info("PhotoSize " + photoSize.asString() + " does not exist for Photo " + photoIdAsString);
+            }
+        }
+    }
 
     /**
      *
@@ -225,24 +236,6 @@ public class PhotoManager extends ObjectManager {
             Photo photo = (Photo) obj;
             saveScaledImages(photo);
             updateTags(photo);
-        }
-    }
-
-    /**
-     * Removes all tags of the Photo (obj) in the datastore that have been removed by the user
-     * and adds all new tags of the photo to the datastore.
-     */
-    protected void updateTags(Photo photo) {
-        // delete all existing tags, for the case that some have been removed
-        deleteObjects(Tag.class, Tag.PHOTO_ID, photo.getId().asString());
-
-        // add all current tags to the datastore
-        Set<String> tags = new HashSet<String>();
-        photoTagCollector.collect(tags, photo);
-        for (Iterator<String> i = tags.iterator(); i.hasNext(); ) {
-            Tag tag = new Tag(i.next(), photo.getId().asString());
-            log.info("Write tag: " + tag.asString());
-            writeObject(tag);
         }
     }
 
@@ -271,26 +264,20 @@ public class PhotoManager extends ObjectManager {
     }
 
     /**
-     * @methodtype command
-     * <p/>
-     * Loads all scaled Images of this Photo from Google Cloud Storage
+     * Removes all tags of the Photo (obj) in the datastore that have been removed by the user
+     * and adds all new tags of the photo to the datastore.
      */
-    protected void loadScaledImages(Photo photo) {
-        String photoIdAsString = photo.getId().asString();
-        GcsAdapter gcsAdapter = GcsAdapter.getInstance();
+    protected void updateTags(Photo photo) {
+        // delete all existing tags, for the case that some have been removed
+        deleteObjects(Tag.class, Tag.PHOTO_ID, photo.getId().asString());
 
-        for (PhotoSize photoSize : PhotoSize.values()) {
-            if (gcsAdapter.doesImageExist(photoIdAsString, photoSize.asInt())) {
-                try {
-                    Image image = gcsAdapter.readFromCloudStorage(photoIdAsString, photoSize.asInt());
-                    photo.setImage(photoSize, image);
-                    log.info("Loaded Image of size " + photoSize.asString() + " for Photo " + photoIdAsString);
-                } catch (IOException e) {
-                    log.log(Level.SEVERE, "Could not load Image of size " + photoSize.asString() + " for Photo " + photoIdAsString);
-                }
-            } else {
-                log.info("PhotoSize " + photoSize.asString() + " does not exist for Photo " + photoIdAsString);
-            }
+        // add all current tags to the datastore
+        Set<String> tags = new HashSet<String>();
+        photoTagCollector.collect(tags, photo);
+        for (Iterator<String> i = tags.iterator(); i.hasNext(); ) {
+            Tag tag = new Tag(i.next(), photo.getId().asString());
+            log.info("Write tag: " + tag.asString());
+            writeObject(tag);
         }
     }
 
@@ -396,6 +383,18 @@ public class PhotoManager extends ObjectManager {
         Photo result = PhotoUtil.createPhoto(filename, id, uploadedImage);
         addPhoto(result);
         return result;
+    }
+
+    /**
+     * @methodtype command
+     */
+    public void addPhoto(Photo photo) {
+        PhotoId id = photo.getId();
+        assertIsNewPhoto(id);
+        doAddPhoto(photo);
+
+        //AsyncTaskExecutor.savePhotoAsync(id.asString());
+        GlobalsManager.getInstance().saveGlobals();
     }
 
     /**

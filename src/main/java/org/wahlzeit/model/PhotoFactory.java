@@ -20,19 +20,9 @@
 
 package org.wahlzeit.model;
 
-import com.google.appengine.api.datastore.KeyFactory;
-import com.google.appengine.tools.cloudstorage.GcsFileMetadata;
-import com.google.appengine.tools.cloudstorage.GcsFileOptions;
-import com.google.appengine.tools.cloudstorage.GcsFilename;
-import com.google.appengine.tools.cloudstorage.GcsInputChannel;
-import org.wahlzeit.services.OfyService;
-import org.wahlzeit.services.SysLog;
+import org.wahlzeit.services.LogBuilder;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author dirkriehle
@@ -40,17 +30,32 @@ import java.util.logging.Level;
 
 public class PhotoFactory {
 
+    private static final Logger log = Logger.getLogger(PhotoFactory.class.getName());
     /**
      * Hidden singleton instance; needs to be initialized from the outside.
      */
     private static PhotoFactory instance = null;
 
     /**
+     *
+     */
+    protected PhotoFactory() {
+        // do nothing
+    }
+
+    /**
+     * Hidden singleton instance; needs to be initialized from the outside.
+     */
+    public static void initialize() {
+        getInstance(); // drops result due to getInstance() side-effects
+    }
+
+    /**
      * Public singleton access method.
      */
     public static synchronized PhotoFactory getInstance() {
         if (instance == null) {
-            SysLog.logSysInfo("setting generic PhotoFactory");
+            log.config(LogBuilder.createSystemMessage().addAction("setting generic PhotoFactory").toString());
             setInstance(new PhotoFactory());
         }
 
@@ -69,20 +74,6 @@ public class PhotoFactory {
     }
 
     /**
-     * Hidden singleton instance; needs to be initialized from the outside.
-     */
-    public static void initialize() {
-        getInstance(); // drops result due to getInstance() side-effects
-    }
-
-    /**
-     *
-     */
-    protected PhotoFactory() {
-        // do nothing
-    }
-
-    /**
      * @methodtype factory
      */
     public Photo createPhoto() {
@@ -90,16 +81,15 @@ public class PhotoFactory {
     }
 
     /**
-     *  Creates a new photo with the specified id
+     * Creates a new photo with the specified id
      */
     public Photo createPhoto(PhotoId id) {
         return new Photo(id);
     }
 
     /**
-     *  Loads a photo.
-     *  The Java object is loaded from the Google Datastore, the Images in all sizes are loaded from the
-     *  Google Cloud storage.
+     * Loads a photo. The Java object is loaded from the Google Datastore, the Images in all sizes are loaded from the
+     * Google Cloud storage.
      */
     public Photo loadPhoto(PhotoId id) {
        /* Photo result =

@@ -29,7 +29,6 @@ import org.wahlzeit.model.Tags;
 import org.wahlzeit.model.User;
 import org.wahlzeit.model.UserSession;
 import org.wahlzeit.services.LogBuilder;
-import org.wahlzeit.services.SysLog;
 import org.wahlzeit.utils.StringUtil;
 import org.wahlzeit.webparts.WebPart;
 
@@ -82,19 +81,19 @@ public class UploadPhotoFormHandler extends AbstractWebFormHandler {
 
             photo.setTags(new Tags(tags));
 
-            log.info(LogBuilder.createUserMessage().
+            log.config(LogBuilder.createUserMessage().
                     addAction("Upload Photo").
                     addParameter("Photo", photo.getId().asString()).
                     addParameter("tags", photo.getTags().asString()).toString());
 
             us.setTwoLineMessage(us.getConfiguration().getPhotoUploadSucceeded(), us.getConfiguration().getKeepGoing());
-            log.info(LogBuilder.createSystemMessage().
+            log.config(LogBuilder.createSystemMessage().
                     addAction("Calling async task to save Photo").
                     addParameter("ID", photo.getId().asString()).toString());
 
             AsyncTaskExecutor.savePhotoAsync(photo.getId().asString());
         } catch (Exception ex) {
-            SysLog.logThrowable(ex);
+            log.warning(LogBuilder.createSystemMessage().addException("uploading photo failed", ex).toString());
             us.setMessage(us.getConfiguration().getPhotoUploadFailed());
         }
 

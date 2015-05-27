@@ -22,16 +22,19 @@ package org.wahlzeit.handlers;
 
 import org.wahlzeit.model.AccessRights;
 import org.wahlzeit.model.UserSession;
-import org.wahlzeit.services.SysLog;
+import org.wahlzeit.services.LogBuilder;
 import org.wahlzeit.webparts.WebPart;
 
 import java.util.Map;
+import java.util.logging.Logger;
 
 
 /**
  * @author dirkriehle
  */
 public abstract class AbstractWebFormHandler extends AbstractWebPartHandler implements WebFormHandler {
+
+    private static final Logger log = Logger.getLogger(AbstractWebFormHandler.class.getName());
 
     /**
      *
@@ -55,23 +58,18 @@ public abstract class AbstractWebFormHandler extends AbstractWebPartHandler impl
     protected abstract void doMakeWebPart(UserSession us, WebPart part);
 
     /**
-     * @methodtype boolean-query
-     */
-    protected boolean isWellFormedPost(UserSession us, Map args) {
-        return true;
-    }
-
-    /**
      *
      */
     public final String handlePost(UserSession us, Map args) {
         if (!hasAccessRights(us, args)) {
-            SysLog.logSysInfo("insufficient rights for POST from: " + us.getEmailAddressAsString());
+            log.warning(LogBuilder.createSystemMessage().
+                    addParameter("insufficient rights for POST from", us.getEmailAddressAsString()).toString());
             return getIllegalAccessErrorPage(us);
         }
 
         if (!isWellFormedPost(us, args)) {
-            SysLog.logSysInfo("received ill-formed POST from: " + us.getEmailAddressAsString());
+            log.warning(LogBuilder.createSystemMessage().
+                    addParameter("received ill-formed POST from", us.getEmailAddressAsString()).toString());
             return getIllegalArgumentErrorPage(us);
         }
 
@@ -79,9 +77,16 @@ public abstract class AbstractWebFormHandler extends AbstractWebPartHandler impl
             // may throw Exception
             return doHandlePost(us, args);
         } catch (Throwable t) {
-            SysLog.logThrowable(t);
+            log.warning(LogBuilder.createSystemMessage().addException("Handle post failed", t).toString());
             return getInternalProcessingErrorPage(us);
         }
+    }
+
+    /**
+     * @methodtype boolean-query
+     */
+    protected boolean isWellFormedPost(UserSession us, Map args) {
+        return true;
     }
 
     /**
