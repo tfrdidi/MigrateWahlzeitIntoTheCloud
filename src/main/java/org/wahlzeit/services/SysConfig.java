@@ -35,7 +35,7 @@ public class SysConfig extends AbstractConfig {
      *
      */
     protected static SysConfig instance = null;
-    private static Logger log = Logger.getLogger(SysLog.class.getName());
+    private static Logger log = Logger.getLogger(SysConfig.class.getName());
     /**
      *
      */
