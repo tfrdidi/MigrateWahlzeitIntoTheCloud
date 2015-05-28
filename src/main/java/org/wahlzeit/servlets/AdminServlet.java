@@ -28,6 +28,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.logging.Logger;
 
 
 /**
@@ -39,6 +40,8 @@ public class AdminServlet extends AbstractServlet {
      *
      */
     private static final long serialVersionUID = 42L; // any one does; class never serialized
+
+    private static final Logger log = Logger.getLogger(AdminServlet.class.getName());
 
     /**
      *

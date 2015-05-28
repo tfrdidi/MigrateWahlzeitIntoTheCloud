@@ -20,9 +20,10 @@
 
 package org.wahlzeit.handlers;
 
+import org.wahlzeit.services.LogBuilder;
+
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -31,34 +32,11 @@ import java.util.logging.Logger;
  */
 public class WebPartHandlerManager {
 
-    private static final Logger log = Logger.getLogger(WebPartHandler.class.getName());
-
-    /**
-     *
-     */
-    public static WebPageHandler getWebPageHandler(String name) {
-        return instance.getWebPageHandlerFor(name);
-    }
-
-    /**
-     *
-     */
-    public static WebFormHandler getWebFormHandler(String name) {
-        return instance.getWebFormHandlerFor(name);
-    }
-
-    /**
-     *
-     */
-    public static WebPartHandlerManager getInstance() {
-        return instance;
-    }
-
     /**
      *
      */
     protected static final WebPartHandlerManager instance = new WebPartHandlerManager();
-
+    private static final Logger log = Logger.getLogger(WebPartHandler.class.getName());
     /**
      *
      */
@@ -69,6 +47,13 @@ public class WebPartHandlerManager {
      */
     protected WebPartHandlerManager() {
         // do nothing
+    }
+
+    /**
+     *
+     */
+    public static WebPageHandler getWebPageHandler(String name) {
+        return instance.getWebPageHandlerFor(name);
     }
 
     /**
@@ -86,6 +71,20 @@ public class WebPartHandlerManager {
     /**
      *
      */
+    public WebPartHandler getDefaultWebPageHandler() {
+        return handler.get("index");
+    }
+
+    /**
+     *
+     */
+    public static WebFormHandler getWebFormHandler(String name) {
+        return instance.getWebFormHandlerFor(name);
+    }
+
+    /**
+     *
+     */
     public WebFormHandler getWebFormHandlerFor(String name) {
         WebPartHandler result = handler.get(name);
         if (result == null || !(result instanceof WebFormHandler)) {
@@ -98,17 +97,20 @@ public class WebPartHandlerManager {
     /**
      *
      */
-    public WebPartHandler addWebPartHandler(String name, WebPartHandler myHandler) {
-        handler.put(name, myHandler);
-        log.log(Level.INFO, "Added Handler {0} for link {1}", new Object[]{myHandler, name});
-        return myHandler;
+    public static WebPartHandlerManager getInstance() {
+        return instance;
     }
 
     /**
      *
      */
-    public WebPartHandler getDefaultWebPageHandler() {
-        return handler.get("index");
+    public WebPartHandler addWebPartHandler(String name, WebPartHandler myHandler) {
+        handler.put(name, myHandler);
+        log.config(LogBuilder.createSystemMessage().
+                addAction("add WebPartHandler").
+                addParameter("name", name).
+                addParameter("handler", myHandler).toString());
+        return myHandler;
     }
 
     /**

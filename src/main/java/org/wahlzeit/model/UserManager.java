@@ -122,17 +122,16 @@ public class UserManager extends ObjectManager {
                 return existingUser;
             }
         });
-        log.info(existingUser.size() + " found in the Datastore.");
 
         for (User user : existingUser) {
             if (!doHasUserByTag(user.getNameAsTag())) {
                 doAddUser(user);
             } else {
-                log.info("User " + user.getName() + " has already been loaded.");
+                log.config(LogBuilder.createSystemMessage().addParameter("user has been loaded", user.getName()).toString());
             }
         }
 
-        log.info("loaded all users");
+        log.info(LogBuilder.createSystemMessage().addMessage("loaded all users").toString());
     }
 
     /**
@@ -159,7 +158,7 @@ public class UserManager extends ObjectManager {
      */
     protected void doAddUser(User user) {
         users.put(user.getNameAsTag(), user);
-        log.info("Added new user " + user.getName() + " to the list of all users.");
+        log.config(LogBuilder.createSystemMessage().addParameter("Added new user", user.getName()).toString());
     }
 
     /**

@@ -53,7 +53,7 @@ import java.util.logging.Logger;
  */
 public class MainServlet extends AbstractServlet {
 
-    protected static final Logger log = Logger.getLogger(MainServlet.class.getName());
+    private static final Logger log = Logger.getLogger(MainServlet.class.getName());
     /**
      *
      */
@@ -87,8 +87,8 @@ public class MainServlet extends AbstractServlet {
         }
 
         redirectRequest(response, link);
-        SessionManager.dropThreadLocalSession();
         us.addProcessingTime(System.currentTimeMillis() - startTime);
+        SessionManager.dropThreadLocalSession();
     }
 
     /**

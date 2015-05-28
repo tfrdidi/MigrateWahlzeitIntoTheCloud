@@ -73,7 +73,7 @@ public class User extends Client implements Persistent, HttpSessionBindingListen
     public static final String MEMBER_SINCE = "memberSince";
     public static final String NO_PHOTOS = "noPhotos";
 
-    protected static final Logger log = Logger.getLogger(User.class.getName());
+    private static final Logger log = Logger.getLogger(User.class.getName());
 
     /**
      * 0 is never returned, first value is 1

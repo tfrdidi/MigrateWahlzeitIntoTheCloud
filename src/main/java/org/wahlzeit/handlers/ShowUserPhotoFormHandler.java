@@ -101,6 +101,7 @@ public class ShowUserPhotoFormHandler extends AbstractWebFormHandler {
             result = PartUtil.TELL_FRIEND_PAGE_NAME;
         } else if (us.isFormType(args, "select")) {
             user.setUserPhoto(photo);
+            us.setClient(user);
             userManager.saveUser(user);
             log.info(LogBuilder.createUserMessage().
                     addAction("Select user photo").

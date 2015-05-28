@@ -26,13 +26,11 @@ import org.wahlzeit.model.PhotoFactory;
 import org.wahlzeit.model.PhotoManager;
 import org.wahlzeit.model.User;
 import org.wahlzeit.model.UserManager;
+import org.wahlzeit.services.LogBuilder;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.util.logging.Handler;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
-import java.util.logging.StreamHandler;
 
 /**
  * A single-threaded Main class with database connection. Can be used by tools that don't want to start a server.
@@ -50,13 +48,16 @@ public abstract class ModelMain extends AbstractMain {
         super.startUp(rootDir);
         log.info("AbstractMain.startUp completed");
 
+        log.config(LogBuilder.createSystemMessage().addAction("load globals").toString());
         GlobalsManager.getInstance().loadGlobals();
-        log.info("Globals loaded");
-        UserManager.getInstance().init();
-        log.info("All users have been loaded.");
 
+        log.config(LogBuilder.createSystemMessage().addAction("load user").toString());
+        UserManager.getInstance().init();
+
+        log.config(LogBuilder.createSystemMessage().addAction("init PhotoFactory").toString());
         PhotoFactory.initialize();
-        log.info("PhotoFactory initialized.");
+
+        log.config(LogBuilder.createSystemMessage().addAction("load Photos").toString());
         PhotoManager.getInstance().init();
     }
 
@@ -68,6 +69,16 @@ public abstract class ModelMain extends AbstractMain {
         saveAll();
 
         super.shutDown();
+    }
+
+    /**
+     *
+     */
+    public void saveAll() {
+        PhotoCaseManager.getInstance().savePhotoCases();
+        PhotoManager.getInstance().savePhotos();
+        UserManager.getInstance().saveUsers();
+        GlobalsManager.getInstance().saveGlobals();
     }
 
     /**
@@ -94,16 +105,5 @@ public abstract class ModelMain extends AbstractMain {
             //Photo newPhoto = photoManager.createPhoto(photoFiles[i]);
             //user.addPhoto(newPhoto);
         }
-    }
-
-
-    /**
-     *
-     */
-    public void saveAll() {
-        PhotoCaseManager.getInstance().savePhotoCases();
-        PhotoManager.getInstance().savePhotos();
-        UserManager.getInstance().saveUsers();
-        GlobalsManager.getInstance().saveGlobals();
     }
 }

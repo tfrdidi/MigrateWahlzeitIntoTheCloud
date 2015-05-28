@@ -27,6 +27,7 @@ import org.wahlzeit.model.GermanModelConfig;
 import org.wahlzeit.model.LanguageConfigs;
 import org.wahlzeit.services.ConfigDir;
 import org.wahlzeit.services.Language;
+import org.wahlzeit.services.LogBuilder;
 import org.wahlzeit.services.SysConfig;
 import org.wahlzeit.webparts.WebPartTemplateService;
 
@@ -92,29 +93,19 @@ public class ServiceMain extends ModelMain {
     public void startUp(boolean inProduction, String rootDir) throws Exception {
         isInProduction = inProduction;
 
-        log.info("Entering");
+        log.config(LogBuilder.createSystemMessage().addAction("Start up ModelMain").toString());
         super.startUp(rootDir);
-        log.info("super startUp completed");
 
+        log.config(LogBuilder.createSystemMessage().addAction("Configure WebPartTemplateService").toString());
         configureWebPartTemplateService();
-        log.info("configureWebPartTemplateService completed");
+
+        log.config(LogBuilder.createSystemMessage().addAction("Configure WebPartHandler").toString());
         configureWebPartHandlers();
-        log.info("configureWebPartHandlers completed");
+
+        log.config(LogBuilder.createSystemMessage().addAction("Configure LanguageModels").toString());
         configureLanguageModels();
-        log.info("configureLanguageModels completed");
 
-        //AgentManager am = AgentManager.getInstance();
-        //am.startAllThreads();
-    }
-
-    /**
-     *
-     */
-    public void shutDown() throws Exception {
-        //AgentManager am = AgentManager.getInstance();
-        //am.stopAllThreads();
-
-        super.shutDown();
+        log.config(LogBuilder.createSystemMessage().addMessage("StartUp complete.").toString());
     }
 
     /**
@@ -228,6 +219,16 @@ public class ServiceMain extends ModelMain {
     public void configureLanguageModels() {
         LanguageConfigs.put(Language.ENGLISH, new EnglishModelConfig());
         LanguageConfigs.put(Language.GERMAN, new GermanModelConfig());
+    }
+
+    /**
+     *
+     */
+    public void shutDown() throws Exception {
+        //AgentManager am = AgentManager.getInstance();
+        //am.stopAllThreads();
+
+        super.shutDown();
     }
 
 }
