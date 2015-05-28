@@ -24,7 +24,7 @@ import com.google.appengine.api.images.Image;
 import com.google.appengine.api.images.ImagesService;
 import com.google.appengine.api.images.ImagesServiceFactory;
 import com.google.appengine.api.images.Transform;
-import org.wahlzeit.services.SysLog;
+import org.wahlzeit.services.LogBuilder;
 
 import java.util.logging.Logger;
 
@@ -71,7 +71,23 @@ public class PhotoUtil {
         }
     }
 
+    /**
+     * @methodtype assertion
+     */
+    protected static void assertIsValidImage(Image image) {
+        if (image == null) {
+            throw new IllegalArgumentException("Image = null!");
+        }
+    }
 
+    /**
+     *
+     */
+    protected static void assertHasValidSize(int cw, int ch) {
+        if (PhotoSize.THUMB.isWiderAndHigher(cw, ch)) {
+            throw new IllegalArgumentException("Photo too small!");
+        }
+    }
 
     /**
      * @methodtype command
@@ -90,25 +106,7 @@ public class PhotoUtil {
 
         photo.setImage(size, newImage);
 
-        SysLog.logSysInfo("Scaled image to size: " + size.asString());
-    }
-
-    /**
-     * @methodtype assertion
-     */
-    protected static void assertIsValidImage(Image image) {
-        if (image == null) {
-            throw new IllegalArgumentException("Not a valid photo!");
-        }
-    }
-
-    /**
-     *
-     */
-    protected static void assertHasValidSize(int cw, int ch) {
-        if (PhotoSize.THUMB.isWiderAndHigher(cw, ch)) {
-            throw new IllegalArgumentException("Photo too small!");
-        }
+        log.config(LogBuilder.createSystemMessage().addParameter("Scaled image to size: ", size.asString()).toString());
     }
 
 }

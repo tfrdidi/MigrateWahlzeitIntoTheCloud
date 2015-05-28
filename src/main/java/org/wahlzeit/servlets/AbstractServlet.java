@@ -21,12 +21,10 @@
 package org.wahlzeit.servlets;
 
 import org.wahlzeit.main.ServiceMain;
-import org.wahlzeit.model.LanguageConfigs;
 import org.wahlzeit.model.UserSession;
-import org.wahlzeit.services.Language;
+import org.wahlzeit.services.LogBuilder;
 import org.wahlzeit.services.Session;
 import org.wahlzeit.services.SessionManager;
-import org.wahlzeit.services.SysLog;
 import org.wahlzeit.utils.StringUtil;
 import org.wahlzeit.webparts.WebPart;
 
@@ -47,12 +45,12 @@ import java.util.logging.Logger;
  */
 public abstract class AbstractServlet extends HttpServlet {
 
+    protected static final Logger log = Logger.getLogger(AbstractServlet.class.getName());
+    private static final long serialVersionUID = 42L; // any does; class never serialized
     /**
      *
      */
     protected static int lastSessionId = 0; // system and agent are named differently
-    private static final long serialVersionUID = 42L; // any does; class never serialized
-    protected static final Logger log = Logger.getLogger(AbstractServlet.class.getName());
 
     /**
      *
@@ -92,13 +90,6 @@ public abstract class AbstractServlet extends HttpServlet {
         }
 
         SessionManager.dropThreadLocalSession();
-    }
-
-    /**
-     *
-     */
-    protected void myGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // do nothing
     }
 
     /**
@@ -159,28 +150,8 @@ public abstract class AbstractServlet extends HttpServlet {
     /**
      *
      */
-    protected void redirectRequest(HttpServletResponse response, String link) throws IOException {
-        response.setContentType("text/html");
-        String newTarget = new String("/" + link + ".html");
-        log.info(SysLog.logSysInfo("Redirect to", newTarget).toString());
-        response.sendRedirect(newTarget);
-    }
-
-    /**
-     *
-     */
-    protected void configureResponse(Session ctx, HttpServletResponse response, WebPart result) throws IOException {
-        long processingTime = ctx.getProcessingTime();
-        result.addString("processingTime", StringUtil.asStringInSeconds((processingTime == 0) ? 1 : processingTime));
-        log.info(SysLog.logSysInfo("proctime", String.valueOf(processingTime)).toString());
-
-        response.setContentType("text/html");
-
-        PrintWriter out = response.getWriter();
-        result.writeOn(out);
-        out.close();
-
-        response.setStatus(HttpServletResponse.SC_OK);
+    protected void myGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // do nothing
     }
 
     /**
@@ -190,6 +161,34 @@ public abstract class AbstractServlet extends HttpServlet {
         String result = request.getRequestURL().toString();
         int lastIndex = result.lastIndexOf('/') + 1;
         return result.substring(0, lastIndex);
+    }
+
+    /**
+     *
+     */
+    protected void redirectRequest(HttpServletResponse response, String link) throws IOException {
+        response.setContentType("text/html");
+        String newTarget = new String("/" + link + ".html");
+        log.config(LogBuilder.createSystemMessage().addParameter("Redirect to", newTarget).toString());
+        response.sendRedirect(newTarget);
+    }
+
+    /**
+     *
+     */
+    protected void configureResponse(Session ctx, HttpServletResponse response, WebPart result) throws IOException {
+        long processingTime = ctx.getProcessingTime();
+        result.addString("processingTime", StringUtil.asStringInSeconds((processingTime == 0) ? 1 : processingTime));
+        log.config(LogBuilder.createSystemMessage().
+                addParameter("proctime", String.valueOf(processingTime)).toString());
+
+        response.setContentType("text/html");
+
+        PrintWriter out = response.getWriter();
+        result.writeOn(out);
+        out.close();
+
+        response.setStatus(HttpServletResponse.SC_OK);
     }
 
     /**

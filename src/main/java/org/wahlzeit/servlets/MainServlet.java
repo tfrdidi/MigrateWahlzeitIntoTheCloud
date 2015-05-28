@@ -34,7 +34,6 @@ import org.wahlzeit.handlers.WebPartHandlerManager;
 import org.wahlzeit.model.UserSession;
 import org.wahlzeit.services.LogBuilder;
 import org.wahlzeit.services.SessionManager;
-import org.wahlzeit.services.SysLog;
 import org.wahlzeit.webparts.WebPart;
 
 import javax.servlet.ServletException;
@@ -59,6 +58,38 @@ public class MainServlet extends AbstractServlet {
      *
      */
     private static final long serialVersionUID = 42L; // any one does; class never serialized
+
+    /**
+     *
+     */
+    public void myPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        long startTime = System.currentTimeMillis();
+
+        UserSession us = (UserSession) SessionManager.getThreadLocalSession();
+        String link = request.getRequestURI();
+        int linkStart = link.lastIndexOf("/") + 1;
+        int linkEnd = link.indexOf(".form");
+        if (linkEnd != -1) {
+            link = link.substring(linkStart, linkEnd);
+        } else {
+            link = PartUtil.NULL_FORM_NAME;
+        }
+        log.info(LogBuilder.createUserMessage().addParameter("posted to", link).toString());
+
+        Map args = getRequestArgs(request, us);
+        log.info(LogBuilder.createSystemMessage().
+                addParameter("POST arguments", getRequestArgsAsString(us, args)).toString());
+
+        WebFormHandler formHandler = WebPartHandlerManager.getWebFormHandler(link);
+        link = PartUtil.DEFAULT_PAGE_NAME;
+        if (formHandler != null) {
+            link = formHandler.handlePost(us, args);
+        }
+
+        redirectRequest(response, link);
+        SessionManager.dropThreadLocalSession();
+        us.addProcessingTime(System.currentTimeMillis() - startTime);
+    }
 
     /**
      *
@@ -103,38 +134,6 @@ public class MainServlet extends AbstractServlet {
     /**
      *
      */
-    public void myPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        long startTime = System.currentTimeMillis();
-
-        UserSession us = (UserSession) SessionManager.getThreadLocalSession();
-        String link = request.getRequestURI();
-        int linkStart = link.lastIndexOf("/") + 1;
-        int linkEnd = link.indexOf(".form");
-        if (linkEnd != -1) {
-            link = link.substring(linkStart, linkEnd);
-        } else {
-            link = PartUtil.NULL_FORM_NAME;
-        }
-        log.info(LogBuilder.createUserMessage().addParameter("posted to", link).toString());
-
-        Map args = getRequestArgs(request, us);
-        log.info(LogBuilder.createSystemMessage().
-                addParameter("POST arguments", getRequestArgsAsString(us, args)).toString());
-
-        WebFormHandler formHandler = WebPartHandlerManager.getWebFormHandler(link);
-        link = PartUtil.DEFAULT_PAGE_NAME;
-        if (formHandler != null) {
-            link = formHandler.handlePost(us, args);
-        }
-
-        redirectRequest(response, link);
-        SessionManager.dropThreadLocalSession();
-        us.addProcessingTime(System.currentTimeMillis() - startTime);
-    }
-
-    /**
-     *
-     */
     protected Map getRequestArgs(HttpServletRequest request, UserSession us) throws IOException, ServletException {
         String contentType = request.getContentType();
         if ((contentType != null) && contentType.startsWith("multipart/form-data")) {
@@ -164,15 +163,15 @@ public class MainServlet extends AbstractServlet {
                     Image image = getImage(inputStream);
                     us.setUploadedImage(image);
                     result.put("fileName", filename);
-                    log.info(SysLog.logSysInfo("Uploaded image", filename).toString());
+                    log.config(LogBuilder.createSystemMessage().addParameter("Uploaded image", filename).toString());
                 } else {
                     String key = fileItemStream.getFieldName();
                     InputStream is = fileItemStream.openStream();
                     String value = CharStreams.toString(new InputStreamReader(is, Charsets.UTF_8));
                     result.put(key, value);
-                    StringBuffer logMessage = SysLog.logSysInfo("Key of uploaded parameter", key);
-                    SysLog.addField(logMessage, "value", value);
-                    log.info(logMessage.toString());
+                    log.config(LogBuilder.createSystemMessage().
+                            addParameter("Key of uploaded parameter", key).
+                            addParameter("value", value).toString());
                 }
             }
         } catch (Exception ex) {

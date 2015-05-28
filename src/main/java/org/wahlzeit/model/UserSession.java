@@ -23,8 +23,8 @@ package org.wahlzeit.model;
 import com.google.appengine.api.images.Image;
 import org.wahlzeit.services.EmailAddress;
 import org.wahlzeit.services.Language;
+import org.wahlzeit.services.LogBuilder;
 import org.wahlzeit.services.Session;
-import org.wahlzeit.services.SysLog;
 import org.wahlzeit.utils.HtmlUtil;
 import org.wahlzeit.utils.StringUtil;
 
@@ -234,7 +234,8 @@ public class UserSession extends Session implements Serializable {
             client.setEmailAddress(emailAddress);
             setClient(client);
         } else {
-            SysLog.logSysError("attempted to set email address to null client");
+            log.warning(LogBuilder.createSystemMessage().
+                    addMessage("attempted to set email address, but client=null!").toString());
         }
     }
 

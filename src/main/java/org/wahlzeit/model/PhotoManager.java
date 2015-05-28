@@ -23,9 +23,9 @@ package org.wahlzeit.model;
 import com.google.appengine.api.images.Image;
 import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.Work;
+import org.wahlzeit.services.LogBuilder;
 import org.wahlzeit.services.ObjectManager;
 import org.wahlzeit.services.Persistent;
-import org.wahlzeit.services.SysLog;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -37,7 +37,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -143,8 +142,7 @@ public class PhotoManager extends ObjectManager {
     }
 
     /**
-     * @methodtype init
-     * Loads all Photos from the Datastore and holds them in the cache
+     * @methodtype init Loads all Photos from the Datastore and holds them in the cache
      */
     public void init() {
         loadPhotos();
@@ -163,32 +161,34 @@ public class PhotoManager extends ObjectManager {
             }
         });
 
-        log.info(SysLog.logSysInfo("Number of photos found in datastore", String.valueOf(existingPhotos.size())).toString());
         for (Photo photo : existingPhotos) {
             if (!doHasPhoto(photo.getId())) {
-                log.config(SysLog.logSysInfo("Load Photo with ID", photo.getIdAsString()).toString());
+                log.config(LogBuilder.createSystemMessage().
+                        addParameter("Load Photo with ID", photo.getIdAsString()).toString());
                 loadScaledImages(photo);
-                // Todo: load tags
                 doAddPhoto(photo);
                 try {
                     String ownerName = photo.getOwnerName();
-                    log.log(Level.INFO, "Owner of photo {0} is {1}.", new Object[]{photo.getIdAsString(), ownerName});
                     User user = UserManager.getInstance().getUserByName(ownerName);
                     if (user != null) {
                         user.addPhoto(photo);
-                        log.info(SysLog.logSysInfo("found user").toString());
+                        log.config(LogBuilder.createSystemMessage().
+                                addParameter("Found owner", user.getName()).toString());
                     } else {
-                        log.warning(SysLog.logSysInfo("No user found").toString());
+                        log.warning(LogBuilder.createSystemMessage().
+                                addParameter("missing owner", ownerName).toString());
                     }
                 } catch (Exception e) {
-                    log.log(Level.WARNING, "problem when loading owner: ", e);
+                    log.warning(LogBuilder.createSystemMessage().
+                            addException("Problem when loading owner", e).toString());
                 }
             } else {
-                log.config(SysLog.logSysInfo("Already loaded Photo", photo.getIdAsString()).toString());
+                log.config(LogBuilder.createSystemMessage().
+                        addParameter("Already loaded Photo", photo.getIdAsString()).toString());
             }
         }
 
-        log.info(SysLog.logSysInfo("All photos loaded.").toString());
+        log.info(LogBuilder.createSystemMessage().addMessage("All photos loaded.").toString());
     }
 
     /**
@@ -209,16 +209,25 @@ public class PhotoManager extends ObjectManager {
         GcsAdapter gcsAdapter = GcsAdapter.getInstance();
 
         for (PhotoSize photoSize : PhotoSize.values()) {
+            log.config(LogBuilder.createSystemMessage().
+                    addAction("loading image").
+                    addParameter("image size", photoSize.asString()).
+                    addParameter("photo ID", photoIdAsString).toString());
             if (gcsAdapter.doesImageExist(photoIdAsString, photoSize.asInt())) {
                 try {
                     Image image = gcsAdapter.readFromCloudStorage(photoIdAsString, photoSize.asInt());
-                    photo.setImage(photoSize, image);
-                    log.info("Loaded Image of size " + photoSize.asString() + " for Photo " + photoIdAsString);
+                    if (image != null) {
+                        photo.setImage(photoSize, image);
+                    }
                 } catch (IOException e) {
-                    log.log(Level.SEVERE, "Could not load Image of size " + photoSize.asString() + " for Photo " + photoIdAsString);
+                    log.warning(LogBuilder.createSystemMessage().
+                            addParameter("size", photoSize.asString()).
+                            addParameter("photo ID", photoIdAsString).
+                            addException("Could not load image although it exists", e).toString());
                 }
             } else {
-                log.info("PhotoSize " + photoSize.asString() + " does not exist for Photo " + photoIdAsString);
+                log.config(LogBuilder.createSystemMessage().
+                        addParameter("Size does not exist", photoSize.asString()).toString());
             }
         }
     }
@@ -254,18 +263,23 @@ public class PhotoManager extends ObjectManager {
                     if (!gcsAdapter.doesImageExist(photoIdAsString, photoSize.asInt())) {
                         gcsAdapter.writeToCloudStorage(image, photoIdAsString, photoSize.asInt());
                     }
-                } catch (Exception e) {
-                    log.log(Level.SEVERE, "Could not store Image in Cloud Storage.", e);
+                } catch (IllegalArgumentException e) {
+                    log.warning(LogBuilder.createSystemMessage().
+                            addException("Invalid parameter to store Image", e).toString());
+                } catch (IOException e) {
+                    log.warning(LogBuilder.createSystemMessage().
+                            addException("Problem storing image", e).toString());
                 }
             } else {
-                log.info("No photo for size '" + photoSize.asString() + "'");
+                log.config(LogBuilder.createSystemMessage().
+                        addParameter("No image for size", photoSize.asString()).toString());
             }
         }
     }
 
     /**
-     * Removes all tags of the Photo (obj) in the datastore that have been removed by the user
-     * and adds all new tags of the photo to the datastore.
+     * Removes all tags of the Photo (obj) in the datastore that have been removed by the user and adds all new tags of
+     * the photo to the datastore.
      */
     protected void updateTags(Photo photo) {
         // delete all existing tags, for the case that some have been removed
@@ -276,7 +290,7 @@ public class PhotoManager extends ObjectManager {
         photoTagCollector.collect(tags, photo);
         for (Iterator<String> i = tags.iterator(); i.hasNext(); ) {
             Tag tag = new Tag(i.next(), photo.getId().asString());
-            log.info("Write tag: " + tag.asString());
+            log.config(LogBuilder.createSystemMessage().addParameter("Writing Tag", tag.asString()).toString());
             writeObject(tag);
         }
     }
@@ -327,7 +341,8 @@ public class PhotoManager extends ObjectManager {
             id = filter.getRandomDisplayablePhotoId();
             result = getPhotoFromId(id);
             if ((result != null) && !result.isVisible()) {
-                log.info("addProcessedPhoto: " + result.getId().asString());
+                log.config(LogBuilder.createSystemMessage().
+                        addParameter("add processed photo", result.getId().asString()).toString());
                 filter.addProcessedPhoto(result);
             }
         }
@@ -342,7 +357,8 @@ public class PhotoManager extends ObjectManager {
         // get all tags that match the filter conditions
         List<PhotoId> result = new LinkedList<PhotoId>();
         int noFilterConditions = filter.getFilterConditions().size();
-        log.info(SysLog.logSysInfo("Number of filter conditions", String.valueOf(noFilterConditions)).toString());
+        log.config(LogBuilder.createSystemMessage().
+                addParameter("Number of filter conditions", String.valueOf(noFilterConditions)).toString());
 
         if (noFilterConditions == 0) {
             Collection<PhotoId> candidates = photoCache.keySet();
@@ -354,20 +370,20 @@ public class PhotoManager extends ObjectManager {
                 }
             }
 
-            log.info(SysLog.logSysInfo("Photos to show", String.valueOf(newPhotos)).toString());
+            log.config(LogBuilder.createSystemMessage().addParameter("Number of photos to show", newPhotos).toString());
         } else {
             List<Tag> tags = new LinkedList<Tag>();
             for (String condition : filter.getFilterConditions()) {
                 readObjects(tags, Tag.class, Tag.TEXT, condition);
             }
-            log.info(SysLog.logSysInfo("Number of Tags", String.valueOf(tags.size())).toString());
 
             // get the list of all photo ids that correspond to the tags
             for (Tag tag : tags) {
                 PhotoId photoId = PhotoId.getIdFromString(tag.getPhotoId());
                 if (!filter.isProcessedPhotoId(photoId)) {
                     result.add(PhotoId.getIdFromString(tag.getPhotoId()));
-                    log.config(SysLog.logSysInfo("Photo ID", tag.getPhotoId(), "Add photo to filter-result.").toString());
+                    log.config(LogBuilder.createSystemMessage().
+                            addParameter("Add photo to filter, ID", tag.getPhotoId()).toString());
                 }
             }
         }

@@ -25,8 +25,8 @@ import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Subclass;
 import org.wahlzeit.services.EmailAddress;
 import org.wahlzeit.services.Language;
+import org.wahlzeit.services.LogBuilder;
 import org.wahlzeit.services.Persistent;
-import org.wahlzeit.services.SysLog;
 import org.wahlzeit.utils.StringUtil;
 
 import javax.servlet.http.HttpSession;
@@ -79,33 +79,10 @@ public class User extends Client implements Persistent, HttpSessionBindingListen
      * 0 is never returned, first value is 1
      */
     protected static Long lastUserId = 0L;
-
-    /**
-     *
-     */
-    public static Long getLastUserId() {
-        return lastUserId;
-    }
-
-    /**
-     *
-     */
-    public static synchronized void setLastUserId(Long newId) {
-        lastUserId = newId;
-    }
-
-    /**
-     *
-     */
-    public static synchronized Long getNextUserId() {
-        return ++lastUserId;
-    }
-
     /**
      *
      */
     protected transient int writeCount = 0;
-
     /**
      *
      */
@@ -113,7 +90,6 @@ public class User extends Client implements Persistent, HttpSessionBindingListen
     @Index
     protected String nameAsTag;
     protected String password;
-
     /**
      *
      */
@@ -123,21 +99,17 @@ public class User extends Client implements Persistent, HttpSessionBindingListen
     protected Gender gender = Gender.UNDEFINED;
     protected UserStatus status = UserStatus.CREATED;
     protected long confirmationCode = 0; // 0 means doesn't need confirmation
-
     /**
      *
      */
     protected Photo userPhoto = null;
     protected Set<Photo> photos = new HashSet<Photo>();
-
     /**
      *
      */
     protected long creationTime = System.currentTimeMillis();
-
     @Ignore
     transient protected HttpSession httpSession = null;
-
     /**
      *
      */
@@ -150,13 +122,6 @@ public class User extends Client implements Persistent, HttpSessionBindingListen
      */
     public User(String myName, String myPassword, EmailAddress myEmailAddress, long vc) {
         initialize(AccessRights.USER, myEmailAddress, myName, myPassword, vc);
-    }
-
-    /**
-     *
-     */
-    protected User() {
-        // do nothing
     }
 
     /**
@@ -176,6 +141,57 @@ public class User extends Client implements Persistent, HttpSessionBindingListen
         homePage = getDefaultHomePage();
 
         incWriteCount();
+    }
+
+    /**
+     *
+     */
+    public static synchronized Long getNextUserId() {
+        return ++lastUserId;
+    }
+
+    /**
+     * @methodtype get
+     */
+    public URL getDefaultHomePage() {
+        return StringUtil.asUrl(getSiteUrlAsString() + "filter?userName=" + name); // @TODO Application
+    }
+
+    /**
+     * @methodtype get
+     */
+    public String getSiteUrlAsString() {
+        return "http://wahlzeit.org/";
+    }
+
+    /**
+     * @methodtype command
+     */
+    protected void notifyHttpSession() {
+        if (httpSession != null) {
+            httpSession.setAttribute(UserSession.CLIENT, this);
+        }
+    }
+
+    /**
+     *
+     */
+    protected User() {
+        // do nothing
+    }
+
+    /**
+     *
+     */
+    public static Long getLastUserId() {
+        return lastUserId;
+    }
+
+    /**
+     *
+     */
+    public static synchronized void setLastUserId(Long newId) {
+        lastUserId = newId;
     }
 
     /**
@@ -225,13 +241,6 @@ public class User extends Client implements Persistent, HttpSessionBindingListen
             Photo photo = i.next();
             photo.setOwnerEmailAddress(emailAddress);
         }
-    }
-
-    /**
-     * @methodtype get
-     */
-    public String getName() {
-        return name;
     }
 
     /**
@@ -342,20 +351,6 @@ public class User extends Client implements Persistent, HttpSessionBindingListen
     /**
      * @methodtype get
      */
-    public String getSiteUrlAsString() {
-        return "http://wahlzeit.org/";
-    }
-
-    /**
-     * @methodtype get
-     */
-    public URL getDefaultHomePage() {
-        return StringUtil.asUrl(getSiteUrlAsString() + "filter?userName=" + name); // @TODO Application
-    }
-
-    /**
-     * @methodtype get
-     */
     public Gender getGender() {
         return gender;
     }
@@ -366,6 +361,13 @@ public class User extends Client implements Persistent, HttpSessionBindingListen
     public void setGender(Gender newGender) {
         gender = newGender;
         incWriteCount();
+    }
+
+    /**
+     * @methodtype boolean query
+     */
+    public boolean isConfirmed() {
+        return getStatus().isConfirmed();
     }
 
     /**
@@ -381,13 +383,6 @@ public class User extends Client implements Persistent, HttpSessionBindingListen
     public void setStatus(UserStatus newStatus) {
         status = newStatus;
         incWriteCount();
-    }
-
-    /**
-     * @methodtype boolean query
-     */
-    public boolean isConfirmed() {
-        return getStatus().isConfirmed();
     }
 
     /**
@@ -499,23 +494,25 @@ public class User extends Client implements Persistent, HttpSessionBindingListen
 
     @Override
     public void valueBound(HttpSessionBindingEvent event) {
-        log.info(SysLog.logSysInfo("User bound to HttpSession.").toString());
+        log.config(LogBuilder.createSystemMessage().
+                addAction("bind user to HttpSession").
+                addParameter("name", getName()).toString());
         httpSession = event.getSession();
+    }
+
+    /**
+     * @methodtype get
+     */
+    public String getName() {
+        return name;
     }
 
     @Override
     public void valueUnbound(HttpSessionBindingEvent event) {
-        log.info(SysLog.logSysInfo("User unbound from HttpSession.").toString());
+        log.config(LogBuilder.createSystemMessage().
+                addAction("unbound user to HttpSession").
+                addParameter("name", getName()).toString());
         httpSession = null;
-    }
-
-    /**
-     * @methodtype command
-     */
-    protected void notifyHttpSession() {
-        if (httpSession != null) {
-            httpSession.setAttribute(UserSession.CLIENT, this);
-        }
     }
 
 }

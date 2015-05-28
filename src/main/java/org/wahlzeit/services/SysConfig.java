@@ -21,6 +21,7 @@
 package org.wahlzeit.services;
 
 import java.io.File;
+import java.util.logging.Logger;
 
 /**
  * A basic set of system configuration data
@@ -30,71 +31,27 @@ import java.io.File;
 public class SysConfig extends AbstractConfig {
 
     public static String DATA_PATH = "org-wahlzeit-data";
-
     /**
      *
      */
     protected static SysConfig instance = null;
-
-    /**
-     *
-     */
-    public static SysConfig getInstance() {
-        if (instance == null) {
-            SysLog.logSysInfo("creating generic SysConfig");
-            setInstance(new SysConfig(""));
-        }
-        return instance;
-    }
-
-    /**
-     * Sets the singleton instance of SysConfig.
-     *
-     * @methodtype set
-     * @methodproperty composed, class
-     */
-    public static synchronized void setInstance(SysConfig sysConfig) {
-        assertIsUninitialized();
-        instance = sysConfig;
-    }
-
-    /**
-     * @methodtype assertion
-     * @methodproperty primitive, class
-     */
-    public static synchronized void assertIsUninitialized() {
-        if (instance != null) {
-            throw new IllegalStateException("attempt to initalize SysConfig again");
-        }
-    }
-
-    /**
-     * Drop singleton instance to cope with repeated startup/shutdown scenarios
-     */
-    public static synchronized void dropInstance() {
-        instance = null;
-        SysLog.logSysInfo("dropped current SysConfig");
-    }
-
+    private static Logger log = Logger.getLogger(SysLog.class.getName());
     /**
      *
      */
     protected String rootDir;
-
     /**
      *
      */
     protected ConfigDir scriptsDir;
     protected ConfigDir staticDir;
     protected ConfigDir templatesDir;
-
     /**
      *
      */
     protected Directory photosDir;
     protected Directory backupDir;
     protected Directory tempDir;
-
     /**
      *
      */
@@ -121,10 +78,50 @@ public class SysConfig extends AbstractConfig {
     }
 
     /**
+     * Drop singleton instance to cope with repeated startup/shutdown scenarios
+     */
+    public static synchronized void dropInstance() {
+        log.config(LogBuilder.createSystemMessage().addAction("drop SysConfig instance").toString());
+        instance = null;
+    }
+
+    /**
      *
      */
     public static String getRootDirAsString() {
         return getInstance().rootDir;
+    }
+
+    /**
+     *
+     */
+    public static SysConfig getInstance() {
+        if (instance == null) {
+            log.config(LogBuilder.createSystemMessage().addAction("create generic SysConfig").toString());
+            setInstance(new SysConfig(""));
+        }
+        return instance;
+    }
+
+    /**
+     * Sets the singleton instance of SysConfig.
+     *
+     * @methodtype set
+     * @methodproperty composed, class
+     */
+    public static synchronized void setInstance(SysConfig sysConfig) {
+        assertIsUninitialized();
+        instance = sysConfig;
+    }
+
+    /**
+     * @methodtype assertion
+     * @methodproperty primitive, class
+     */
+    public static synchronized void assertIsUninitialized() {
+        if (instance != null) {
+            throw new IllegalStateException("attempt to initalize SysConfig again");
+        }
     }
 
     /**

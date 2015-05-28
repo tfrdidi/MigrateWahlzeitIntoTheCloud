@@ -22,15 +22,13 @@ package org.wahlzeit.webparts;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
-import com.google.common.io.Resources;
 import org.wahlzeit.services.ConfigDir;
-import org.wahlzeit.services.SysLog;
+import org.wahlzeit.services.LogBuilder;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -42,25 +40,15 @@ import java.util.logging.Logger;
  */
 public class WebPartTemplateService {
 
-    private static final Logger log = Logger.getLogger(WebPartTemplateService.class.getName());
-
     /**
      *
      */
     protected static final WebPartTemplateService instance = new WebPartTemplateService();
-
-    /**
-     * Convenience method...
-     */
-    public static WebPartTemplateService getInstance() {
-        return instance;
-    }
-
+    private static final Logger log = Logger.getLogger(WebPartTemplateService.class.getName());
     /**
      *
      */
     protected Map<String, WebPartTemplate> templates = new HashMap<String, WebPartTemplate>();
-
     /**
      *
      */
@@ -74,17 +62,10 @@ public class WebPartTemplateService {
     }
 
     /**
-     *
+     * Convenience method...
      */
-    public ConfigDir getTemplatesDir() {
-        return templatesDir;
-    }
-
-    /**
-     *
-     */
-    public void setTemplatesDir(ConfigDir newTemplatesDir) {
-        templatesDir = newTemplatesDir;
+    public static WebPartTemplateService getInstance() {
+        return instance;
     }
 
     /**
@@ -99,7 +80,9 @@ public class WebPartTemplateService {
                 loadTemplate(shortName);
                 result = templates.get(shortName);
             } catch (IOException ioex) {
-                SysLog.logThrowable(ioex);
+                log.warning(LogBuilder.createSystemMessage().
+                        addParameter("template name", shortName).
+                        addException("Problem loading template", ioex).toString());
             }
         }
 
@@ -112,7 +95,9 @@ public class WebPartTemplateService {
     protected void loadTemplate(String shortName) throws IOException {
         WebPartTemplate template = new WebPartTemplate(shortName);
         String fileName = getTemplatesDir().getAbsoluteConfigFileName(shortName + ".html");
-        SysLog.logSysInfo("file name", fileName, "opened HTML template file");
+        log.config(LogBuilder.createSystemMessage().
+                addAction("open html template file").
+                addParameter("file name", fileName).toString());
         File file = new File(fileName);
 
         try {
@@ -121,14 +106,29 @@ public class WebPartTemplateService {
 
             if(source != null) {
                 template.initialize(source);
-                SysLog.logCreatedObject("WebPartTmpl", shortName);
+                log.config(LogBuilder.createSystemMessage().addAction("Initialize template").toString());
             }
 
             templates.put(shortName, template);
         }
         catch (IOException e) {
-            log.log(Level.SEVERE, "I/O Error while reading Template file '" + fileName + "'", e);
+            log.warning(LogBuilder.createSystemMessage().
+                    addException("I/O Error while reading Template file", e).toString());
         }
+    }
+
+    /**
+     *
+     */
+    public ConfigDir getTemplatesDir() {
+        return templatesDir;
+    }
+
+    /**
+     *
+     */
+    public void setTemplatesDir(ConfigDir newTemplatesDir) {
+        templatesDir = newTemplatesDir;
     }
 
 }

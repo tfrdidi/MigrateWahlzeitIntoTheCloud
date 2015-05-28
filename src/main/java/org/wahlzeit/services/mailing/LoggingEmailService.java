@@ -21,13 +21,17 @@
 package org.wahlzeit.services.mailing;
 
 import org.wahlzeit.services.EmailAddress;
-import org.wahlzeit.services.SysLog;
+import org.wahlzeit.services.LogBuilder;
+
+import java.util.logging.Logger;
 
 /**
  * A logging mailing service logs email send attempts before sending emails.
  * This is a decorator pattern application.
  */
 public class LoggingEmailService implements EmailService {
+
+    private static final Logger log = Logger.getLogger(LoggingEmailService.class.getName());
 
     /**
      *
@@ -50,7 +54,11 @@ public class LoggingEmailService implements EmailService {
         String toString = (to == null) ? "null" : to.asString();
         String subjectString = (subject == null) ? "null" : subject;
 
-        SysLog.logSysInfo("Called sendEmail from: " + fromString + " to: " + toString + " with subject: " + subjectString);
+        log.config(LogBuilder.createSystemMessage().
+                addAction("Send E-Mail").
+                addParameter("from", fromString).
+                addParameter("to", toString).
+                addParameter("subject", subjectString).toString());
 
         decorated.sendEmail(from, to, subject, body);
     }
@@ -79,7 +87,12 @@ public class LoggingEmailService implements EmailService {
         String bccString = (bcc == null) ? "null" : bcc.asString();
         String subjectString = (subject == null) ? "null" : subject;
 
-        SysLog.logSysInfo("Called sendEmail from: " + fromString + " to: " + toString + " bcc: " + bccString + " with subject: " + subjectString);
+        log.config(LogBuilder.createSystemMessage().
+                addAction("Send E-Mail").
+                addParameter("from", fromString).
+                addParameter("to", toString).
+                addParameter("bcc", bccString).
+                addParameter("subject", subjectString).toString());
 
         decorated.sendEmail(from, to, bcc, subject, body);
     }

@@ -23,8 +23,8 @@ package org.wahlzeit.model;
 import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.Work;
 import org.wahlzeit.services.EmailAddress;
+import org.wahlzeit.services.LogBuilder;
 import org.wahlzeit.services.ObjectManager;
-import org.wahlzeit.services.SysLog;
 import org.wahlzeit.services.mailing.EmailService;
 import org.wahlzeit.services.mailing.EmailServiceManager;
 
@@ -45,6 +45,8 @@ import java.util.logging.Logger;
  */
 public class UserManager extends ObjectManager {
 
+    private static final Long DEFAULT_ADMIN_ID = 1L;
+    private static final Logger log = Logger.getLogger(UserManager.class.getName());
     /**
      * Reserved names that cannot be registered by regular users
      *
@@ -55,6 +57,18 @@ public class UserManager extends ObjectManager {
             "anonymous",
             "flickr"
     );
+    /**
+     *
+     */
+    protected static UserManager instance = new UserManager();
+    /**
+     * Maps nameAsTag to user of that name (as tag)
+     */
+    protected Map<String, User> users = new HashMap<String, User>();
+    /**
+     *
+     */
+    protected Random codeGenerator = new Random(System.currentTimeMillis());
 
     /**
      *
@@ -65,28 +79,9 @@ public class UserManager extends ObjectManager {
     /**
      *
      */
-    protected static UserManager instance = new UserManager();
-
-    private static final Long DEFAULT_ADMIN_ID = 1L;
-    private static final Logger log = Logger.getLogger(UserManager.class.getName());
-
-    /**
-     *
-     */
     public static UserManager getInstance() {
         return instance;
     }
-
-    /**
-     * Maps nameAsTag to user of that name (as tag)
-     */
-    protected Map<String, User> users = new HashMap<String, User>();
-
-    /**
-     *
-     */
-    protected Random codeGenerator = new Random(System.currentTimeMillis());
-
 
     public void init() {
         assertAdminExists();
@@ -118,67 +113,26 @@ public class UserManager extends ObjectManager {
     /**
      *
      */
-    public boolean hasUserByName(String name) {
-        assertIsNonNullArgument(name, "user-by-name");
-        return hasUserByTag(Tags.asTag(name));
-    }
+    public void loadExistingUsers() {
+        Collection<User> existingUser = ObjectifyService.run(new Work<Collection<User>>() {
+            @Override
+            public Collection<User> run() {
+                Collection<User> existingUser = new ArrayList<User>();
+                readObjects(existingUser, User.class);
+                return existingUser;
+            }
+        });
+        log.info(existingUser.size() + " found in the Datastore.");
 
-    /**
-     *
-     */
-    public boolean hasUserByTag(String tag) {
-        assertIsNonNullArgument(tag, "user-by-tag");
-        return getUserByTag(tag) != null;
-    }
-
-    /**
-     *
-     */
-    protected boolean doHasUserByTag(String tag) {
-        return doGetUserByTag(tag) != null;
-    }
-
-    /**
-     *
-     */
-    public User getUserByName(String name) {
-        return getUserByTag(Tags.asTag(name));
-    }
-
-    /**
-     *
-     */
-    public User getUserByTag(String tag) {
-        assertIsNonNullArgument(tag, "user-by-tag");
-
-        User result = doGetUserByTag(tag);
-
-        if (result == null) {
-            log.info(SysLog.logSysInfo("User not in cache", tag).toString());
-            result = readObject(User.class, User.NAME_AS_TAG, tag);
-            if (result != null) {
-                doAddUser(result);
+        for (User user : existingUser) {
+            if (!doHasUserByTag(user.getNameAsTag())) {
+                doAddUser(user);
+            } else {
+                log.info("User " + user.getName() + " has already been loaded.");
             }
         }
-        else {
-            log.info(SysLog.logSysInfo("User loaded from cache", tag).toString());
-        }
 
-        return result;
-    }
-
-    /**
-     *
-     */
-    public boolean isReservedUserName(String userName) {
-        return reservedNames.contains(Tags.asTag(userName));
-    }
-
-    /**
-     *
-     */
-    protected User doGetUserByTag(String tag) {
-        return users.get(tag);
+        log.info("loaded all users");
     }
 
     /**
@@ -196,9 +150,84 @@ public class UserManager extends ObjectManager {
     /**
      *
      */
+    protected boolean doHasUserByTag(String tag) {
+        return doGetUserByTag(tag) != null;
+    }
+
+    /**
+     *
+     */
     protected void doAddUser(User user) {
         users.put(user.getNameAsTag(), user);
         log.info("Added new user " + user.getName() + " to the list of all users.");
+    }
+
+    /**
+     * @methodtype assertion
+     */
+    protected void assertIsUnknownUserAsIllegalArgument(User user) {
+        if (hasUserByTag(user.getNameAsTag())) {
+            throw new IllegalArgumentException(user.getName() + "is already known");
+        }
+    }
+
+    /**
+     *
+     */
+    protected User doGetUserByTag(String tag) {
+        return users.get(tag);
+    }
+
+    /**
+     *
+     */
+    public boolean hasUserByTag(String tag) {
+        assertIsNonNullArgument(tag, "user-by-tag");
+        return getUserByTag(tag) != null;
+    }
+
+    /**
+     *
+     */
+    public User getUserByTag(String tag) {
+        assertIsNonNullArgument(tag, "user-by-tag");
+
+        User result = doGetUserByTag(tag);
+
+        if (result == null) {
+            log.config(LogBuilder.createSystemMessage().addParameter("User not in cache", tag).toString());
+            result = readObject(User.class, User.NAME_AS_TAG, tag);
+            if (result != null) {
+                doAddUser(result);
+            }
+        }
+        else {
+            log.config(LogBuilder.createSystemMessage().addParameter("User loaded from cache", tag).toString());
+        }
+
+        return result;
+    }
+
+    /**
+     *
+     */
+    public boolean hasUserByName(String name) {
+        assertIsNonNullArgument(name, "user-by-name");
+        return hasUserByTag(Tags.asTag(name));
+    }
+
+    /**
+     *
+     */
+    public User getUserByName(String name) {
+        return getUserByTag(Tags.asTag(name));
+    }
+
+    /**
+     *
+     */
+    public boolean isReservedUserName(String userName) {
+        return reservedNames.contains(Tags.asTag(userName));
     }
 
     /**
@@ -221,28 +250,12 @@ public class UserManager extends ObjectManager {
     }
 
     /**
-     *
+     * @methodtype assertion
      */
-    public void loadExistingUsers() {
-        Collection<User> existingUser = ObjectifyService.run(new Work<Collection<User>>() {
-            @Override
-            public Collection<User> run() {
-                Collection<User> existingUser = new ArrayList<User>();
-                readObjects(existingUser, User.class);
-                return existingUser;
-            }
-        });
-        log.info(existingUser.size() + " found in the Datastore.");
-
-        for (User user : existingUser) {
-            if (!doHasUserByTag(user.getNameAsTag())) {
-                doAddUser(user);
-            } else {
-                log.info("User " + user.getName() + " has already been loaded.");
-            }
+    protected void assertIsUnknownUserAsIllegalState(User user) {
+        if (hasUserByTag(user.getNameAsTag())) {
+            throw new IllegalStateException(user.getName() + "should not be known");
         }
-
-        log.info("loaded all users");
     }
 
     /**
@@ -291,16 +304,16 @@ public class UserManager extends ObjectManager {
     /**
      *
      */
-    public void saveUser(User user) {
-        updateObject(user);
+    public void removeUser(User user) {
+        saveUser(user);
+        users.remove(user.getNameAsTag());
     }
 
     /**
      *
      */
-    public void removeUser(User user) {
-        saveUser(user);
-        users.remove(user.getNameAsTag());
+    public void saveUser(User user) {
+        updateObject(user);
     }
 
     /**
@@ -334,24 +347,6 @@ public class UserManager extends ObjectManager {
         }
 
         return result;
-    }
-
-    /**
-     * @methodtype assertion
-     */
-    protected void assertIsUnknownUserAsIllegalArgument(User user) {
-        if (hasUserByTag(user.getNameAsTag())) {
-            throw new IllegalArgumentException(user.getName() + "is already known");
-        }
-    }
-
-    /**
-     * @methodtype assertion
-     */
-    protected void assertIsUnknownUserAsIllegalState(User user) {
-        if (hasUserByTag(user.getNameAsTag())) {
-            throw new IllegalStateException(user.getName() + "should not be known");
-        }
     }
 
 }

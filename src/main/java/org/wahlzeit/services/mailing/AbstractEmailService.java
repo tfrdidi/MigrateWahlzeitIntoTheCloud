@@ -21,15 +21,18 @@
 package org.wahlzeit.services.mailing;
 
 import org.wahlzeit.services.EmailAddress;
-import org.wahlzeit.services.SysLog;
+import org.wahlzeit.services.LogBuilder;
 import org.wahlzeit.utils.StringUtil;
 
 import javax.mail.Message;
+import java.util.logging.Logger;
 
 /**
  * Abstract superclass for non-trivial EmailServer implementations.
  */
 public abstract class AbstractEmailService implements EmailService {
+
+    private static final Logger log = Logger.getLogger(AbstractEmailService.class.getName());
 
     /**
      *
@@ -70,7 +73,8 @@ public abstract class AbstractEmailService implements EmailService {
             sendEmail(from, to, bcc, subject, body);
             return true;
         } catch (Exception ex) {
-            SysLog.logThrowable(ex);
+            log.warning(LogBuilder.createSystemMessage().
+                    addException("Problem sending email", ex).toString());
             return false;
         }
     }
