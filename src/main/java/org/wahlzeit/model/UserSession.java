@@ -26,7 +26,6 @@ import org.wahlzeit.services.Language;
 import org.wahlzeit.services.LogBuilder;
 import org.wahlzeit.services.Session;
 import org.wahlzeit.utils.HtmlUtil;
-import org.wahlzeit.utils.StringUtil;
 
 import javax.servlet.http.HttpSession;
 import java.io.Serializable;
@@ -37,6 +36,10 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 /**
+ * Wrapper class for {@link HttpSession} to provide a readable interface for Wahlzeit.
+ *
+ * {@link HttpSession}s are managed automatically by Google App Engine.
+ *
  * @author dirkriehle
  */
 public class UserSession extends Session implements Serializable {
@@ -52,7 +55,7 @@ public class UserSession extends Session implements Serializable {
     public static final String PRAISED_PHOTOS = "praisedPhotos";
     public static final String MESSAGE = "message";
     public static final String HEADING = "heading";
-    public static final String CLIENT = "client";
+    public static final String CLIENT_NAME = "clientName";
     public static final String SITE_URL = "siteUrl";
     public static final String CONFIGURATION = "configuration";
     public static final String CONFIRMATION_CODE = "confirmationCode";
@@ -182,16 +185,12 @@ public class UserSession extends Session implements Serializable {
      * @methodtype convert Returns some signifier of current user
      */
     public String getClientName() {
-        String result = ANONYMOUS_CLIENT;
-        if (!StringUtil.isNullOrEmptyString(getEmailAddressAsString())) {
-            result = getEmailAddressAsString();
-            Client client = getClient();
-            if (client != null && client instanceof User) {
-                User user = (User) client;
-                result = user.getName();
-            }
-        }
-        return result;
+        return (String) httpSession.getAttribute(CLIENT_NAME);
+    }
+
+    @Override
+    protected void notifyProcessingTimeChanged() {
+        httpSession.setAttribute(Session.PROCESSING_TIME, super.getProcessingTime());
     }
 
     /**
@@ -210,19 +209,15 @@ public class UserSession extends Session implements Serializable {
      * @methodtype get
      */
     public Client getClient() {
-        return (Client) httpSession.getAttribute(CLIENT);
+        String clientName = (String) httpSession.getAttribute(CLIENT_NAME);
+        return UserManager.getInstance().getClientByName(clientName);
     }
 
     /**
      * @methodtype set
      */
     public void setClient(Client newClient) {
-        httpSession.setAttribute(CLIENT, newClient);
-    }
-
-    @Override
-    protected void notifyProcessingTimeChanged() {
-        httpSession.setAttribute(Session.PROCESSING_TIME, super.getProcessingTime());
+        httpSession.setAttribute(CLIENT_NAME, newClient.getName());
     }
 
     /**
@@ -232,7 +227,6 @@ public class UserSession extends Session implements Serializable {
         Client client = getClient();
         if (client != null) {
             client.setEmailAddress(emailAddress);
-            setClient(client);
         } else {
             log.warning(LogBuilder.createSystemMessage().
                     addMessage("attempted to set email address, but client=null!").toString());

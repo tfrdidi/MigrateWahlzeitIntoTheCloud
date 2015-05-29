@@ -31,7 +31,7 @@ public class UserSessionProvider extends ExternalResource {
         HttpSession httpSession = mock(HttpSession.class);
         when(httpSession.getAttribute(UserSession.INITIALIZED)).thenReturn(UserSession.INITIALIZED);
         when(httpSession.getAttribute(UserSession.CONFIGURATION)).thenReturn(new EnglishModelConfig());
-        when(httpSession.getAttribute(UserSession.CLIENT)).thenReturn(
+        when(httpSession.getAttribute(UserSession.CLIENT_NAME)).thenReturn(
                 ObjectifyService.run(new Work<Guest>() {
                     @Override
                     public Guest run() {

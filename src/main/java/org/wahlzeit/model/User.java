@@ -28,8 +28,6 @@ import org.wahlzeit.services.LogBuilder;
 import org.wahlzeit.utils.StringUtil;
 
 import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpSessionBindingEvent;
-import javax.servlet.http.HttpSessionBindingListener;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -46,7 +44,7 @@ import java.util.logging.Logger;
  * @author dirkriehle
  */
 @Subclass(index = true)
-public class User extends Client implements HttpSessionBindingListener {
+public class User extends Client {
 
     /**
      *
@@ -56,7 +54,6 @@ public class User extends Client implements HttpSessionBindingListener {
     public static final String PASSWORD_AGAIN = "passwordAgain";
     public static final String EMAIL_ADDRESS = "emailAddress";
     public static final String TERMS = "termsAndConditions";
-    public static final String NAME_AS_TAG = "nameAsTag";
 
     /**
      *
@@ -153,19 +150,19 @@ public class User extends Client implements HttpSessionBindingListener {
     }
 
     /**
-     * @methodtype command
-     */
-    protected void notifyHttpSession() {
-        if (httpSession != null) {
-            httpSession.setAttribute(UserSession.CLIENT, this);
-        }
-    }
-
-    /**
      *
      */
     protected User() {
         // do nothing
+    }
+
+    /**
+     * @methodtype command
+     */
+    protected void notifyHttpSession() {
+        if (httpSession != null) {
+            httpSession.setAttribute(UserSession.CLIENT_NAME, this);
+        }
     }
 
     /**
@@ -200,7 +197,6 @@ public class User extends Client implements HttpSessionBindingListener {
      */
     public final void incWriteCount() {
         writeCount++;
-        notifyHttpSession();
     }
 
     /**
@@ -455,23 +451,6 @@ public class User extends Client implements HttpSessionBindingListener {
                 }
             }
         };
-    }
-
-
-    @Override
-    public void valueBound(HttpSessionBindingEvent event) {
-        log.config(LogBuilder.createSystemMessage().
-                addAction("bind user to HttpSession").
-                addParameter("name", getName()).toString());
-        httpSession = event.getSession();
-    }
-
-    @Override
-    public void valueUnbound(HttpSessionBindingEvent event) {
-        log.config(LogBuilder.createSystemMessage().
-                addAction("unbound user to HttpSession").
-                addParameter("name", getName()).toString());
-        httpSession = null;
     }
 
 }
