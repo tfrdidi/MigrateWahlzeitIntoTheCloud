@@ -77,7 +77,7 @@ public abstract class ModelMain extends AbstractMain {
     public void saveAll() {
         PhotoCaseManager.getInstance().savePhotoCases();
         PhotoManager.getInstance().savePhotos();
-        UserManager.getInstance().saveUsers();
+        UserManager.getInstance().saveClients();
         GlobalsManager.getInstance().saveGlobals();
     }
 

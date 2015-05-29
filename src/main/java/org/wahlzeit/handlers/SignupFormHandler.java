@@ -83,7 +83,7 @@ public class SignupFormHandler extends AbstractWebFormHandler {
         } else if (StringUtil.isNullOrEmptyString(emailAddress)) {
             us.setMessage(cfg.getFieldIsMissing());
             return PartUtil.SIGNUP_PAGE_NAME;
-        } else if (userManager.hasUserByName(userName)) {
+        } else if (userManager.hasClientByName(userName)) {
             us.setMessage(cfg.getUserAlreadyExists());
             return PartUtil.SIGNUP_PAGE_NAME;
         } else if (userManager.isReservedUserName(userName)) {
@@ -115,7 +115,7 @@ public class SignupFormHandler extends AbstractWebFormHandler {
         userManager.emailWelcomeMessage(us, user);
         us.setClient(user);
 
-        userManager.saveUser(user);
+        userManager.saveClient(user);
 
         log.info(LogBuilder.createUserMessage().addAction("Signup").toString());
 

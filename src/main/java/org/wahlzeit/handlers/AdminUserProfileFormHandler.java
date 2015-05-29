@@ -109,7 +109,7 @@ public class AdminUserProfileFormHandler extends AbstractWebFormHandler {
         user.setHomePage(StringUtil.asUrl(homePage));
         user.setNotifyAboutPraise((notifyAboutPraise != null) && notifyAboutPraise.equals("on"));
 
-        um.removeUser(user);
+        um.removeClient(user);
         user = um.getUserByName(userId);
         us.setSavedArg("userId", userId);
 

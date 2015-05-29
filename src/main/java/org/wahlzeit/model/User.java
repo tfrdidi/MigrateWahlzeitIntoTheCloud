@@ -25,7 +25,6 @@ import com.googlecode.objectify.annotation.Subclass;
 import org.wahlzeit.services.EmailAddress;
 import org.wahlzeit.services.Language;
 import org.wahlzeit.services.LogBuilder;
-import org.wahlzeit.services.Persistent;
 import org.wahlzeit.utils.StringUtil;
 
 import javax.servlet.http.HttpSession;
@@ -47,7 +46,7 @@ import java.util.logging.Logger;
  * @author dirkriehle
  */
 @Subclass(index = true)
-public class User extends Client implements Persistent, HttpSessionBindingListener {
+public class User extends Client implements HttpSessionBindingListener {
 
     /**
      *
@@ -119,9 +118,11 @@ public class User extends Client implements Persistent, HttpSessionBindingListen
      * @methodtype initialization
      */
     protected void initialize(AccessRights r, EmailAddress ea, String n, String p, long vc) {
+        // name should be set before .initialize, because .initialize registers itself with the name
+        // at the UserManager.
+        name = n;
         super.initialize(r, ea);
 
-        name = n;
 
         nameAsTag = Tags.asTag(n);
 
@@ -130,7 +131,10 @@ public class User extends Client implements Persistent, HttpSessionBindingListen
 
         homePage = getDefaultHomePage();
 
-        UserManager.getInstance().addUser(this);
+        log.config(LogBuilder.createSystemMessage().
+                addAction("initialize user").
+                addParameter("name", name).
+                addParameter("password", password).toString());
         incWriteCount();
     }
 
@@ -165,6 +169,26 @@ public class User extends Client implements Persistent, HttpSessionBindingListen
     }
 
     /**
+     * @methodtype get
+     */
+    public String getIdAsString() {
+        return String.valueOf(name);
+    }
+
+    /**
+     * @methodtype set
+     */
+    public void setEmailAddress(EmailAddress myEmailAddress) {
+        super.setEmailAddress(myEmailAddress);
+        incWriteCount();
+
+        for (Iterator<Photo> i = photos.iterator(); i.hasNext(); ) {
+            Photo photo = i.next();
+            photo.setOwnerEmailAddress(emailAddress);
+        }
+    }
+
+    /**
      * @methodtype boolean query
      */
     public boolean isDirty() {
@@ -184,26 +208,6 @@ public class User extends Client implements Persistent, HttpSessionBindingListen
      */
     public void resetWriteCount() {
         writeCount = 0;
-    }
-
-    /**
-     * @methodtype get
-     */
-    public String getIdAsString() {
-        return String.valueOf(name);
-    }
-
-    /**
-     * @methodtype set
-     */
-    public void setEmailAddress(EmailAddress myEmailAddress) {
-        super.setEmailAddress(myEmailAddress);
-        incWriteCount();
-
-        for (Iterator<Photo> i = photos.iterator(); i.hasNext(); ) {
-            Photo photo = i.next();
-            photo.setOwnerEmailAddress(emailAddress);
-        }
     }
 
     /**

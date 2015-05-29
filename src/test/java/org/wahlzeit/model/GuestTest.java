@@ -2,12 +2,14 @@ package org.wahlzeit.model;
 
 import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.Work;
-import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.wahlzeit.handlers.LocalDatastoreServiceTestConfigProvider;
+import org.junit.rules.RuleChain;
+import org.wahlzeit.testEnvironmentProvider.LocalDatastoreServiceTestConfigProvider;
+import org.wahlzeit.testEnvironmentProvider.RegisteredOfyEnvironmentProvider;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Test class for {@link Guest}.
@@ -17,18 +19,16 @@ import static org.junit.Assert.assertEquals;
 public class GuestTest {
 
     @ClassRule
-    public static LocalDatastoreServiceTestConfigProvider localDatastoreServiceTestConfigProvider =
-            new LocalDatastoreServiceTestConfigProvider();
+    public static RuleChain ruleChain = RuleChain.
+            outerRule(new LocalDatastoreServiceTestConfigProvider()).
+            around(new RegisteredOfyEnvironmentProvider());
 
-    @BeforeClass
-    public static void setClassUp() {
-        ObjectifyService.factory().register(Client.class);
-    }
 
     @Test
     public void testNameGeneration() {
-        assertNewGuestHasId(1);
-        assertNewGuestHasId(2);
+        int clientId = ClientManager.lastClientId.intValue();
+        assertNewGuestHasId(++clientId);
+        assertNewGuestHasId(++clientId);
         // creation of user should not consume a next id
         ObjectifyService.run(new Work<Void>() {
             @Override
@@ -37,13 +37,28 @@ public class GuestTest {
                 return null;
             }
         });
-        assertNewGuestHasId(3);
+        assertNewGuestHasId(++clientId);
+
+        clientId -= 3;
+        // test if GUEST_PREFIX == guest#
+        testGetGuestFromUserManager("guest#" + ++clientId);
+        testGetGuestFromUserManager(Guest.GUEST_PREFIX + ++clientId);
+        testGetGuestFromUserManager(Guest.GUEST_PREFIX + ++clientId);
     }
 
     protected void assertNewGuestHasId(int id) {
-        Guest testGuest = new Guest();
+        Guest testGuest = ObjectifyService.run(new Work<Guest>() {
+            @Override
+            public Guest run() {
+                return new Guest();
+            }
+        });
         String userName = testGuest.getName();
         String expectedUserName = Guest.GUEST_PREFIX + id;
         assertEquals(expectedUserName, userName);
+    }
+
+    protected void testGetGuestFromUserManager(String name) {
+        assertNotNull(UserManager.getInstance().getClientByName(name));
     }
 }

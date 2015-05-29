@@ -74,7 +74,7 @@ public class LoginFormHandler extends AbstractWebFormHandler {
         } else if (StringUtil.isNullOrEmptyString(password)) {
             us.setMessage(us.getConfiguration().getFieldIsMissing());
             return PartUtil.LOGIN_PAGE_NAME;
-        } else if (!userManager.hasUserByName(userName)) {
+        } else if (!userManager.hasClientByName(userName)) {
             us.setMessage(us.getConfiguration().getLoginIsIncorrect());
             return PartUtil.LOGIN_PAGE_NAME;
         }

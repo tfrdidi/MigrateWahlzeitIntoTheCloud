@@ -24,16 +24,13 @@ import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.Work;
 import org.wahlzeit.services.EmailAddress;
 import org.wahlzeit.services.LogBuilder;
-import org.wahlzeit.services.ObjectManager;
 import org.wahlzeit.services.mailing.EmailService;
 import org.wahlzeit.services.mailing.EmailServiceManager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.logging.Logger;
 
@@ -43,7 +40,7 @@ import java.util.logging.Logger;
  *
  * @author dirkriehle
  */
-public class UserManager extends ObjectManager {
+public class UserManager extends ClientManager {
 
     private static final Logger log = Logger.getLogger(UserManager.class.getName());
     /**
@@ -57,18 +54,12 @@ public class UserManager extends ObjectManager {
             "flickr",
             "guest#"
     );
+
     /**
      *
      */
-    protected static UserManager instance = new UserManager();
-    /**
-     *
-     */
-    protected static Long lastClientId = 0L;
-    /**
-     * Maps nameAsTag to user of that name (as tag)
-     */
-    protected Map<String, User> users = new HashMap<String, User>();
+    protected static UserManager instance;
+
     /**
      *
      */
@@ -84,6 +75,9 @@ public class UserManager extends ObjectManager {
      *
      */
     public static UserManager getInstance() {
+        if (instance == null) {
+            instance = new UserManager();
+        }
         return instance;
     }
 
@@ -102,8 +96,7 @@ public class UserManager extends ObjectManager {
                 Collection<Administrator> admins = new ArrayList<Administrator>();
                 readObjects(admins, Administrator.class);
                 if (admins.size() == 0) {
-                    Administrator defaultAdministrator = new Administrator("admin", "admin", "root@localhost", 0);
-                    addUser(defaultAdministrator);
+                    new Administrator("admin", "admin", "root@localhost", 0);
                     log.info("No default Administrator exists. Created one.");
                 } else {
                     log.info("Default Administrator exists.");
@@ -117,133 +110,24 @@ public class UserManager extends ObjectManager {
      *
      */
     public void loadExistingUsers() {
-        Collection<User> existingUser = ObjectifyService.run(new Work<Collection<User>>() {
+        ObjectifyService.run(new Work<Void>() {
             @Override
-            public Collection<User> run() {
+            public Void run() {
                 Collection<User> existingUser = new ArrayList<User>();
                 readObjects(existingUser, User.class);
-                return existingUser;
+
+                for (User user : existingUser) {
+                    if (!hasClientByName(user.getName())) {
+                        doAddClient(user);
+                    } else {
+                        log.config(LogBuilder.createSystemMessage().addParameter("user has been loaded", user.getName()).toString());
+                    }
+                }
+                return null;
             }
         });
 
-        for (User user : existingUser) {
-            if (!doHasUserByTag(user.getNameAsTag())) {
-                doAddUser(user);
-            } else {
-                log.config(LogBuilder.createSystemMessage().addParameter("user has been loaded", user.getName()).toString());
-            }
-        }
-
-        log.info(LogBuilder.createSystemMessage().addMessage("loaded all users").toString());
-    }
-
-    /**
-     *
-     */
-    public void addUser(User user) {
-        assertIsNonNullArgument(user);
-        assertIsUnknownUserAsIllegalArgument(user);
-
-        writeObject(user);
-
-        doAddUser(user);
-    }
-
-    /**
-     *
-     */
-    protected boolean doHasUserByTag(String tag) {
-        return doGetUserByTag(tag) != null;
-    }
-
-    /**
-     *
-     */
-    protected void doAddUser(User user) {
-        users.put(user.getNameAsTag(), user);
-        log.config(LogBuilder.createSystemMessage().addParameter("Added new user", user.getName()).toString());
-    }
-
-    /**
-     * @methodtype assertion
-     */
-    protected void assertIsUnknownUserAsIllegalArgument(User user) {
-        if (hasUserByTag(user.getNameAsTag())) {
-            throw new IllegalArgumentException(user.getName() + "is already known");
-        }
-    }
-
-    /**
-     *
-     */
-    protected User doGetUserByTag(String tag) {
-        return users.get(tag);
-    }
-
-    /**
-     *
-     */
-    public boolean hasUserByTag(String tag) {
-        assertIsNonNullArgument(tag, "user-by-tag");
-        return getUserByTag(tag) != null;
-    }
-
-    /**
-     *
-     */
-    public User getUserByTag(String tag) {
-        assertIsNonNullArgument(tag, "user-by-tag");
-
-        User result = doGetUserByTag(tag);
-
-        if (result == null) {
-            log.config(LogBuilder.createSystemMessage().addParameter("User not in cache", tag).toString());
-            result = readObject(User.class, User.NAME_AS_TAG, tag);
-            if (result != null) {
-                doAddUser(result);
-            }
-        }
-        else {
-            log.config(LogBuilder.createSystemMessage().addParameter("User loaded from cache", tag).toString());
-        }
-
-        return result;
-    }
-
-    /**
-     *
-     */
-    public synchronized Long getNextClientId() {
-        return ++lastClientId;
-    }
-
-    /**
-     *
-     */
-    public Long getLastClientId() {
-        return lastClientId;
-    }
-
-    /**
-     *
-     */
-    public synchronized void setLastClientId(Long newId) {
-        lastClientId = newId;
-    }
-
-    /**
-     *
-     */
-    public boolean hasUserByName(String name) {
-        assertIsNonNullArgument(name, "user-by-name");
-        return hasUserByTag(Tags.asTag(name));
-    }
-
-    /**
-     *
-     */
-    public User getUserByName(String name) {
-        return getUserByTag(Tags.asTag(name));
+        log.info(LogBuilder.createSystemMessage().addMessage("loaded all clients").toString());
     }
 
     /**
@@ -251,34 +135,6 @@ public class UserManager extends ObjectManager {
      */
     public boolean isReservedUserName(String userName) {
         return reservedNames.contains(Tags.asTag(userName));
-    }
-
-    /**
-     *
-     */
-    public void deleteUser(User user) {
-        assertIsNonNullArgument(user);
-        doDeleteUser(user);
-
-        deleteObject(user);
-
-        assertIsUnknownUserAsIllegalState(user);
-    }
-
-    /**
-     *
-     */
-    protected void doDeleteUser(User user) {
-        users.remove(user.getNameAsTag());
-    }
-
-    /**
-     * @methodtype assertion
-     */
-    protected void assertIsUnknownUserAsIllegalState(User user) {
-        if (hasUserByTag(user.getNameAsTag())) {
-            throw new IllegalStateException(user.getName() + "should not be known");
-        }
     }
 
     /**
@@ -327,28 +183,6 @@ public class UserManager extends ObjectManager {
     /**
      *
      */
-    public void removeUser(User user) {
-        saveUser(user);
-        users.remove(user.getNameAsTag());
-    }
-
-    /**
-     *
-     */
-    public void saveUser(User user) {
-        updateObject(user);
-    }
-
-    /**
-     *
-     */
-    public void saveUsers() {
-        updateObjects(users.values());
-    }
-
-    /**
-     *
-     */
     public User getUserByEmailAddress(String emailAddress) {
         return getUserByEmailAddress(EmailAddress.getFromString(emailAddress));
     }
@@ -357,19 +191,31 @@ public class UserManager extends ObjectManager {
      *
      */
     public User getUserByEmailAddress(EmailAddress emailAddress) {
-        User result = null;
+        User result;
         result = readObject(User.class, User.EMAIL_ADDRESS, emailAddress.asString());
 
         if (result != null) {
-            User current = doGetUserByTag(result.getNameAsTag());
+            User current = getUserByName(result.getName());
             if (current == null) {
-                doAddUser(result);
+                doAddClient(result);
             } else {
                 result = current;
             }
         }
 
         return result;
+    }
+
+    /**
+     * @methodtype get
+     */
+    public User getUserByName(String name) {
+        Client client = super.getClientByName(name);
+        if (client instanceof User) {
+            return (User) client;
+        } else {
+            return null;
+        }
     }
 
 }

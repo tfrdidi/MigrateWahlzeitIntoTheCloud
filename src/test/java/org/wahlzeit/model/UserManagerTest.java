@@ -3,8 +3,8 @@ package org.wahlzeit.model;
 import org.junit.Rule;
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;
-import org.wahlzeit.handlers.LocalDatastoreServiceTestConfigProvider;
-import org.wahlzeit.handlers.UserSessionProvider;
+import org.wahlzeit.testEnvironmentProvider.LocalDatastoreServiceTestConfigProvider;
+import org.wahlzeit.testEnvironmentProvider.UserSessionProvider;
 
 /**
  * Test class for {@link UserManager}.

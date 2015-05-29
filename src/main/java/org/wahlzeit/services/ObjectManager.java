@@ -42,7 +42,7 @@ public abstract class ObjectManager {
 
     private static final Logger log = Logger.getLogger(ObjectManager.class.getName());
 
-    
+
     /**
      * Reads the first Entity with the given key in the Datastore
      */
@@ -65,6 +65,18 @@ public abstract class ObjectManager {
     }
 
     /**
+     * Reads the first Entity with the given key in the Datastore
+     */
+    protected <E> E readObject(Class<E> type, String id) throws IllegalArgumentException {
+        assertIsNonNullArgument(type, "type");
+        assertIsNonNullArgument(id, "id");
+
+        log.config(LogBuilder.createSystemMessage().
+                addMessage("Load Type " + type.toString() + " with ID " + id + " from datastore.").toString());
+        return OfyService.ofy().load().type(type).id(id).now();
+    }
+
+    /**
      * Reads an Entity of the specified type where the wanted parameter has the given name, e.g. readObject(User.class,
      * "emailAddress", "name@provider.com").
      */
@@ -81,7 +93,7 @@ public abstract class ObjectManager {
     }
 
     /**
-     * Reads all Entities of the specified type, e.g. readObject(User.class) to get a list of all users
+     * Reads all Entities of the specified type, e.g. readObject(User.class) to get a list of all clients
      */
     protected <E> void readObjects(Collection<E> result, Class<E> type) {
         assertIsNonNullArgument(result, "result");
@@ -97,7 +109,7 @@ public abstract class ObjectManager {
 
     /**
      * Reads all Entities of the specified type, where the given property matches the wanted value e.g.
-     * readObject(User.class) to get a list of all users
+     * readObject(User.class) to get a list of all clients
      */
     protected <E> void readObjects(Collection<E> result, Class<E> type, String propertyName, Object value) {
         assertIsNonNullArgument(result, "result");

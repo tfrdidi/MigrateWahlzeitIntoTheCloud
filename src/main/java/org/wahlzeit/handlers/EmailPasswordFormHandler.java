@@ -67,7 +67,7 @@ public class EmailPasswordFormHandler extends AbstractWebFormHandler {
         if (StringUtil.isNullOrEmptyString(userName)) {
             us.setMessage(us.getConfiguration().getFieldIsMissing());
             return PartUtil.EMAIL_PASSWORD_PAGE_NAME;
-        } else if (!userManager.hasUserByName(userName)) {
+        } else if (!userManager.hasClientByName(userName)) {
             us.setMessage(us.getConfiguration().getUserNameIsUnknown());
             return PartUtil.EMAIL_PASSWORD_PAGE_NAME;
         }

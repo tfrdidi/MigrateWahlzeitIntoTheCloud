@@ -1,4 +1,4 @@
-package org.wahlzeit.handlers;
+package org.wahlzeit.testEnvironmentProvider;
 
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;

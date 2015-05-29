@@ -102,7 +102,7 @@ public class ShowUserPhotoFormHandler extends AbstractWebFormHandler {
         } else if (us.isFormType(args, "select")) {
             user.setUserPhoto(photo);
             us.setClient(user);
-            userManager.saveUser(user);
+            userManager.saveClient(user);
             log.info(LogBuilder.createUserMessage().
                     addAction("Select user photo").
                     addParameter("Photo", id).toString());
@@ -111,7 +111,7 @@ public class ShowUserPhotoFormHandler extends AbstractWebFormHandler {
             PhotoManager.getInstance().savePhoto(photo);
             if (user.getUserPhoto() == photo) {
                 user.setUserPhoto(null);
-                userManager.saveUser(user);
+                userManager.saveClient(user);
             }
             log.info(LogBuilder.createUserMessage().
                     addAction("Deselect user photo").toString());

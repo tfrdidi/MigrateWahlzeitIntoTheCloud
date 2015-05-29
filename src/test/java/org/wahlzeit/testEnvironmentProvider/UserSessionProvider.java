@@ -1,5 +1,7 @@
-package org.wahlzeit.handlers;
+package org.wahlzeit.testEnvironmentProvider;
 
+import com.googlecode.objectify.ObjectifyService;
+import com.googlecode.objectify.Work;
 import org.junit.rules.ExternalResource;
 import org.wahlzeit.model.EnglishModelConfig;
 import org.wahlzeit.model.Guest;
@@ -29,7 +31,14 @@ public class UserSessionProvider extends ExternalResource {
         HttpSession httpSession = mock(HttpSession.class);
         when(httpSession.getAttribute(UserSession.INITIALIZED)).thenReturn(UserSession.INITIALIZED);
         when(httpSession.getAttribute(UserSession.CONFIGURATION)).thenReturn(new EnglishModelConfig());
-        when(httpSession.getAttribute(UserSession.CLIENT)).thenReturn(new Guest());
+        when(httpSession.getAttribute(UserSession.CLIENT)).thenReturn(
+                ObjectifyService.run(new Work<Guest>() {
+                    @Override
+                    public Guest run() {
+                        return new Guest();
+                    }
+                })
+        );
 
         Map<String, Object> dummyMap = new HashMap<String, Object>();
         dummyMap.put(UserSession.MESSAGE, "dummy Message");

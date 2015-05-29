@@ -1,52 +1,44 @@
 package org.wahlzeit.handlers;
 
-import com.googlecode.objectify.ObjectifyService;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.assertTrue;
-
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;
-import org.wahlzeit.model.Client;
 import org.wahlzeit.model.UserSession;
 import org.wahlzeit.services.EmailAddress;
 import org.wahlzeit.services.SessionManager;
+import org.wahlzeit.testEnvironmentProvider.LocalDatastoreServiceTestConfigProvider;
+import org.wahlzeit.testEnvironmentProvider.RegisteredOfyEnvironmentProvider;
+import org.wahlzeit.testEnvironmentProvider.SysConfigProvider;
+import org.wahlzeit.testEnvironmentProvider.UserSessionProvider;
+import org.wahlzeit.testEnvironmentProvider.WebFormHandlerProvider;
 import org.wahlzeit.webparts.WebPart;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.junit.Assert.assertTrue;
+
 /**
  * Created by Lukas Hahmann on 21.05.15.
  */
 public class TellFriendTest {
 
-    public UserSessionProvider userSessionProvider = new UserSessionProvider();
-
-    public WebFormHandlerProvider webFormHandlerProvider = new WebFormHandlerProvider();
-
-    public LocalDatastoreServiceTestConfigProvider localDatastoreServiceTestConfigProvider = new LocalDatastoreServiceTestConfigProvider();
-
-    @Rule
-    public TestRule chain = RuleChain
-            .outerRule(localDatastoreServiceTestConfigProvider)
-            .around(userSessionProvider)
-            .around(webFormHandlerProvider);
-
     @ClassRule
     public static SysConfigProvider sysConfigProvider = new SysConfigProvider();
-
+    public WebFormHandlerProvider webFormHandlerProvider = new WebFormHandlerProvider();
+    @Rule
+    public TestRule chain = RuleChain.
+            outerRule(new LocalDatastoreServiceTestConfigProvider()).
+            around(new RegisteredOfyEnvironmentProvider()).
+            around(new UserSessionProvider()).
+            around(webFormHandlerProvider);
     private UserSession session;
     private WebFormHandler handler;
 
-    @BeforeClass
-    public static void setClassUp() {
-        ObjectifyService.factory().register(Client.class);
-    }
 
     @Before
     public void setUp() {

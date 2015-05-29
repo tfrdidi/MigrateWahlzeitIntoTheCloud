@@ -3,10 +3,11 @@ package org.wahlzeit.services;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
-import org.wahlzeit.handlers.LocalDatastoreServiceTestConfigProvider;
-import org.wahlzeit.handlers.UserSessionProvider;
 import org.wahlzeit.model.CaseId;
 import org.wahlzeit.model.UserSession;
+import org.wahlzeit.testEnvironmentProvider.LocalDatastoreServiceTestConfigProvider;
+import org.wahlzeit.testEnvironmentProvider.RegisteredOfyEnvironmentProvider;
+import org.wahlzeit.testEnvironmentProvider.UserSessionProvider;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -44,6 +45,7 @@ public class LogBuilderTest {
     @ClassRule
     public static RuleChain ruleChain = RuleChain.
             outerRule(new LocalDatastoreServiceTestConfigProvider()).
+            around(new RegisteredOfyEnvironmentProvider()).
             around(new UserSessionProvider());
 
     @Test

@@ -27,6 +27,7 @@ import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Parent;
 import org.wahlzeit.services.EmailAddress;
 import org.wahlzeit.services.ObjectManager;
+import org.wahlzeit.services.Persistent;
 
 import java.io.Serializable;
 
@@ -37,7 +38,7 @@ import java.io.Serializable;
  * @author dirkriehle
  */
 @Entity
-public abstract class Client implements Serializable{
+public abstract class Client implements Serializable, Persistent {
 
     @Id
     protected String name;
@@ -56,6 +57,8 @@ public abstract class Client implements Serializable{
      */
     protected AccessRights rights = AccessRights.NONE;
 
+    protected int writeCount = 0;
+
     /**
      *
      */
@@ -69,6 +72,8 @@ public abstract class Client implements Serializable{
     protected void initialize(AccessRights myRights, EmailAddress myEmailAddress) {
         rights = myRights;
         setEmailAddress(myEmailAddress);
+        incWriteCount();
+        UserManager.getInstance().addClient(this);
     }
 
     /**
@@ -90,6 +95,7 @@ public abstract class Client implements Serializable{
      */
     public void setRights(AccessRights newRights) {
         rights = newRights;
+        incWriteCount();
     }
 
     /**
@@ -116,8 +122,7 @@ public abstract class Client implements Serializable{
     /**
      * @methodtype boolean-query
      */
-    public boolean hasModeratorRights
-    () {
+    public boolean hasModeratorRights() {
         return hasRights(AccessRights.MODERATOR);
     }
 
@@ -140,6 +145,28 @@ public abstract class Client implements Serializable{
      */
     public void setEmailAddress(EmailAddress newEmailAddress) {
         emailAddress = newEmailAddress;
+        incWriteCount();
+    }
+
+    /**
+     *
+     */
+    public boolean isDirty() {
+        return writeCount != 0;
+    }
+
+    /**
+     *
+     */
+    public void incWriteCount() {
+        writeCount++;
+    }
+
+    /**
+     *
+     */
+    public void resetWriteCount() {
+        writeCount = 0;
     }
 
 }
