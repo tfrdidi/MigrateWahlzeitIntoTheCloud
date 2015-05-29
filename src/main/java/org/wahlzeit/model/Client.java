@@ -40,7 +40,7 @@ import java.io.Serializable;
 public abstract class Client implements Serializable{
 
     @Id
-    protected Long id;
+    protected String name;
 
     @Parent
     protected Key parent = ObjectManager.applicationRootKey;
@@ -74,6 +74,13 @@ public abstract class Client implements Serializable{
     /**
      * @methodtype get
      */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @methodtype get
+     */
     public AccessRights getRights() {
         return rights;
     }
@@ -88,15 +95,15 @@ public abstract class Client implements Serializable{
     /**
      * @methodtype boolean-query
      */
-    public boolean hasRights(AccessRights otherRights) {
-        return AccessRights.hasRights(rights, otherRights);
+    public boolean hasGuestRights() {
+        return hasRights(AccessRights.GUEST);
     }
 
     /**
      * @methodtype boolean-query
      */
-    public boolean hasGuestRights() {
-        return hasRights(AccessRights.GUEST);
+    public boolean hasRights(AccessRights otherRights) {
+        return AccessRights.hasRights(rights, otherRights);
     }
 
     /**

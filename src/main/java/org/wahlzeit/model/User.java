@@ -21,7 +21,6 @@
 package org.wahlzeit.model;
 
 import com.googlecode.objectify.annotation.Ignore;
-import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Subclass;
 import org.wahlzeit.services.EmailAddress;
 import org.wahlzeit.services.Language;
@@ -53,7 +52,6 @@ public class User extends Client implements Persistent, HttpSessionBindingListen
     /**
      *
      */
-    public static final String ID = "id";
     public static final String NAME = "name";
     public static final String PASSWORD = "password";
     public static final String PASSWORD_AGAIN = "passwordAgain";
@@ -76,18 +74,10 @@ public class User extends Client implements Persistent, HttpSessionBindingListen
     private static final Logger log = Logger.getLogger(User.class.getName());
 
     /**
-     * 0 is never returned, first value is 1
-     */
-    protected static Long lastUserId = 0L;
-    /**
      *
      */
     protected transient int writeCount = 0;
-    /**
-     *
-     */
-    protected String name;
-    @Index
+
     protected String nameAsTag;
     protected String password;
     /**
@@ -110,6 +100,7 @@ public class User extends Client implements Persistent, HttpSessionBindingListen
     protected long creationTime = System.currentTimeMillis();
     @Ignore
     transient protected HttpSession httpSession = null;
+
     /**
      *
      */
@@ -130,24 +121,17 @@ public class User extends Client implements Persistent, HttpSessionBindingListen
     protected void initialize(AccessRights r, EmailAddress ea, String n, String p, long vc) {
         super.initialize(r, ea);
 
-        id = getNextUserId();
-
         name = n;
-        nameAsTag = Tags.asTag(name);
+
+        nameAsTag = Tags.asTag(n);
 
         password = p;
         confirmationCode = vc;
 
         homePage = getDefaultHomePage();
 
+        UserManager.getInstance().addUser(this);
         incWriteCount();
-    }
-
-    /**
-     *
-     */
-    public static synchronized Long getNextUserId() {
-        return ++lastUserId;
     }
 
     /**
@@ -181,27 +165,6 @@ public class User extends Client implements Persistent, HttpSessionBindingListen
     }
 
     /**
-     *
-     */
-    public static Long getLastUserId() {
-        return lastUserId;
-    }
-
-    /**
-     *
-     */
-    public static synchronized void setLastUserId(Long newId) {
-        lastUserId = newId;
-    }
-
-    /**
-     * @methodtype get
-     */
-    public Long getId() {
-        return id;
-    }
-
-    /**
      * @methodtype boolean query
      */
     public boolean isDirty() {
@@ -227,7 +190,7 @@ public class User extends Client implements Persistent, HttpSessionBindingListen
      * @methodtype get
      */
     public String getIdAsString() {
-        return String.valueOf(id);
+        return String.valueOf(name);
     }
 
     /**
@@ -429,7 +392,6 @@ public class User extends Client implements Persistent, HttpSessionBindingListen
     public void addPhoto(Photo newPhoto) {
         photos.add(newPhoto);
 
-        newPhoto.setOwnerId(id);
         newPhoto.setOwnerName(name);
         newPhoto.setOwnerNotifyAboutPraise(notifyAboutPraise);
         newPhoto.setOwnerEmailAddress(emailAddress);
@@ -498,13 +460,6 @@ public class User extends Client implements Persistent, HttpSessionBindingListen
                 addAction("bind user to HttpSession").
                 addParameter("name", getName()).toString());
         httpSession = event.getSession();
-    }
-
-    /**
-     * @methodtype get
-     */
-    public String getName() {
-        return name;
     }
 
     @Override

@@ -88,7 +88,6 @@ public abstract class ModelMain extends AbstractMain {
         UserManager userManager = UserManager.getInstance();
         long confirmationCode = userManager.createConfirmationCode();
         User user = new User(userName, password, emailAddress, confirmationCode);
-        userManager.addUser(user);
 
         PhotoManager photoManager = PhotoManager.getInstance();
         File photoDirFile = new File(photoDir);

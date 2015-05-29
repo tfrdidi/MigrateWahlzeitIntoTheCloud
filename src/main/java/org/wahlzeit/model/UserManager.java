@@ -45,7 +45,6 @@ import java.util.logging.Logger;
  */
 public class UserManager extends ObjectManager {
 
-    private static final Long DEFAULT_ADMIN_ID = 1L;
     private static final Logger log = Logger.getLogger(UserManager.class.getName());
     /**
      * Reserved names that cannot be registered by regular users
@@ -55,12 +54,17 @@ public class UserManager extends ObjectManager {
     public static List<String> reservedNames = Arrays.asList(
             "admin",
             "anonymous",
-            "flickr"
+            "flickr",
+            "guest#"
     );
     /**
      *
      */
     protected static UserManager instance = new UserManager();
+    /**
+     *
+     */
+    protected static Long lastClientId = 0L;
     /**
      * Maps nameAsTag to user of that name (as tag)
      */
@@ -97,12 +101,11 @@ public class UserManager extends ObjectManager {
             public Void run() {
                 Collection<Administrator> admins = new ArrayList<Administrator>();
                 readObjects(admins, Administrator.class);
-                if(admins.size() == 0) {
+                if (admins.size() == 0) {
                     Administrator defaultAdministrator = new Administrator("admin", "admin", "root@localhost", 0);
                     addUser(defaultAdministrator);
                     log.info("No default Administrator exists. Created one.");
-                }
-                else {
+                } else {
                     log.info("Default Administrator exists.");
                 }
                 return null;
@@ -205,6 +208,27 @@ public class UserManager extends ObjectManager {
         }
 
         return result;
+    }
+
+    /**
+     *
+     */
+    public synchronized Long getNextClientId() {
+        return ++lastClientId;
+    }
+
+    /**
+     *
+     */
+    public Long getLastClientId() {
+        return lastClientId;
+    }
+
+    /**
+     *
+     */
+    public synchronized void setLastClientId(Long newId) {
+        lastClientId = newId;
     }
 
     /**

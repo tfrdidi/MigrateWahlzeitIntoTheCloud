@@ -19,18 +19,11 @@ import static org.wahlzeit.services.OfyService.ofy;
  */
 public class GlobalsManager extends ObjectManager {
 
+    private static final Logger log = Logger.getLogger(GlobalsManager.class.getName());
     /**
      *
      */
     private static GlobalsManager instance = new GlobalsManager();
-    private static final Logger log = Logger.getLogger(GlobalsManager.class.getName());
-
-    /**
-     * @methodtype get
-     */
-    public static GlobalsManager getInstance() {
-        return instance;
-    }
 
     /**
      * @methodtype command
@@ -46,31 +39,19 @@ public class GlobalsManager extends ObjectManager {
         });
         log.info(globals.asString());
 
-        User.setLastUserId(globals.getLastUserId());
+        UserManager.getInstance().setLastClientId(globals.getLastUserId());
         PhotoId.setCurrentIdFromInt(globals.getLastPhotoId());
         Case.setLastCaseId(new CaseId(globals.getLastCaseId()));
         AbstractServlet.setLastSessionId(globals.getLastSessionId());
     }
 
     /**
-     * @methodtype command
-     * Saves all global variables.
+     * @methodtype wrapper
      */
-    public synchronized void saveGlobals() {
-        final Globals globals = new Globals();
-        globals.setLastUserId(User.getLastUserId());
-        globals.setLastPhotoId(PhotoId.getCurrentIdAsInt());
-        globals.setLastCaseId(Case.getLastCaseId().asInt());
-        globals.setLastSessionId(AbstractServlet.getLastSessionId());
-        log.info(globals.asString());
-
-        ObjectifyService.run(new Work<Void>() {
-            @Override
-            public Void run() {
-                writeObject(globals);
-                return null;
-            }
-        });
+    private void initGlobals() {
+        if (!GlobalsManager.getInstance().hasGlobals()) {
+            createDefaultGlobals();
+        }
     }
 
     /**
@@ -86,12 +67,10 @@ public class GlobalsManager extends ObjectManager {
     }
 
     /**
-     * @methodtype wrapper
+     * @methodtype get
      */
-    private void initGlobals() {
-        if (!GlobalsManager.getInstance().hasGlobals()) {
-            createDefaultGlobals();
-        }
+    public static GlobalsManager getInstance() {
+        return instance;
     }
 
     /**
@@ -107,6 +86,27 @@ public class GlobalsManager extends ObjectManager {
                 globals.setLastCaseId(0);
                 globals.setLastSessionId(0);
                 ofy().save().entity(globals).now();
+                return null;
+            }
+        });
+    }
+
+    /**
+     * @methodtype command
+     * Saves all global variables.
+     */
+    public synchronized void saveGlobals() {
+        final Globals globals = new Globals();
+        globals.setLastUserId(UserManager.getInstance().getLastClientId());
+        globals.setLastPhotoId(PhotoId.getCurrentIdAsInt());
+        globals.setLastCaseId(Case.getLastCaseId().asInt());
+        globals.setLastSessionId(AbstractServlet.getLastSessionId());
+        log.info(globals.asString());
+
+        ObjectifyService.run(new Work<Void>() {
+            @Override
+            public Void run() {
+                writeObject(globals);
                 return null;
             }
         });

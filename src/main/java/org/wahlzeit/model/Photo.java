@@ -70,24 +70,12 @@ public class Photo extends DataObject {
     public static final int MAX_PHOTO_HEIGHT = 600;
     public static final int MAX_THUMB_PHOTO_WIDTH = 105;
     public static final int MAX_THUMB_PHOTO_HEIGHT = 150;
-
-    /**
-     *
-     */
-    //TODO: change it to a single long
-    @Id
-    Long idLong;
     @Index
     protected PhotoId id = null;
-
-    @Parent
-    Key parent = ObjectManager.applicationRootKey;
     /**
      *
      */
-    protected Long ownerId = 0L;
-    @Index protected String ownerName;
-
+    protected String ownerName;
     /**
      * To avoid scaling when accessing a photo, all pictures sizes are stored in an own file.
      * The photo java object is stored in the Google Datastore, the Images are stored in the
@@ -95,7 +83,6 @@ public class Photo extends DataObject {
      */
     @Ignore
     transient protected Map<PhotoSize, Image> images = new ArrayMap<PhotoSize, Image>();
-
     /**
      *
      */
@@ -103,39 +90,41 @@ public class Photo extends DataObject {
     protected EmailAddress ownerEmailAddress = EmailAddress.EMPTY;
     protected Language ownerLanguage = Language.ENGLISH;
     protected URL ownerHomePage;
-
     /**
      *
      */
     protected int width;
     protected int height;
     protected PhotoSize maxPhotoSize = PhotoSize.MEDIUM; // derived
-
     /**
      *
      */
     protected Tags tags = Tags.EMPTY_TAGS;
-
     /**
      *
      */
     protected PhotoStatus status = PhotoStatus.VISIBLE;
-
     /**
      *
      */
     protected int praiseSum = 10;
     protected int noVotes = 1;
-
     /**
      *
      */
     protected long creationTime = System.currentTimeMillis();
-
     /**
      * The default type is jpg
      */
     protected String ending = "jpg";
+    /**
+     *
+     */
+    //TODO: change it to a single long
+    @Id
+    Long idLong;
+    @Parent
+    Key parent = ObjectManager.applicationRootKey;
 
     /**
      *
@@ -185,21 +174,6 @@ public class Photo extends DataObject {
     /**
      * @methodtype get
      */
-    public Long getOwnerId() {
-        return ownerId;
-    }
-
-    /**
-     * @methodtype set
-     */
-    public void setOwnerId(Long newId) {
-        ownerId = newId;
-        incWriteCount();
-    }
-
-    /**
-     * @methodtype get
-     */
     public String getOwnerName() {
         return ownerName;
     }
@@ -242,21 +216,6 @@ public class Photo extends DataObject {
     }
 
     /**
-     * @methodtype get
-     */
-    public EmailAddress getOwnerEmailAddress() {
-        return ownerEmailAddress;
-    }
-
-    /**
-     * @methodtype set
-     */
-    public void setOwnerEmailAddress(EmailAddress newEmailAddress) {
-        ownerEmailAddress = newEmailAddress;
-        incWriteCount();
-    }
-
-    /**
      *
      */
     public Language getOwnerLanguage() {
@@ -294,10 +253,18 @@ public class Photo extends DataObject {
     }
 
     /**
-     * @methodtype boolean-query
+     * @methodtype get
      */
-    public boolean isWiderThanHigher() {
-        return (height * MAX_PHOTO_WIDTH) < (width * MAX_PHOTO_HEIGHT);
+    public EmailAddress getOwnerEmailAddress() {
+        return ownerEmailAddress;
+    }
+
+    /**
+     * @methodtype set
+     */
+    public void setOwnerEmailAddress(EmailAddress newEmailAddress) {
+        ownerEmailAddress = newEmailAddress;
+        incWriteCount();
     }
 
     /**
@@ -319,6 +286,13 @@ public class Photo extends DataObject {
      */
     public int getThumbWidth() {
         return isWiderThanHigher() ? MAX_THUMB_PHOTO_WIDTH : (width * MAX_THUMB_PHOTO_HEIGHT / height);
+    }
+
+    /**
+     * @methodtype boolean-query
+     */
+    public boolean isWiderThanHigher() {
+        return (height * MAX_PHOTO_WIDTH) < (width * MAX_PHOTO_HEIGHT);
     }
 
     /**
@@ -359,15 +333,15 @@ public class Photo extends DataObject {
     /**
      * @methodtype get
      */
-    public double getPraise() {
-        return (double) praiseSum / noVotes;
+    public String getPraiseAsString(ModelConfig cfg) {
+        return cfg.asPraiseString(getPraise());
     }
 
     /**
      * @methodtype get
      */
-    public String getPraiseAsString(ModelConfig cfg) {
-        return cfg.asPraiseString(getPraise());
+    public double getPraise() {
+        return (double) praiseSum / noVotes;
     }
 
     /**

@@ -111,7 +111,6 @@ public class SignupFormHandler extends AbstractWebFormHandler {
 
         long confirmationCode = userManager.createConfirmationCode();
         User user = new User(userName, password, emailAddress, confirmationCode);
-        userManager.addUser(user);
 
         userManager.emailWelcomeMessage(us, user);
         us.setClient(user);

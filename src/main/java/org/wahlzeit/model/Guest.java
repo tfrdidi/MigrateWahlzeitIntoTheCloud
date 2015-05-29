@@ -30,9 +30,15 @@ import org.wahlzeit.services.EmailAddress;
 public class Guest extends Client {
 
     /**
+     * The name of each client starts with this prefix
+     */
+    public static final String GUEST_PREFIX = "guest#";
+
+    /**
      *
      */
     public Guest() {
+        name = GUEST_PREFIX + UserManager.getInstance().getNextClientId();
         initialize(AccessRights.GUEST, EmailAddress.EMPTY);
     }
 
