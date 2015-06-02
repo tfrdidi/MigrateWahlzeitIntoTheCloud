@@ -3,6 +3,7 @@ package org.wahlzeit.handlers;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import org.wahlzeit.model.AccessRights;
+import org.wahlzeit.model.Administrator;
 import org.wahlzeit.model.User;
 import org.wahlzeit.model.UserManager;
 import org.wahlzeit.model.UserSession;
@@ -61,8 +62,12 @@ public class LoginHandler extends AbstractWebFormHandler {
                 // create new Wahlzeit user
                 String emailAddress = googleUser.getEmail();
                 long confirmationCode = userManager.createConfirmationCode();
-                user = new User(userId, "null", emailAddress, confirmationCode);
 
+                if (userService.isUserAdmin()) {
+                    user = new Administrator(userId, "null", emailAddress, confirmationCode);
+                } else {
+                    user = new User(userId, "null", emailAddress, confirmationCode);
+                }
                 userManager.emailWelcomeMessage(us, user);
                 us.setClient(user);
 

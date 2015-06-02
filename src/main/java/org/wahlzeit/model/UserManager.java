@@ -82,28 +82,7 @@ public class UserManager extends ClientManager {
     }
 
     public void init() {
-        assertAdminExists();
         loadExistingUsers();
-    }
-
-    /**
-     * @methodtype assert
-     */
-    public void assertAdminExists() {
-        ObjectifyService.run(new Work<Void>() {
-            @Override
-            public Void run() {
-                Collection<Administrator> admins = new ArrayList<Administrator>();
-                readObjects(admins, Administrator.class);
-                if (admins.size() == 0) {
-                    new Administrator("admin", "admin", "root@localhost", 0);
-                    log.info("No default Administrator exists. Created one.");
-                } else {
-                    log.info("Default Administrator exists.");
-                }
-                return null;
-            }
-        });
     }
 
     /**
