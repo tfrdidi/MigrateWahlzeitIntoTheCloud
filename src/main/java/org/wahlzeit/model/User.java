@@ -131,7 +131,7 @@ public class User extends Client {
         log.config(LogBuilder.createSystemMessage().
                 addAction("initialize user").
                 addParameter("name", name).
-                addParameter("password", password).toString());
+                addParameter("E-Mail", ea.asString()).toString());
         incWriteCount();
     }
 

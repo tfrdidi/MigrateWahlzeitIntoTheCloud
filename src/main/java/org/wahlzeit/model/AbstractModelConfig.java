@@ -20,6 +20,9 @@
 
 package org.wahlzeit.model;
 
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
+import org.wahlzeit.handlers.PartUtil;
 import org.wahlzeit.main.ServiceMain;
 import org.wahlzeit.services.AbstractConfig;
 import org.wahlzeit.services.ConfigDir;
@@ -109,7 +112,10 @@ public abstract class AbstractModelConfig extends AbstractConfig implements Mode
         String baseMenu = doGetValue("BaseMenuPart");
         // there is no separate base menu
 
-        String guestMenu = baseMenu + menuDash + doGetValue("GuestMenuPart");
+        String loginMenu = doGetValue("GuestMenuPart");
+        UserService userService = UserServiceFactory.getUserService();
+        loginMenu = loginMenu.replace("$loginPageLink$", userService.createLoginURL("/" + PartUtil.LOGIN_FORM_NAME));
+        String guestMenu = baseMenu + menuDash + loginMenu;
         doSetValue("GuestMenu", guestMenu);
 
         String userMenu = guestMenu + menuDash + doGetValue("UserMenuPart");

@@ -163,8 +163,8 @@ public class ServiceMain extends ModelMain {
 
         manager.addWebPartHandler(PartUtil.CONFIRM_ACCOUNT_PAGE_NAME, new ConfirmAccountPageHandler());
 
-        temp = manager.addWebPartHandler(PartUtil.LOGIN_FORM_NAME, new LoginFormHandler());
-        manager.addWebPartHandler(PartUtil.LOGIN_PAGE_NAME, new ShowPartPageHandler(AccessRights.GUEST, temp));
+        temp = manager.addWebPartHandler(PartUtil.LOGIN_FORM_NAME, new LoginHandler());
+        manager.addWebPartHandler(PartUtil.LOGIN_FORM_NAME, new ShowPartPageHandler(AccessRights.GUEST, temp));
         temp = manager.addWebPartHandler(PartUtil.EMAIL_USER_NAME_FORM_NAME, new EmailUserNameFormHandler());
         manager.addWebPartHandler(PartUtil.EMAIL_USER_NAME_PAGE_NAME, new ShowPartPageHandler(AccessRights.GUEST, temp));
         temp = manager.addWebPartHandler(PartUtil.EMAIL_PASSWORD_FORM_NAME, new EmailPasswordFormHandler());

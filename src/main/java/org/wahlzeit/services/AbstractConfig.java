@@ -23,6 +23,7 @@ package org.wahlzeit.services;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -60,13 +61,6 @@ public abstract class AbstractConfig implements Configuration, Serializable {
     /**
      *
      */
-    protected final String doGetValue(String key) {
-        return store.get(key);
-    }
-
-    /**
-     *
-     */
     public void setValue(String key, String value) throws IllegalArgumentException {
         assertHasKey(key);
         doSetValue(key, value);
@@ -77,15 +71,6 @@ public abstract class AbstractConfig implements Configuration, Serializable {
      */
     protected final void doSetValue(String key, String value) {
         store.put(key, value);
-    }
-
-    /**
-     * @methodtype assertion
-     */
-    protected final void assertHasKey(String key) throws IllegalArgumentException {
-        if (!store.containsKey(key)) {
-            throw new IllegalArgumentException("unknown key: " + key);
-        }
     }
 
     /**
@@ -106,9 +91,9 @@ public abstract class AbstractConfig implements Configuration, Serializable {
     public void loadProperties(File file) throws IOException {
         Properties input = new Properties();
 
-        FileInputStream stream = null;
+        InputStreamReader stream = null;
         try {
-            stream = new FileInputStream(file);
+            stream = new InputStreamReader(new FileInputStream(file), "UTF8");
             input.load(stream);
 
             for (Enumeration e = input.propertyNames(); e.hasMoreElements(); ) {
@@ -120,5 +105,21 @@ public abstract class AbstractConfig implements Configuration, Serializable {
                 stream.close();
             }
         }
+    }
+
+    /**
+     * @methodtype assertion
+     */
+    protected final void assertHasKey(String key) throws IllegalArgumentException {
+        if (!store.containsKey(key)) {
+            throw new IllegalArgumentException("unknown key: " + key);
+        }
+    }
+
+    /**
+     *
+     */
+    protected final String doGetValue(String key) {
+        return store.get(key);
     }
 }
