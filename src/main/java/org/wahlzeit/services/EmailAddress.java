@@ -20,8 +20,6 @@
 
 package org.wahlzeit.services;
 
-import org.wahlzeit.utils.StringUtil;
-
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import java.io.Serializable;
@@ -45,6 +43,10 @@ public class EmailAddress implements Serializable {
      *
      */
     public static final EmailAddress EMPTY = doGetFromString(""); // after map initialization...
+    /**
+     *
+     */
+    protected String value;
 
     private EmailAddress() {
         // for Objectify to load
@@ -53,8 +55,14 @@ public class EmailAddress implements Serializable {
     /**
      *
      */
+    protected EmailAddress(String myAddress) {
+        value = myAddress;
+    }
+
+    /**
+     *
+     */
     public static EmailAddress getFromString(String myValue) {
-        assertIsRelaxedValidString(myValue);
         return doGetFromString(myValue);
     }
 
@@ -74,27 +82,6 @@ public class EmailAddress implements Serializable {
         }
 
         return result;
-    }
-
-    /**
-     *
-     */
-    protected static void assertIsRelaxedValidString(String address) throws IllegalArgumentException {
-        if (StringUtil.isNullOrEmptyString(address) || !StringUtil.isValidLocalEmailAddress(address)) {
-            throw new IllegalArgumentException(address + " is not a relaxed valid email address");
-        }
-    }
-
-    /**
-     *
-     */
-    protected String value;
-
-    /**
-     *
-     */
-    protected EmailAddress(String myAddress) {
-        value = myAddress;
     }
 
     /**
@@ -129,16 +116,16 @@ public class EmailAddress implements Serializable {
     /**
      *
      */
-    public boolean isEmpty() {
-        return this == EMPTY;
+
+    public boolean isValid() {
+        return !isEmpty();
     }
 
     /**
      *
      */
-
-    public boolean isValid() {
-        return !isEmpty();
+    public boolean isEmpty() {
+        return this == EMPTY;
     }
 
 }

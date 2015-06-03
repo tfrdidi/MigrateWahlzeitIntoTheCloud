@@ -8,6 +8,7 @@ import org.wahlzeit.webparts.WebPartTemplateService;
  * Created by Lukas Hahmann on 22.05.15.
  */
 public class SysConfigProvider extends ExternalResource {
+
     @Override
     protected void before() throws Throwable {
         SysConfig.dropInstance();

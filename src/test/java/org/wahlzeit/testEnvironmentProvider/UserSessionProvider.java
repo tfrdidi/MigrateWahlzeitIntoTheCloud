@@ -31,14 +31,13 @@ public class UserSessionProvider extends ExternalResource {
         HttpSession httpSession = mock(HttpSession.class);
         when(httpSession.getAttribute(UserSession.INITIALIZED)).thenReturn(UserSession.INITIALIZED);
         when(httpSession.getAttribute(UserSession.CONFIGURATION)).thenReturn(new EnglishModelConfig());
-        when(httpSession.getAttribute(UserSession.CLIENT_NAME)).thenReturn(
-                ObjectifyService.run(new Work<Guest>() {
-                    @Override
-                    public Guest run() {
-                        return new Guest();
-                    }
-                })
-        );
+        String guestName = ObjectifyService.run(new Work<String>() {
+            @Override
+            public String run() {
+                return new Guest().getName();
+            }
+        });
+        when(httpSession.getAttribute(UserSession.CLIENT_NAME)).thenReturn(guestName);
 
         Map<String, Object> dummyMap = new HashMap<String, Object>();
         dummyMap.put(UserSession.MESSAGE, "dummy Message");

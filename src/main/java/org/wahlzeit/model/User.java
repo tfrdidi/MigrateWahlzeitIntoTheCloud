@@ -75,7 +75,6 @@ public class User extends Client {
     protected transient int writeCount = 0;
 
     protected String nameAsTag;
-    protected String password;
     /**
      *
      */
@@ -100,37 +99,36 @@ public class User extends Client {
     /**
      *
      */
-    public User(String myName, String myPassword, String myEmailAddress, long vc) {
-        this(myName, myPassword, EmailAddress.getFromString(myEmailAddress), vc);
+    public User(String myName, String myEmailAddress, long vc) {
+        this(myName, EmailAddress.getFromString(myEmailAddress), vc);
     }
 
     /**
      *
      */
-    public User(String myName, String myPassword, EmailAddress myEmailAddress, long vc) {
-        initialize(AccessRights.USER, myEmailAddress, myName, myPassword, vc);
+    public User(String myName, EmailAddress myEmailAddress, long vc) {
+        initialize(AccessRights.USER, myEmailAddress, myName, vc);
     }
 
     /**
      * @methodtype initialization
      */
-    protected void initialize(AccessRights r, EmailAddress ea, String n, String p, long vc) {
+    protected void initialize(AccessRights r, EmailAddress ea, String name, long vc) {
         // name should be set before .initialize, because .initialize registers itself with the name
         // at the UserManager.
-        name = n;
+        this.name = name;
         super.initialize(r, ea);
 
 
-        nameAsTag = Tags.asTag(n);
+        nameAsTag = Tags.asTag(name);
 
-        password = p;
         confirmationCode = vc;
 
         homePage = getDefaultHomePage();
 
         log.config(LogBuilder.createSystemMessage().
                 addAction("initialize user").
-                addParameter("name", name).
+                addParameter("name", this.name).
                 addParameter("E-Mail", ea.asString()).toString());
         incWriteCount();
     }
@@ -154,22 +152,6 @@ public class User extends Client {
      */
     protected User() {
         // do nothing
-    }
-
-    /**
-     * @methodtype command
-     */
-    protected void notifyHttpSession() {
-        if (httpSession != null) {
-            httpSession.setAttribute(UserSession.CLIENT_NAME, this);
-        }
-    }
-
-    /**
-     * @methodtype get
-     */
-    public String getIdAsString() {
-        return String.valueOf(name);
     }
 
     /**
@@ -211,28 +193,6 @@ public class User extends Client {
      */
     public String getNameAsTag() {
         return nameAsTag;
-    }
-
-    /**
-     * @methodtype get
-     */
-    public String getPassword() {
-        return password;
-    }
-
-    /**
-     * @methodtype set
-     */
-    public void setPassword(String newPassword) {
-        password = newPassword;
-        incWriteCount();
-    }
-
-    /**
-     * @methodtype boolean query
-     */
-    public boolean hasPassword(String otherPassword) {
-        return password.equals(otherPassword);
     }
 
     /**

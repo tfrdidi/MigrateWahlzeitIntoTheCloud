@@ -158,17 +158,8 @@ public class ServiceMain extends ModelMain {
         manager.addWebPartHandler(PartUtil.SET_OPTIONS_PAGE_NAME, new ShowPartPageHandler(AccessRights.GUEST, temp));
 
         // Signup, Login, EmailUserName/Password, and Logout pages
-        temp = manager.addWebPartHandler(PartUtil.SIGNUP_FORM_NAME, new SignupFormHandler());
-        manager.addWebPartHandler(PartUtil.SIGNUP_PAGE_NAME, new ShowPartPageHandler(AccessRights.GUEST, temp));
-
-        manager.addWebPartHandler(PartUtil.CONFIRM_ACCOUNT_PAGE_NAME, new ConfirmAccountPageHandler());
-
         temp = manager.addWebPartHandler(PartUtil.LOGIN_FORM_NAME, new LoginHandler());
         manager.addWebPartHandler(PartUtil.LOGIN_FORM_NAME, new ShowPartPageHandler(AccessRights.GUEST, temp));
-        temp = manager.addWebPartHandler(PartUtil.EMAIL_USER_NAME_FORM_NAME, new EmailUserNameFormHandler());
-        manager.addWebPartHandler(PartUtil.EMAIL_USER_NAME_PAGE_NAME, new ShowPartPageHandler(AccessRights.GUEST, temp));
-        temp = manager.addWebPartHandler(PartUtil.EMAIL_PASSWORD_FORM_NAME, new EmailPasswordFormHandler());
-        manager.addWebPartHandler(PartUtil.EMAIL_PASSWORD_PAGE_NAME, new ShowPartPageHandler(AccessRights.GUEST, temp));
 
         manager.addWebPartHandler(PartUtil.LOGOUT_PAGE_NAME, new LogoutPageHandler());
 
@@ -195,8 +186,6 @@ public class ServiceMain extends ModelMain {
         // EditProfile, ChangePassword, EditPhoto, and UploadPhoto pages
         temp = manager.addWebPartHandler(PartUtil.EDIT_USER_PROFILE_FORM_NAME, new EditUserProfileFormHandler());
         manager.addWebPartHandler(PartUtil.EDIT_USER_PROFILE_PAGE_NAME, new ShowPartPageHandler(AccessRights.USER, temp));
-        temp = manager.addWebPartHandler(PartUtil.CHANGE_PASSWORD_FORM_NAME, new ChangePasswordFormHandler());
-        manager.addWebPartHandler(PartUtil.CHANGE_PASSWORD_PAGE_NAME, new ShowPartPageHandler(AccessRights.USER, temp));
         temp = manager.addWebPartHandler(PartUtil.EDIT_USER_PHOTO_FORM_NAME, new EditUserPhotoFormHandler());
         manager.addWebPartHandler(PartUtil.EDIT_USER_PHOTO_PAGE_NAME, new ShowPartPageHandler(AccessRights.USER, temp));
         temp = manager.addWebPartHandler(PartUtil.UPLOAD_PHOTO_FORM_NAME, new UploadPhotoFormHandler());

@@ -31,17 +31,17 @@ public class CreateUser extends ScriptMain {
     /**
      *
      */
-    public static void main(String[] argv) {
-        new CreateUser().run();
-    }
-
-    /**
-     *
-     */
     protected String userName = "testuser";
     protected String password = "testuser";
     protected String emailAddress = "info@wahlzeit.org";
     protected String photoDir = "config/photos";
+
+    /**
+     *
+     */
+    public static void main(String[] argv) {
+        new CreateUser().run();
+    }
 
     /**
      *
@@ -75,7 +75,7 @@ public class CreateUser extends ScriptMain {
      *
      */
     protected void execute() throws Exception {
-        createUser(userName, password, emailAddress, photoDir);
+        createUser(userName, emailAddress, photoDir);
     }
 
 }

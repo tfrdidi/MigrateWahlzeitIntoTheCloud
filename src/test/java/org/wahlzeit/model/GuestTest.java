@@ -33,7 +33,7 @@ public class GuestTest {
         ObjectifyService.run(new Work<Void>() {
             @Override
             public Void run() {
-                new User("han", "solo", "star@wa.rs", 1337L);
+                new User("han", "star@wa.rs", 1337L);
                 return null;
             }
         });

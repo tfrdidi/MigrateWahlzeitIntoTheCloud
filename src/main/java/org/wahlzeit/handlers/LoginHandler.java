@@ -64,9 +64,9 @@ public class LoginHandler extends AbstractWebFormHandler {
                 long confirmationCode = userManager.createConfirmationCode();
 
                 if (userService.isUserAdmin()) {
-                    user = new Administrator(userId, "null", emailAddress, confirmationCode);
+                    user = new Administrator(userId, emailAddress, confirmationCode);
                 } else {
-                    user = new User(userId, "null", emailAddress, confirmationCode);
+                    user = new User(userId, emailAddress, confirmationCode);
                 }
                 userManager.emailWelcomeMessage(us, user);
                 us.setClient(user);

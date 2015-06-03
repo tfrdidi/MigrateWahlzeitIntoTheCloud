@@ -47,7 +47,7 @@ public class TellFriendFormHandler extends AbstractWebFormHandler {
     public static final String EMAIL_SUBJECT = "emailSubject";
     public static final String EMAIL_BODY = "emailBody";
 
-    private static final Logger log = Logger.getLogger(SignupFormHandler.class.getName());
+    private static final Logger log = Logger.getLogger(TellFriendFormHandler.class.getName());
 
     /**
      *

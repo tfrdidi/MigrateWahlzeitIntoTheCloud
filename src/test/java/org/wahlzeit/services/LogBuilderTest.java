@@ -4,9 +4,10 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 import org.wahlzeit.model.CaseId;
-import org.wahlzeit.model.UserSession;
 import org.wahlzeit.testEnvironmentProvider.LocalDatastoreServiceTestConfigProvider;
 import org.wahlzeit.testEnvironmentProvider.RegisteredOfyEnvironmentProvider;
+import org.wahlzeit.testEnvironmentProvider.SysConfigProvider;
+import org.wahlzeit.testEnvironmentProvider.UserServiceProvider;
 import org.wahlzeit.testEnvironmentProvider.UserSessionProvider;
 
 import java.io.PrintWriter;
@@ -33,26 +34,21 @@ import static org.wahlzeit.services.LogBuilder.USER_LEVEL;
  */
 public class LogBuilderTest {
 
-    private static final String EXPECTED_SYSTEM_MESSAGE =
-            LEVEL + NAME_VALUE_SEPARATOR + SYSTEM_LEVEL + INFO_SEPARATOR +
-                    SESSION + NAME_VALUE_SEPARATOR + UserSessionProvider.USER_SESSION_NAME + INFO_SEPARATOR +
-                    CLIENT + NAME_VALUE_SEPARATOR + UserSession.ANONYMOUS_CLIENT;
 
-    private static final String EXPECTED_USER_MESSAGE = LEVEL + NAME_VALUE_SEPARATOR + USER_LEVEL + INFO_SEPARATOR +
-            SESSION + NAME_VALUE_SEPARATOR + UserSessionProvider.USER_SESSION_NAME + INFO_SEPARATOR +
-            CLIENT + NAME_VALUE_SEPARATOR + UserSession.ANONYMOUS_CLIENT;
 
     @ClassRule
     public static RuleChain ruleChain = RuleChain.
             outerRule(new LocalDatastoreServiceTestConfigProvider()).
             around(new RegisteredOfyEnvironmentProvider()).
+            around(new SysConfigProvider()).
+            around(new UserServiceProvider()).
             around(new UserSessionProvider());
 
     @Test
     public void testCreateUserMessage() {
         String logMessage = LogBuilder.createUserMessage().toString();
         assertNotNull(logMessage);
-        assertEquals(EXPECTED_USER_MESSAGE, logMessage);
+        assertEquals(getExpectedUserMessage(), logMessage);
 
         // make sure even when there is no thread local session that LogBuilder wont throw an exception
         Session session = SessionManager.getThreadLocalSession();
@@ -61,11 +57,23 @@ public class LogBuilderTest {
         SessionManager.setThreadLocalSession(session);
     }
 
+    protected String getExpectedUserMessage() {
+        return LEVEL + NAME_VALUE_SEPARATOR + USER_LEVEL + INFO_SEPARATOR +
+                SESSION + NAME_VALUE_SEPARATOR + UserSessionProvider.USER_SESSION_NAME + INFO_SEPARATOR +
+                CLIENT + NAME_VALUE_SEPARATOR + SessionManager.getThreadLocalSession().getClientName();
+    }
+
     @Test
     public void testCreateSystemMessage() {
         String logMessage = LogBuilder.createSystemMessage().toString();
         assertNotNull(logMessage);
-        assertEquals(EXPECTED_SYSTEM_MESSAGE, logMessage);
+        assertEquals(getExpectedSystemMessage(), logMessage);
+    }
+
+    protected String getExpectedSystemMessage() {
+        return LEVEL + NAME_VALUE_SEPARATOR + SYSTEM_LEVEL + INFO_SEPARATOR +
+                SESSION + NAME_VALUE_SEPARATOR + UserSessionProvider.USER_SESSION_NAME + INFO_SEPARATOR +
+                CLIENT + NAME_VALUE_SEPARATOR + SessionManager.getThreadLocalSession().getClientName();
     }
 
     @Test
@@ -126,7 +134,7 @@ public class LogBuilderTest {
     public void testAddMessage() {
         LogBuilder logBuilder = LogBuilder.createSystemMessage().addMessage("");
         String logMessage = logBuilder.toString();
-        String expectedLogMessage = EXPECTED_SYSTEM_MESSAGE + INFO_SEPARATOR;
+        String expectedLogMessage = getExpectedSystemMessage() + INFO_SEPARATOR;
         assertEquals(expectedLogMessage, logMessage);
 
         logBuilder.addMessage(null);
@@ -147,7 +155,7 @@ public class LogBuilderTest {
         String logMessage = logBuilder.toString();
         StringWriter sw = new StringWriter();
         exception.printStackTrace(new PrintWriter(sw));
-        String expectedLogMessage = EXPECTED_SYSTEM_MESSAGE + INFO_SEPARATOR + EXCEPTION_REASON + NAME_VALUE_SEPARATOR
+        String expectedLogMessage = getExpectedSystemMessage() + INFO_SEPARATOR + EXCEPTION_REASON + NAME_VALUE_SEPARATOR
                 + "because I can" + INFO_SEPARATOR + STACKTRACE + NAME_VALUE_SEPARATOR + sw.toString();
         assertEquals(expectedLogMessage, logMessage);
     }
@@ -157,7 +165,7 @@ public class LogBuilderTest {
         String action = "Build your own lightsaber";
         LogBuilder logBuilder = LogBuilder.createUserMessage().addAction(action);
         String logMessage = logBuilder.toString();
-        String expectedLogMessage = EXPECTED_USER_MESSAGE + INFO_SEPARATOR + ACTION + NAME_VALUE_SEPARATOR + action;
+        String expectedLogMessage = getExpectedUserMessage() + INFO_SEPARATOR + ACTION + NAME_VALUE_SEPARATOR + action;
         assertEquals(expectedLogMessage, logMessage);
 
         logBuilder.addAction(null);
