@@ -154,13 +154,6 @@ public abstract class AbstractModelConfig extends AbstractConfig implements Mode
     /**
      *
      */
-    public EmailAddress getAdministratorEmailAddress() {
-        return EmailAddress.getFromString(doGetValue("AdministratorEmailAddress"));
-    }
-
-    /**
-     *
-     */
     public EmailAddress getAuditEmailAddress() {
         return EmailAddress.getFromString(doGetValue("AuditEmailAddress"));
     }

@@ -43,8 +43,6 @@ public interface ModelConfig extends Configuration, Serializable {
     // System config
     EmailAddress getModeratorEmailAddress();
 
-    EmailAddress getAdministratorEmailAddress();
-
     EmailAddress getAuditEmailAddress();
 
     // Page template

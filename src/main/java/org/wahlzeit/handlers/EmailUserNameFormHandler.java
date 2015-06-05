@@ -80,9 +80,8 @@ public class EmailUserNameFormHandler extends AbstractWebFormHandler {
 
         EmailService emailService = EmailServiceManager.getDefaultService();
 
-        EmailAddress from = us.getConfiguration().getModeratorEmailAddress();
         EmailAddress to = user.getEmailAddress();
-        emailService.sendEmailIgnoreException(from, to, us.getConfiguration().getAuditEmailAddress(), us.getConfiguration().getSendUserNameEmailSubject(), user.getId());
+        emailService.sendEmailIgnoreException(to, us.getConfiguration().getAuditEmailAddress(), us.getConfiguration().getSendUserNameEmailSubject(), user.getId());
 
         log.info(LogBuilder.createUserMessage().
                 addAction("Username send per E-Mail").

@@ -85,10 +85,6 @@ public interface PartUtil {
     String SET_OPTIONS_FORM_NAME = "setOptionsForm";
     String SET_OPTIONS_FORM_FILE = "forms/SetOptionsForm";
 
-    String SIGNUP_PAGE_NAME = "signup";
-    String SIGNUP_FORM_NAME = "signupForm";
-    String SIGNUP_FORM_FILE = "forms/SignupForm";
-
     String CONFIRM_ACCOUNT_PAGE_NAME = "confirm";
 
     String LOGIN_PAGE_NAME = "login";

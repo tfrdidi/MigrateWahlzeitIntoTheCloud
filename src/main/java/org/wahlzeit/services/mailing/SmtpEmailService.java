@@ -27,9 +27,9 @@ import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
-import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
@@ -49,38 +49,19 @@ public class SmtpEmailService extends AbstractEmailService {
      *
      */
     public SmtpEmailService() {
-        this("localhost", "25", null, null);
-    }
-
-    /**
-     *
-     */
-    public SmtpEmailService(String host, String port) {
-        this(host, port, null, null);
-    }
-
-    /**
-     *
-     */
-    public SmtpEmailService(String host, String port, String user, String password) {
-        initialize(host, port, user, password);
+        initialize();
     }
 
     /**
      * @methodtype initialization
      */
-    protected void initialize(String host, String port, String user, String password) {
+    protected void initialize() {
         Properties props = new Properties();
 
-        props.setProperty("mail.smtp.host", host);
-        props.setProperty("mail.smtp.port", port);
+        props.put("mail.host", "smtp.google.com");
+        props.put("mail.transport.protocol", "smtp");
 
         Authenticator auth = null;
-
-        if (user != null && password != null) {
-            auth = new SmtpAuthenticator(user, password);
-            props.setProperty("mail.smtp.auth", "true");
-        }
 
         session = Session.getDefaultInstance(props, auth);
     }
@@ -89,11 +70,12 @@ public class SmtpEmailService extends AbstractEmailService {
      *
      */
     @Override
-    protected Message doCreateEmail(EmailAddress from, EmailAddress to, EmailAddress bcc, String subject, String body) throws MailingException {
+    protected Message doCreateEmail(EmailAddress to, EmailAddress bcc, String subject, String body) throws MailingException {
         Message msg = new MimeMessage(session);
 
         try {
-            msg.setFrom(from.asInternetAddress());
+            // admin email is set in appengine-web.xml
+            msg.setFrom(new InternetAddress(System.getProperty("admin.email", "Test")));
             msg.addRecipient(Message.RecipientType.TO, to.asInternetAddress());
 
             if (bcc.isValid()) {
@@ -133,33 +115,6 @@ public class SmtpEmailService extends AbstractEmailService {
         } catch (MessagingException ex) {
             throw new MailingException("Sending email failed", ex);
         }
-    }
-
-    /**
-     *
-     */
-    protected class SmtpAuthenticator extends Authenticator {
-
-        /**
-         *
-         */
-        private PasswordAuthentication auth;
-
-        /**
-         *
-         */
-        public SmtpAuthenticator(String user, String password) {
-            auth = new PasswordAuthentication(user, password);
-        }
-
-        /**
-         *
-         */
-        @Override
-        protected PasswordAuthentication getPasswordAuthentication() {
-            return auth;
-        }
-
     }
 
 }

@@ -57,7 +57,7 @@ public class Wahlzeit implements ServletContextListener {
             log.config(LogBuilder.createSystemMessage().
                     addParameter("Root directory", rootDir).toString());
 
-            ServiceMain.getInstance().startUp(false, rootDir);
+            ServiceMain.getInstance().startUp(true, rootDir);
         } catch (Exception ex) {
             log.warning(LogBuilder.createSystemMessage().
                     addException("Initializing context failed", ex).toString());

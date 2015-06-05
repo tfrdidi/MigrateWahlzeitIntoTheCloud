@@ -30,15 +30,15 @@ public interface EmailService {
     /**
      *
      */
-    public void sendEmail(EmailAddress from, EmailAddress to, String subject, String body) throws MailingException;
+    void sendEmail(EmailAddress to, String subject, String body) throws MailingException;
 
-    public boolean sendEmailIgnoreException(EmailAddress from, EmailAddress to, String subject, String body);
+    boolean sendEmailIgnoreException(EmailAddress to, String subject, String body);
 
     /**
      *
      */
-    public void sendEmail(EmailAddress from, EmailAddress to, EmailAddress bcc, String subject, String body) throws MailingException;
+    void sendEmail(EmailAddress to, EmailAddress bcc, String subject, String body) throws MailingException;
 
-    public boolean sendEmailIgnoreException(EmailAddress from, EmailAddress to, EmailAddress bcc, String subject, String body);
+    boolean sendEmailIgnoreException(EmailAddress to, EmailAddress bcc, String subject, String body);
 
 }

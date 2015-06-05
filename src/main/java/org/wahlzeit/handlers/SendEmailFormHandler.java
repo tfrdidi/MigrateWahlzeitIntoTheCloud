@@ -120,13 +120,12 @@ public class SendEmailFormHandler extends AbstractWebFormHandler {
 
         UserManager userManager = UserManager.getInstance();
         User toUser = userManager.getUserById(photo.getOwnerId());
-        User fromUser = (User) us.getClient();
 
         emailSubject = us.getConfiguration().getSendEmailSubjectPrefix() + emailSubject;
         emailBody = us.getConfiguration().getSendEmailBodyPrefix() + emailBody + us.getConfiguration().getSendEmailBodyPostfix();
 
         EmailService emailService = EmailServiceManager.getDefaultService();
-        emailService.sendEmailIgnoreException(fromUser.getEmailAddress(), toUser.getEmailAddress(), us.getConfiguration().getAuditEmailAddress(), emailSubject, emailBody);
+        emailService.sendEmailIgnoreException(toUser.getEmailAddress(), us.getConfiguration().getAuditEmailAddress(), emailSubject, emailBody);
 
         log.info(LogBuilder.createUserMessage().
                 addAction("Send E-Mail").

@@ -32,7 +32,7 @@ public class MockEmailService extends AbstractEmailService {
     /**
      *
      */
-    protected Message doCreateEmail(EmailAddress from, EmailAddress to, EmailAddress bcc, String subject, String body) throws MailingException {
+    protected Message doCreateEmail(EmailAddress to, EmailAddress bcc, String subject, String body) throws MailingException {
         return null;
     }
 

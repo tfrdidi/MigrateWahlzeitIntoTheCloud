@@ -49,27 +49,25 @@ public class LoggingEmailService implements EmailService {
      *
      */
     @Override
-    public void sendEmail(EmailAddress from, EmailAddress to, String subject, String body) throws MailingException {
-        String fromString = (from == null) ? "null" : from.asString();
+    public void sendEmail(EmailAddress to, String subject, String body) throws MailingException {
         String toString = (to == null) ? "null" : to.asString();
         String subjectString = (subject == null) ? "null" : subject;
 
         log.config(LogBuilder.createSystemMessage().
                 addAction("Send E-Mail").
-                addParameter("from", fromString).
                 addParameter("to", toString).
                 addParameter("subject", subjectString).toString());
 
-        decorated.sendEmail(from, to, subject, body);
+        decorated.sendEmail(to, subject, body);
     }
 
     /**
      *
      */
     @Override
-    public boolean sendEmailIgnoreException(EmailAddress from, EmailAddress to, String subject, String body) {
+    public boolean sendEmailIgnoreException(EmailAddress to, String subject, String body) {
         try {
-            sendEmail(from, to, subject, body);
+            sendEmail(to, subject, body);
             return true;
         } catch (MailingException ex) {
             // sendEmail failed
@@ -81,29 +79,27 @@ public class LoggingEmailService implements EmailService {
      *
      */
     @Override
-    public void sendEmail(EmailAddress from, EmailAddress to, EmailAddress bcc, String subject, String body) throws MailingException {
-        String fromString = (from == null) ? "null" : from.asString();
+    public void sendEmail(EmailAddress to, EmailAddress bcc, String subject, String body) throws MailingException {
         String toString = (to == null) ? "null" : to.asString();
         String bccString = (bcc == null) ? "null" : bcc.asString();
         String subjectString = (subject == null) ? "null" : subject;
 
         log.config(LogBuilder.createSystemMessage().
                 addAction("Send E-Mail").
-                addParameter("from", fromString).
                 addParameter("to", toString).
                 addParameter("bcc", bccString).
                 addParameter("subject", subjectString).toString());
 
-        decorated.sendEmail(from, to, bcc, subject, body);
+        decorated.sendEmail(to, bcc, subject, body);
     }
 
     /**
      *
      */
     @Override
-    public boolean sendEmailIgnoreException(EmailAddress from, EmailAddress to, EmailAddress bcc, String subject, String body) {
+    public boolean sendEmailIgnoreException(EmailAddress to, EmailAddress bcc, String subject, String body) {
         try {
-            sendEmail(from, to, bcc, subject, body);
+            sendEmail(to, bcc, subject, body);
             return true;
         } catch (MailingException ex) {
             // sendEmail failed

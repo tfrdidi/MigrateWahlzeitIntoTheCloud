@@ -128,7 +128,6 @@ public class UserManager extends ClientManager {
      *
      */
     public void emailWelcomeMessage(UserSession us, User user) {
-        EmailAddress from = us.getConfiguration().getAdministratorEmailAddress();
         EmailAddress to = user.getEmailAddress();
 
         String emailSubject = us.getConfiguration().getWelcomeEmailSubject();
@@ -140,14 +139,13 @@ public class UserManager extends ClientManager {
         emailBody += us.getConfiguration().getGeneralEmailFooter() + "\n\n";
 
         EmailService emailService = EmailServiceManager.getDefaultService();
-        emailService.sendEmailIgnoreException(from, to, us.getConfiguration().getAuditEmailAddress(), emailSubject, emailBody);
+        emailService.sendEmailIgnoreException(to, us.getConfiguration().getAuditEmailAddress(), emailSubject, emailBody);
     }
 
     /**
      *
      */
     public void emailConfirmationRequest(UserSession us, User user) {
-        EmailAddress from = us.getConfiguration().getAdministratorEmailAddress();
         EmailAddress to = user.getEmailAddress();
 
         String emailSubject = us.getConfiguration().getConfirmAccountEmailSubject();
@@ -157,7 +155,7 @@ public class UserManager extends ClientManager {
         emailBody += us.getConfiguration().getGeneralEmailFooter() + "\n\n";
 
         EmailService emailService = EmailServiceManager.getDefaultService();
-        emailService.sendEmailIgnoreException(from, to, us.getConfiguration().getAuditEmailAddress(), emailSubject, emailBody);
+        emailService.sendEmailIgnoreException(to, us.getConfiguration().getAuditEmailAddress(), emailSubject, emailBody);
     }
 
     /**

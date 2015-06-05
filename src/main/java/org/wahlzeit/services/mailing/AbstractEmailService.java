@@ -38,29 +38,28 @@ public abstract class AbstractEmailService implements EmailService {
      *
      */
     @Override
-    public void sendEmail(EmailAddress from, EmailAddress to, String subject, String body) throws MailingException {
-        sendEmail(from, to, EmailAddress.EMPTY, subject, body);
+    public void sendEmail(EmailAddress to, String subject, String body) throws MailingException {
+        sendEmail(to, EmailAddress.EMPTY, subject, body);
     }
 
     /**
      *
      */
     @Override
-    public boolean sendEmailIgnoreException(EmailAddress from, EmailAddress to, String subject, String body) {
-        return sendEmailIgnoreException(from, to, EmailAddress.EMPTY, subject, body);
+    public boolean sendEmailIgnoreException(EmailAddress to, String subject, String body) {
+        return sendEmailIgnoreException(to, EmailAddress.EMPTY, subject, body);
     }
 
     /**
      *
      */
     @Override
-    public void sendEmail(EmailAddress from, EmailAddress to, EmailAddress bcc, String subject, String body) throws MailingException {
-        assertIsValidEmailAddress(from, "from");
+    public void sendEmail(EmailAddress to, EmailAddress bcc, String subject, String body) throws MailingException {
         assertIsValidEmailAddress(to, "to");
         assertIsValidString(subject, "subject");
         assertIsValidString(body, "body");
 
-        Message msg = doCreateEmail(from, to, bcc, subject, body);
+        Message msg = doCreateEmail(to, bcc, subject, body);
         doSendEmail(msg);
     }
 
@@ -68,9 +67,9 @@ public abstract class AbstractEmailService implements EmailService {
      *
      */
     @Override
-    public boolean sendEmailIgnoreException(EmailAddress from, EmailAddress to, EmailAddress bcc, String subject, String body) {
+    public boolean sendEmailIgnoreException(EmailAddress to, EmailAddress bcc, String subject, String body) {
         try {
-            sendEmail(from, to, bcc, subject, body);
+            sendEmail(to, bcc, subject, body);
             return true;
         } catch (Exception ex) {
             log.warning(LogBuilder.createSystemMessage().
@@ -100,7 +99,7 @@ public abstract class AbstractEmailService implements EmailService {
     /**
      *
      */
-    protected abstract Message doCreateEmail(EmailAddress from, EmailAddress to, EmailAddress bcc, String subject, String body) throws MailingException;
+    protected abstract Message doCreateEmail(EmailAddress to, EmailAddress bcc, String subject, String body) throws MailingException;
 
     /**
      *

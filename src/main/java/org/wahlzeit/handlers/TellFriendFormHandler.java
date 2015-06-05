@@ -63,7 +63,6 @@ public class TellFriendFormHandler extends AbstractWebFormHandler {
         Map args = us.getSavedArgs();
         part.addStringFromArgs(args, UserSession.MESSAGE);
 
-        part.maskAndAddStringFromArgsWithDefault(args, EMAIL_FROM, us.getEmailAddressAsString());
         part.maskAndAddStringFromArgs(args, EMAIL_TO);
         part.maskAndAddStringFromArgsWithDefault(args, EMAIL_SUBJECT, us.getConfiguration().getTellFriendEmailSubject());
 
@@ -85,18 +84,11 @@ public class TellFriendFormHandler extends AbstractWebFormHandler {
      *
      */
     protected String doHandlePost(UserSession us, Map args) {
-        String yourEmailAddress = us.getAndSaveAsString(args, EMAIL_FROM);
         String friendsEmailAddress = us.getAndSaveAsString(args, EMAIL_TO);
         String emailSubject = us.getAndSaveAsString(args, EMAIL_SUBJECT);
         String emailBody = us.getAndSaveAsString(args, EMAIL_BODY);
 
-        if (StringUtil.isNullOrEmptyString(yourEmailAddress)) {
-            us.setMessage(us.getConfiguration().getEmailAddressIsMissing());
-            return PartUtil.TELL_FRIEND_PAGE_NAME;
-        } else if (!StringUtil.isValidStrictEmailAddress(yourEmailAddress)) {
-            us.setMessage(us.getConfiguration().getEmailAddressIsInvalid());
-            return PartUtil.TELL_FRIEND_PAGE_NAME;
-        } else if (StringUtil.isNullOrEmptyString(friendsEmailAddress)) {
+        if (StringUtil.isNullOrEmptyString(friendsEmailAddress)) {
             us.setMessage(us.getConfiguration().getEmailAddressIsMissing());
             return PartUtil.TELL_FRIEND_PAGE_NAME;
         } else if (!StringUtil.isValidStrictEmailAddress(friendsEmailAddress)) {
@@ -108,21 +100,19 @@ public class TellFriendFormHandler extends AbstractWebFormHandler {
             return PartUtil.TELL_FRIEND_PAGE_NAME;
         }
 
-        EmailAddress from = EmailAddress.getFromString(yourEmailAddress);
         EmailAddress to = EmailAddress.getFromString(friendsEmailAddress);
 
         EmailService emailService = EmailServiceManager.getDefaultService();
-        emailService.sendEmailIgnoreException(from, to, us.getConfiguration().getAuditEmailAddress(), emailSubject, emailBody);
+        emailService.sendEmailIgnoreException(to, us.getConfiguration().getAuditEmailAddress(), emailSubject, emailBody);
 
         log.info(LogBuilder.createUserMessage().
                 addAction("TellFriend").
-                addParameter("recipient", to.asString()).
-                addParameter("from", from.asString()).toString());
+                addParameter("recipient", to.asString()).toString());
 
 
         us.setTwoLineMessage(us.getConfiguration().getEmailWasSent() + friendsEmailAddress + "! ", us.getConfiguration().getKeepGoing());
 
-        return PartUtil.TELL_FRIEND_PAGE_NAME;
+        return PartUtil.SHOW_NOTE_PAGE_NAME;
     }
 
 }
