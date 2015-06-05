@@ -21,6 +21,7 @@
 package org.wahlzeit.services.mailing;
 
 import org.wahlzeit.services.EmailAddress;
+import org.wahlzeit.services.LogBuilder;
 
 import javax.mail.Authenticator;
 import javax.mail.BodyPart;
@@ -34,11 +35,14 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 /**
  *
  */
 public class SmtpEmailService extends AbstractEmailService {
+
+    private static final Logger log = Logger.getLogger(SmtpEmailService.class.getName());
 
     /**
      *
@@ -112,6 +116,9 @@ public class SmtpEmailService extends AbstractEmailService {
     protected void doSendEmail(Message msg) throws MailingException {
         try {
             Transport.send(msg);
+            log.config(LogBuilder.createSystemMessage().
+                    addMessage("email send").
+                    addParameter("subject", msg.getSubject()).toString());
         } catch (MessagingException ex) {
             throw new MailingException("Sending email failed", ex);
         }

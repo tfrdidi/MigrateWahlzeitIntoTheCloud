@@ -151,6 +151,7 @@ public abstract class AbstractModelConfig extends AbstractConfig implements Mode
         return EmailAddress.getFromString(doGetValue("ModeratorEmailAddress"));
     }
 
+
     /**
      *
      */
@@ -658,20 +659,6 @@ public abstract class AbstractModelConfig extends AbstractConfig implements Mode
     /**
      *
      */
-    public String getConfirmAccountEmailSubject() {
-        return doGetValue("ConfirmAccountEmailSubject");
-    }
-
-    /**
-     *
-     */
-    public String getConfirmAccountEmailBody() {
-        return doGetValue("ConfirmAccountEmailBody");
-    }
-
-    /**
-     *
-     */
     public String getNotifyAboutPraiseEmailSubject() {
         return doGetValue("NotifyAboutPraiseEmailSubject");
     }
@@ -709,6 +696,20 @@ public abstract class AbstractModelConfig extends AbstractConfig implements Mode
      */
     public String asPraiseString(double praise) {
         return praiseFormatter.format(praise);
+    }
+
+    /**
+     *
+     */
+    public String getConfirmAccountEmailSubject() {
+        return doGetValue("ConfirmAccountEmailSubject");
+    }
+
+    /**
+     *
+     */
+    public String getConfirmAccountEmailBody() {
+        return doGetValue("ConfirmAccountEmailBody");
     }
 
 }

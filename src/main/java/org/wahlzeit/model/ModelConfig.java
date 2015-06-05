@@ -219,11 +219,6 @@ public interface ModelConfig extends Configuration, Serializable {
 
     String getWelcomeEmailUserName();
 
-    // Request confirmation email
-    String getConfirmAccountEmailSubject();
-
-    String getConfirmAccountEmailBody();
-
     // Notify about praise email
     String getNotifyAboutPraiseEmailSubject();
 

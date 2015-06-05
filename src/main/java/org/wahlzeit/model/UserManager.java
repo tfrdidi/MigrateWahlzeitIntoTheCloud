@@ -133,24 +133,6 @@ public class UserManager extends ClientManager {
         String emailSubject = us.getConfiguration().getWelcomeEmailSubject();
         String emailBody = us.getConfiguration().getWelcomeEmailBody() + "\n\n";
         emailBody += us.getConfiguration().getWelcomeEmailUserName() + user.getId() + "\n\n";
-        emailBody += us.getConfiguration().getConfirmAccountEmailBody() + "\n\n";
-        emailBody += "confirm?code=" + user.getConfirmationCode() + "\n\n";
-        emailBody += us.getConfiguration().getGeneralEmailRegards() + "\n\n----\n";
-        emailBody += us.getConfiguration().getGeneralEmailFooter() + "\n\n";
-
-        EmailService emailService = EmailServiceManager.getDefaultService();
-        emailService.sendEmailIgnoreException(to, us.getConfiguration().getAuditEmailAddress(), emailSubject, emailBody);
-    }
-
-    /**
-     *
-     */
-    public void emailConfirmationRequest(UserSession us, User user) {
-        EmailAddress to = user.getEmailAddress();
-
-        String emailSubject = us.getConfiguration().getConfirmAccountEmailSubject();
-        String emailBody = us.getConfiguration().getConfirmAccountEmailBody() + "\n\n";
-        emailBody += "confirm?code=" + user.getConfirmationCode() + "\n\n"; // @TODO Application
         emailBody += us.getConfiguration().getGeneralEmailRegards() + "\n\n----\n";
         emailBody += us.getConfiguration().getGeneralEmailFooter() + "\n\n";
 
