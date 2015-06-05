@@ -61,7 +61,7 @@ public class EditUserProfileFormHandler extends AbstractWebFormHandler {
 
         Photo photo = user.getUserPhoto();
         part.addString(Photo.THUMB, getPhotoThumb(us, photo));
-        part.addSelect(User.GENDER, Gender.class, (String) args.get(User.GENDER), user.getGender());
+        part.addSelect(User.GENDER, Gender.class, user.getGender().asString(), user.getGender());
         part.addSelect(User.LANGUAGE, Language.class, (String) args.get(User.LANGUAGE), user.getLanguage());
 
         part.maskAndAddStringFromArgsWithDefault(args, User.EMAIL_ADDRESS, user.getEmailAddress().asString());
@@ -84,7 +84,9 @@ public class EditUserProfileFormHandler extends AbstractWebFormHandler {
         user.setNotifyAboutPraise(notify);
 
         try {
-            user.setNickName(nickName);
+            if (!nickName.equals(user.getNickName())) {
+                user.setNickName(nickName);
+            }
         } catch (IllegalArgumentException e) {
             us.setMessage(us.getConfiguration().getNickNameExists(nickName));
             return PartUtil.SHOW_NOTE_PAGE_NAME;
