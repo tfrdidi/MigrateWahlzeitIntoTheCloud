@@ -78,4 +78,11 @@ public class EnglishModelConfig extends AbstractModelConfig {
         return "Photo by " + HtmlUtil.asHref("/filter?userName=" + un, un);
     }
 
+    /**
+     *
+     */
+    public String getNickNameExists(String nickName) {
+        return "User name " + nickName + " is already used. Please " + HtmlUtil.asHref("/profile.html", "select another one.");
+    }
+
 }

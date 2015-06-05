@@ -247,4 +247,7 @@ public interface ModelConfig extends Configuration, Serializable {
 
     String asPraiseString(double praise);
 
+
+    String getNickNameExists(String nickName);
+
 }

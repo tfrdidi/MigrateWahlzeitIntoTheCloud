@@ -3,7 +3,9 @@ package org.wahlzeit.model;
 import org.wahlzeit.services.LogBuilder;
 import org.wahlzeit.services.ObjectManager;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -26,6 +28,8 @@ public abstract class ClientManager extends ObjectManager {
      */
     protected Map<String, Client> idClientMap = new HashMap<String, Client>();
 
+    protected List<String> listOfUsedNicknames = new ArrayList<String>();
+
 
     // add methods -----------------------------------------------------------------------------------------------------
 
@@ -33,9 +37,10 @@ public abstract class ClientManager extends ObjectManager {
      * @methodtype set
      * @methodproperty wrapper
      */
-    public void addClient(Client client) {
+    public void addClient(Client client) throws IllegalArgumentException {
         assertIsNonNullArgument(client);
         assertIsUnknownClientAsIllegalArgument(client);
+        assertNicknameIsNotUsed(client.getNickName());
 
         doAddClient(client);
     }
@@ -50,12 +55,22 @@ public abstract class ClientManager extends ObjectManager {
     }
 
     /**
+     * @methodtype assertion
+     */
+    protected void assertNicknameIsNotUsed(String nickName) {
+        if (listOfUsedNicknames.contains(nickName)) {
+            throw new IllegalArgumentException("Nickname " + nickName + " is already used.");
+        }
+    }
+
+    /**
      * @methodtype set
      * @methodproperty primitive
      */
     protected void doAddClient(Client client) {
         idClientMap.put(client.getId(), client);
         writeObject(client);
+        listOfUsedNicknames.add(client.getNickName());
         log.config(LogBuilder.createSystemMessage().addParameter("Added new user", client.getId()).toString());
     }
 
@@ -173,5 +188,18 @@ public abstract class ClientManager extends ObjectManager {
         if (hasClientById(client.getId())) {
             throw new IllegalStateException(client.getId() + "should not be known");
         }
+    }
+
+
+    // update methods --------------------------------------------------------------------------------------------------
+
+    /**
+     * @methodtype set
+     */
+    public void changeNickname(String oldNickName, String newNickName) throws IllegalArgumentException {
+        assertNicknameIsNotUsed(newNickName);
+
+        listOfUsedNicknames.remove(oldNickName);
+        listOfUsedNicknames.add(newNickName);
     }
 }

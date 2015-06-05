@@ -83,7 +83,13 @@ public class EditUserProfileFormHandler extends AbstractWebFormHandler {
         boolean notify = (status != null) && status.equals("on");
         user.setNotifyAboutPraise(notify);
 
-        user.setNickName(nickName);
+        try {
+            user.setNickName(nickName);
+        } catch (IllegalArgumentException e) {
+            us.setMessage(us.getConfiguration().getNickNameExists(nickName));
+            return PartUtil.SHOW_NOTE_PAGE_NAME;
+        }
+
 
         if (!StringUtil.isNullOrEmptyString(gender)) {
             user.setGender(Gender.getFromString(gender));

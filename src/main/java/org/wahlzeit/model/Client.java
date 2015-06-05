@@ -117,7 +117,8 @@ public abstract class Client implements Serializable, Persistent {
     /**
      * @methodtype set
      */
-    public void setNickName(String nickName) {
+    public void setNickName(String nickName) throws IllegalArgumentException {
+        UserManager.getInstance().changeNickname(this.nickName, nickName);
         this.nickName = nickName;
         incWriteCount();
     }

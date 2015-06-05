@@ -78,4 +78,10 @@ public class GermanModelConfig extends AbstractModelConfig {
         return "Photo von " + HtmlUtil.asHref("/filter?userName=" + un, un);
     }
 
+    /**
+     *
+     */
+    public String getNickNameExists(String nickName) {
+        return "Benutzername " + nickName + " wird bereits verwendet. Bitte " + HtmlUtil.asHref("/profile.html", "wählen Sie einen anderen.");
+    }
 }
