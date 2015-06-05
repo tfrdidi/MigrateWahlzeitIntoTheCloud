@@ -114,8 +114,6 @@ public class TellFriendFormHandler extends AbstractWebFormHandler {
         EmailService emailService = EmailServiceManager.getDefaultService();
         emailService.sendEmailIgnoreException(from, to, us.getConfiguration().getAuditEmailAddress(), emailSubject, emailBody);
 
-        us.setEmailAddress(from);
-
         log.info(LogBuilder.createUserMessage().
                 addAction("TellFriend").
                 addParameter("recipient", to.asString()).

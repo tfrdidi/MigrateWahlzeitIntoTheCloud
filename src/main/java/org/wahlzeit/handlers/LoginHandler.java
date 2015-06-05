@@ -51,22 +51,23 @@ public class LoginHandler extends AbstractWebFormHandler {
                     addParameter("E-Mail", googleUser.getEmail()).toString());
             String userId = googleUser.getUserId();
             UserManager userManager = UserManager.getInstance();
-            User user = userManager.getUserByName(userId);
+            User user = userManager.getUserById(userId);
             if (user != null) {
                 // Wahlzeit user already exists
                 us.setClient(user);
                 log.config(LogBuilder.createSystemMessage().
                         addMessage("Wahlzeit user exists").
-                        addParameter("id", user.getName()).toString());
+                        addParameter("id", user.getId()).toString());
             } else {
                 // create new Wahlzeit user
                 String emailAddress = googleUser.getEmail();
+                String nickName = googleUser.getNickname();
                 long confirmationCode = userManager.createConfirmationCode();
 
                 if (userService.isUserAdmin()) {
-                    user = new Administrator(userId, emailAddress, confirmationCode);
+                    user = new Administrator(userId, nickName, emailAddress, confirmationCode);
                 } else {
-                    user = new User(userId, emailAddress, confirmationCode);
+                    user = new User(userId, nickName, emailAddress, confirmationCode);
                 }
                 userManager.emailWelcomeMessage(us, user);
                 us.setClient(user);

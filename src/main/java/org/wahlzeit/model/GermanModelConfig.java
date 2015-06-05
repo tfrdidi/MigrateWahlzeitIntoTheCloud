@@ -23,7 +23,6 @@ package org.wahlzeit.model;
 import org.wahlzeit.services.Language;
 import org.wahlzeit.utils.HtmlUtil;
 
-import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 
@@ -42,6 +41,14 @@ public class GermanModelConfig extends AbstractModelConfig {
         praiseFormatter.setMinimumFractionDigits(2);
 
         super.initialize(Language.GERMAN, new SimpleDateFormat("d. MMM yyyy"), praiseFormatter);
+    }
+
+    /**
+     *
+     */
+    public String getNewPhotoSizeSet(PhotoSize ss) {
+        String size = HtmlUtil.asBold(asValueString(ss));
+        return "Wir haben die Fotogröße auf " + size + " gesetzt.";
     }
 
     /**
@@ -67,22 +74,8 @@ public class GermanModelConfig extends AbstractModelConfig {
     /**
      *
      */
-    public String asPhotoCaption(String un, URL url) {
-        String result = "Foto";
-        if (url != null) {
-            result += " von " + HtmlUtil.asHref(url.toString(), un);
-        } else {
-            result += " von " + un;
-        }
-        return result;
-    }
-
-    /**
-     *
-     */
-    public String getNewPhotoSizeSet(PhotoSize ss) {
-        String size = HtmlUtil.asBold(asValueString(ss));
-        return "Wir haben die Fotogröße auf " + size + " gesetzt.";
+    public String asPhotoCaption(String un) {
+        return "Photo von " + HtmlUtil.asHref("/filter?userName=" + un, un);
     }
 
 }

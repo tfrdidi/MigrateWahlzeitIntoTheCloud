@@ -168,12 +168,12 @@ public class PhotoManager extends ObjectManager {
                 loadScaledImages(photo);
                 doAddPhoto(photo);
                 try {
-                    String ownerName = photo.getOwnerName();
-                    User user = UserManager.getInstance().getUserByName(ownerName);
+                    String ownerName = photo.getOwnerId();
+                    User user = UserManager.getInstance().getUserById(ownerName);
                     if (user != null) {
                         user.addPhoto(photo);
                         log.config(LogBuilder.createSystemMessage().
-                                addParameter("Found owner", user.getName()).toString());
+                                addParameter("Found owner", user.getId()).toString());
                     } else {
                         log.warning(LogBuilder.createSystemMessage().
                                 addParameter("missing owner", ownerName).toString());
@@ -307,7 +307,7 @@ public class PhotoManager extends ObjectManager {
      */
     public Set<Photo> findPhotosByOwner(String ownerName) {
         Set<Photo> result = new HashSet<Photo>();
-        readObjects(result, Photo.class, Photo.OWNER_NAME, ownerName);
+        readObjects(result, Photo.class, Photo.OWNER_ID, ownerName);
 
         for (Iterator<Photo> i = result.iterator(); i.hasNext(); ) {
             doAddPhoto(i.next());

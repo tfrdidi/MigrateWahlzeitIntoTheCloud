@@ -40,8 +40,8 @@ public class Guest extends Client {
      *
      */
     public Guest() {
-        name = GUEST_PREFIX + UserManager.getInstance().getNextClientId();
-        initialize(AccessRights.GUEST, EmailAddress.EMPTY);
+        String userId = GUEST_PREFIX + UserManager.getInstance().getNextClientId();
+        initialize(userId, userId, EmailAddress.EMPTY, AccessRights.GUEST);
     }
 
 }

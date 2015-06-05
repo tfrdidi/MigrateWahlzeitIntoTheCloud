@@ -7,7 +7,9 @@
 		<tr>
 			<td class="thumb" rowspan="6">{$thumb}</td>
 			<td class="fiveCol2">User name:&nbsp;</td>
-			<td class="fiveCol3x" colspan="3"><b>{$name}</b></td>
+			<td class="fiveCol3x" colspan="3">
+				<input type="text" name="nickName" value="{$nickName}" size="40"/>
+			</td>
 		</tr>
 		<tr>
 			<td class="fiveCol2">Gender:&nbsp;</td>
@@ -30,19 +32,11 @@
 		</tr>
 		<tr>
 			<td class="fiveCol2">Email address:&nbsp;</td>
-			<td class="fiveCol3">
-				<input type="text" name="emailAddress" value="{$emailAddress}" size="40" />
-			</td>
+			<td class="fiveCol3x" colspan="3"><b>{$emailAddress}</b></td>
 			<td class="inline" align="right">
 				<input type="checkbox" name="notifyAboutPraise" {$notifyAboutPraise} />
 			</td>
 			<td class="fiveCol5">Notify about praise</td>
-		</tr>
-		<tr>
-			<td class="fiveCol2">Home page:&nbsp;</td>
-			<td class="fiveCol3x" colspan="3">
-				<input type="text" name="homePage" value="{$homePage}" size="40" />
-			</td>
 		</tr>
 		<tr>
 			<td class="fiveCol2">&nbsp;</td>

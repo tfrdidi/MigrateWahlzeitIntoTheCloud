@@ -78,7 +78,7 @@ public class Session {
     /**
      * @methodtype get
      */
-    public String getClientName() {
+    public String getClientId() {
         return "system";
     }
 

@@ -76,7 +76,7 @@ public class ShowAdminPageHandler extends AbstractWebPageHandler implements WebF
         WebFormHandler handler = getFormHandler(PartUtil.NULL_FORM_NAME);
 
         String userId = us.getSavedArg("userId").toString();
-        User user = UserManager.getInstance().getUserByName(userId);
+        User user = UserManager.getInstance().getUserById(userId);
         log.config("UserId: " + userId);
         if (user != null) {
             log.config("User = null");
@@ -132,7 +132,7 @@ public class ShowAdminPageHandler extends AbstractWebPageHandler implements WebF
     protected String performAdminUserProfileRequest(UserSession us, Map args) {
         String userId = us.getAndSaveAsString(args, "userId");
         log.config("UserId: " + userId);
-        User user = UserManager.getInstance().getUserByName(userId);
+        User user = UserManager.getInstance().getUserById(userId);
         if (user == null) {
             log.config("User = null");
             us.setMessage(us.getConfiguration().getUserNameIsUnknown());

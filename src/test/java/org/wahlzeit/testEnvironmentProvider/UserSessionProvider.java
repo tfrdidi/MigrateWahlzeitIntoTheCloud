@@ -34,10 +34,10 @@ public class UserSessionProvider extends ExternalResource {
         String guestName = ObjectifyService.run(new Work<String>() {
             @Override
             public String run() {
-                return new Guest().getName();
+                return new Guest().getId();
             }
         });
-        when(httpSession.getAttribute(UserSession.CLIENT_NAME)).thenReturn(guestName);
+        when(httpSession.getAttribute(UserSession.CLIENT_ID)).thenReturn(guestName);
 
         Map<String, Object> dummyMap = new HashMap<String, Object>();
         dummyMap.put(UserSession.MESSAGE, "dummy Message");

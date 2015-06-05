@@ -96,10 +96,10 @@ public class UserManager extends ClientManager {
                 readObjects(existingUser, User.class);
 
                 for (User user : existingUser) {
-                    if (!hasClientByName(user.getName())) {
+                    if (!hasClientById(user.getId())) {
                         doAddClient(user);
                     } else {
-                        log.config(LogBuilder.createSystemMessage().addParameter("user has been loaded", user.getName()).toString());
+                        log.config(LogBuilder.createSystemMessage().addParameter("user has been loaded", user.getId()).toString());
                     }
                 }
                 return null;
@@ -132,9 +132,9 @@ public class UserManager extends ClientManager {
 
         String emailSubject = us.getConfiguration().getWelcomeEmailSubject();
         String emailBody = us.getConfiguration().getWelcomeEmailBody() + "\n\n";
-        emailBody += us.getConfiguration().getWelcomeEmailUserName() + user.getName() + "\n\n";
+        emailBody += us.getConfiguration().getWelcomeEmailUserName() + user.getId() + "\n\n";
         emailBody += us.getConfiguration().getConfirmAccountEmailBody() + "\n\n";
-        emailBody += user.getSiteUrlAsString() + "confirm?code=" + user.getConfirmationCode() + "\n\n"; // @TODO Application
+        emailBody += "confirm?code=" + user.getConfirmationCode() + "\n\n";
         emailBody += us.getConfiguration().getGeneralEmailRegards() + "\n\n----\n";
         emailBody += us.getConfiguration().getGeneralEmailFooter() + "\n\n";
 
@@ -151,7 +151,7 @@ public class UserManager extends ClientManager {
 
         String emailSubject = us.getConfiguration().getConfirmAccountEmailSubject();
         String emailBody = us.getConfiguration().getConfirmAccountEmailBody() + "\n\n";
-        emailBody += user.getSiteUrlAsString() + "confirm?code=" + user.getConfirmationCode() + "\n\n"; // @TODO Application
+        emailBody += "confirm?code=" + user.getConfirmationCode() + "\n\n"; // @TODO Application
         emailBody += us.getConfiguration().getGeneralEmailRegards() + "\n\n----\n";
         emailBody += us.getConfiguration().getGeneralEmailFooter() + "\n\n";
 
@@ -174,7 +174,7 @@ public class UserManager extends ClientManager {
         result = readObject(User.class, User.EMAIL_ADDRESS, emailAddress.asString());
 
         if (result != null) {
-            User current = getUserByName(result.getName());
+            User current = getUserById(result.getId());
             if (current == null) {
                 doAddClient(result);
             } else {
@@ -188,8 +188,8 @@ public class UserManager extends ClientManager {
     /**
      * @methodtype get
      */
-    public User getUserByName(String name) {
-        Client client = super.getClientByName(name);
+    public User getUserById(String name) {
+        Client client = super.getClientById(name);
         if (client instanceof User) {
             return (User) client;
         } else {

@@ -84,10 +84,10 @@ public abstract class ModelMain extends AbstractMain {
     /**
      *
      */
-    protected void createUser(String userName, String emailAddress, String photoDir) throws Exception {
+    protected void createUser(String userId, String nickName, String emailAddress, String photoDir) throws Exception {
         UserManager userManager = UserManager.getInstance();
         long confirmationCode = userManager.createConfirmationCode();
-        User user = new User(userName, emailAddress, confirmationCode);
+        new User(userId, nickName, emailAddress, confirmationCode);
 
         PhotoManager photoManager = PhotoManager.getInstance();
         File photoDirFile = new File(photoDir);

@@ -27,7 +27,6 @@ import org.wahlzeit.model.User;
 import org.wahlzeit.model.UserManager;
 import org.wahlzeit.model.UserSession;
 import org.wahlzeit.model.UserStatus;
-import org.wahlzeit.services.EmailAddress;
 import org.wahlzeit.services.Language;
 import org.wahlzeit.services.LogBuilder;
 import org.wahlzeit.utils.HtmlUtil;
@@ -58,19 +57,18 @@ public class AdminUserProfileFormHandler extends AbstractWebFormHandler {
         Map<String, Object> args = us.getSavedArgs();
 
         String userId = us.getAndSaveAsString(args, "userId");
-        User user = UserManager.getInstance().getUserByName(userId);
+        User user = UserManager.getInstance().getUserById(userId);
 
         Photo photo = user.getUserPhoto();
         part.addString(Photo.THUMB, getPhotoThumb(us, photo));
 
-        part.maskAndAddString("userId", user.getName());
-        part.maskAndAddString(User.NAME, user.getName());
+        part.maskAndAddString(User.ID, user.getId());
+        part.maskAndAddString(User.NICK_NAME, user.getId());
         part.addSelect(User.STATUS, UserStatus.class, (String) args.get(User.STATUS));
         part.addSelect(User.RIGHTS, AccessRights.class, (String) args.get(User.RIGHTS));
         part.addSelect(User.GENDER, Gender.class, (String) args.get(User.GENDER));
         part.addSelect(User.LANGUAGE, Language.class, (String) args.get(User.LANGUAGE));
         part.maskAndAddStringFromArgsWithDefault(args, User.EMAIL_ADDRESS, user.getEmailAddress().asString());
-        part.maskAndAddStringFromArgsWithDefault(args, User.HOME_PAGE, user.getHomePage().toString());
 
         if (user.getNotifyAboutPraise()) {
             part.addString(User.NOTIFY_ABOUT_PRAISE, HtmlUtil.CHECKBOX_CHECK);
@@ -83,39 +81,34 @@ public class AdminUserProfileFormHandler extends AbstractWebFormHandler {
     protected String doHandlePost(UserSession us, Map args) {
         UserManager um = UserManager.getInstance();
         String userId = us.getAndSaveAsString(args, "userId");
-        User user = um.getUserByName(userId);
+        User user = um.getUserById(userId);
 
         String status = us.getAndSaveAsString(args, User.STATUS);
         String rights = us.getAndSaveAsString(args, User.RIGHTS);
         String gender = us.getAndSaveAsString(args, User.GENDER);
         String language = us.getAndSaveAsString(args, User.LANGUAGE);
         String emailAddress = us.getAndSaveAsString(args, User.EMAIL_ADDRESS);
-        String homePage = us.getAndSaveAsString(args, User.HOME_PAGE);
         String notifyAboutPraise = us.getAndSaveAsString(args, User.NOTIFY_ABOUT_PRAISE);
 
         if (!StringUtil.isValidStrictEmailAddress(emailAddress)) {
             us.setMessage(us.getConfiguration().getEmailAddressIsInvalid());
             return PartUtil.SHOW_ADMIN_PAGE_NAME;
-        } else if (!StringUtil.isValidURL(homePage)) {
-            us.setMessage(us.getConfiguration().getUrlIsInvalid());
-            return PartUtil.SHOW_ADMIN_PAGE_NAME;
         }
 
         user.setStatus(UserStatus.getFromString(status));
-        user.setRights(AccessRights.getFromString(rights));
+        user.setAccessRights(AccessRights.getFromString(rights));
         user.setGender(Gender.getFromString(gender));
         user.setLanguage(Language.getFromString(language));
-        user.setEmailAddress(EmailAddress.getFromString(emailAddress));
-        user.setHomePage(StringUtil.asUrl(homePage));
+        // TODO user.setEmailAddress(EmailAddress.getFromString(emailAddress));
         user.setNotifyAboutPraise((notifyAboutPraise != null) && notifyAboutPraise.equals("on"));
 
         um.removeClient(user);
-        user = um.getUserByName(userId);
+        user = um.getUserById(userId);
         us.setSavedArg("userId", userId);
 
         log.info(LogBuilder.createUserMessage().
                 addAction("AdminUserProfile").
-                addParameter("User", user.getName()).toString());
+                addParameter("User ID", user.getId()).toString());
 
         us.setMessage(us.getConfiguration().getProfileUpdateSucceeded());
 

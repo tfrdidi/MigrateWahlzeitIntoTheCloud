@@ -26,12 +26,10 @@ import java.util.logging.Logger;
  */
 public class GcsAdapter {
 
-    private static final Logger log = Logger.getLogger(GcsAdapter.class.getName());
-
     public static final String BUCKET_NAME = SysConfig.DATA_PATH;
     public static final String PHOTO_FOLDER = "photos";
     public static final String PHOTO_FOLDER_PATH_WITH_BUCKET = File.separator + BUCKET_NAME + File.separator + PHOTO_FOLDER + File.separator;
-
+    private static final Logger log = Logger.getLogger(GcsAdapter.class.getName());
     /**
      * 1 MB Buffer, does not limit the size of the files. A valid compromise between unused allocation and
      * reallocation.
@@ -45,6 +43,10 @@ public class GcsAdapter {
 
     private static GcsAdapter instance = null;
 
+    private GcsAdapter() {
+
+    }
+
     /**
      * @methodtype get
      */
@@ -55,15 +57,11 @@ public class GcsAdapter {
         return instance;
     }
 
-    private GcsAdapter() {
-
-    }
-
 
     // write-methods ---------------------------------------------------------------------------------------------------
 
     /**
-     * Saves the image in the Google Cloud Storage, so you can access it via ownerName, photoId and size again. An
+     * Saves the image in the Google Cloud Storage, so you can access it via ownerId, photoId and size again. An
      * existing file of that owner with that file name is overwritten.
      *
      * @throws InvalidParameterException - one parameter = null or invalid filename
@@ -80,6 +78,39 @@ public class GcsAdapter {
 
         GcsFilename gcsFilename = getGcsFileName(photoIdAsString, size);
         doWriteToCloudStorage(image, gcsFilename);
+    }
+
+    /**
+     * @methodtype assert
+     */
+    private void assertValidPhotoId(String photoId) throws IllegalArgumentException {
+        if (photoId == null || "".equals(photoId)) {
+            throw new IllegalArgumentException("Invalid photoId:" + photoId);
+        }
+    }
+
+
+    // read methods ----------------------------------------------------------------------------------------------------
+
+    /**
+     * @methodtype assert
+     */
+    private void assertValidImage(Image image) throws IllegalArgumentException {
+        if (image == null) {
+            throw new IllegalArgumentException("Invalid image!");
+        }
+    }
+
+    /**
+     * Creates a <code>GcsFilename</code> for the photo in the specified size. The name structure is:
+     * <p/>
+     * BUCKET_NAME - ownerId/fileName/photoIdAsString
+     *
+     * @methodtype get
+     */
+    private GcsFilename getGcsFileName(String photoIdAsString, int size) {
+        String filePath = PHOTO_FOLDER + File.separator + photoIdAsString + size;
+        return new GcsFilename(BUCKET_NAME, filePath);
     }
 
     /**
@@ -112,10 +143,10 @@ public class GcsAdapter {
     }
 
 
-    // read methods ----------------------------------------------------------------------------------------------------
+    // exist method ----------------------------------------------------------------------------------------------------
 
     /**
-     * Reads an image from Google Cloud Storage via ownerName and filename.
+     * Reads an image from Google Cloud Storage via ownerId and filename.
      *
      * @throws IllegalArgumentException - one parameter = null or invalid filename
      * @throws IOException
@@ -132,24 +163,32 @@ public class GcsAdapter {
         return doReadFromCloudStorage(gcsFilename);
     }
 
+
+    // methods to create GcsFileNames ----------------------------------------------------------------------------------
+
     /**
-     * Reads an image from Google Cloud Storage via ownerName, photoId and the size.
-     *
-     * @throws IOException
-     * @throws IllegalArgumentException - one parameter = null or emtpy
-     * @methodtype get
-     * @methodproperty convenience
-     * @see #writeToCloudStorage(Image, String, int)
+     * @methodtype assert
      */
-    public Image readFromCloudStorage(String photoIdAsString, int size)
-            throws IllegalArgumentException, IOException {
-
-        assertValidPhotoId(photoIdAsString);
-        PhotoSize.assertIsValidPhotoSizeAsInt(size);
-
-        GcsFilename gcsFilename = getGcsFileName(photoIdAsString, size);
-        return doReadFromCloudStorage(gcsFilename);
+    private void assertValidFileName(String fileName) throws IllegalArgumentException {
+        if (fileName == null || "".equals(fileName)) {
+            throw new IllegalArgumentException("Invalid file name!");
+        }
     }
+
+    /**
+     * Creates a <code>GcsFilename</code> for the photo in the specified size. The name structure is:
+     * <p/>
+     * BUCKET_NAME - ownerId/fileName
+     *
+     * @methodtype command
+     */
+    private GcsFilename getGcsFileName(String fileName) {
+        String filePath = PHOTO_FOLDER + File.separator + fileName;
+        return new GcsFilename(BUCKET_NAME, filePath);
+    }
+
+
+    // assertion methods -----------------------------------------------------------------------------------------------
 
     /**
      * Reads the specified file from Google Cloud Storage. When not found, null is returned.
@@ -169,8 +208,24 @@ public class GcsAdapter {
         return ImagesServiceFactory.makeImage(bb.array());
     }
 
+    /**
+     * Reads an image from Google Cloud Storage via ownerId, photoId and the size.
+     *
+     * @throws IOException
+     * @throws IllegalArgumentException - one parameter = null or emtpy
+     * @methodtype get
+     * @methodproperty convenience
+     * @see #writeToCloudStorage(Image, String, int)
+     */
+    public Image readFromCloudStorage(String photoIdAsString, int size)
+            throws IllegalArgumentException, IOException {
 
-    // exist method ----------------------------------------------------------------------------------------------------
+        assertValidPhotoId(photoIdAsString);
+        PhotoSize.assertIsValidPhotoSizeAsInt(size);
+
+        GcsFilename gcsFilename = getGcsFileName(photoIdAsString, size);
+        return doReadFromCloudStorage(gcsFilename);
+    }
 
     /**
      * Checks if the specified Image already exists in the Google Cloud Storage
@@ -195,62 +250,5 @@ public class GcsAdapter {
         }
         log.log(Level.CONFIG, "Image for PhotoId {0} in size {1} exists: {2}", new Object[]{photoIdAsString, size, result});
         return result;
-    }
-
-
-    // methods to create GcsFileNames ----------------------------------------------------------------------------------
-
-    /**
-     * Creates a <code>GcsFilename</code> for the photo in the specified size. The name structure is:
-     * <p/>
-     * BUCKET_NAME - ownerName/fileName/photoIdAsString
-     *
-     * @methodtype get
-     */
-    private GcsFilename getGcsFileName(String photoIdAsString, int size) {
-        String filePath = PHOTO_FOLDER + File.separator + photoIdAsString + size;
-        return new GcsFilename(BUCKET_NAME, filePath);
-    }
-
-    /**
-     * Creates a <code>GcsFilename</code> for the photo in the specified size. The name structure is:
-     * <p/>
-     * BUCKET_NAME - ownerName/fileName
-     *
-     * @methodtype command
-     */
-    private GcsFilename getGcsFileName(String fileName) {
-        String filePath = PHOTO_FOLDER + File.separator + fileName;
-        return new GcsFilename(BUCKET_NAME, filePath);
-    }
-
-
-    // assertion methods -----------------------------------------------------------------------------------------------
-
-    /**
-     * @methodtype assert
-     */
-    private void assertValidPhotoId(String photoId) throws IllegalArgumentException {
-        if (photoId == null || "".equals(photoId)) {
-            throw new IllegalArgumentException("Invalid photoId:" + photoId);
-        }
-    }
-
-    /**
-     * @methodtype assert
-     */
-    private void assertValidImage(Image image) throws IllegalArgumentException {
-        if (image == null) {
-            throw new IllegalArgumentException("Invalid image!");
-        }
-    }
-
-    /**
-     * @methodtype assert
-     */
-    private void assertValidFileName(String fileName) throws IllegalArgumentException {
-        if (fileName == null || "".equals(fileName)) {
-            throw new IllegalArgumentException("Invalid file name!");
-        }
     }
 }

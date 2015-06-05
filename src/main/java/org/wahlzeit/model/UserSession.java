@@ -21,9 +21,7 @@
 package org.wahlzeit.model;
 
 import com.google.appengine.api.images.Image;
-import org.wahlzeit.services.EmailAddress;
 import org.wahlzeit.services.Language;
-import org.wahlzeit.services.LogBuilder;
 import org.wahlzeit.services.Session;
 import org.wahlzeit.utils.HtmlUtil;
 
@@ -55,7 +53,7 @@ public class UserSession extends Session implements Serializable {
     public static final String PRAISED_PHOTOS = "praisedPhotos";
     public static final String MESSAGE = "message";
     public static final String HEADING = "heading";
-    public static final String CLIENT_NAME = "clientName";
+    public static final String CLIENT_ID = "clientId";
     public static final String SITE_URL = "siteUrl";
     public static final String CONFIGURATION = "configuration";
     public static final String CONFIRMATION_CODE = "confirmationCode";
@@ -184,8 +182,8 @@ public class UserSession extends Session implements Serializable {
     /**
      * @methodtype convert Returns some signifier of current user
      */
-    public String getClientName() {
-        return (String) httpSession.getAttribute(CLIENT_NAME);
+    public String getClientId() {
+        return (String) httpSession.getAttribute(CLIENT_ID);
     }
 
     @Override
@@ -209,28 +207,15 @@ public class UserSession extends Session implements Serializable {
      * @methodtype get
      */
     public Client getClient() {
-        String clientName = (String) httpSession.getAttribute(CLIENT_NAME);
-        return UserManager.getInstance().getClientByName(clientName);
+        String clientName = (String) httpSession.getAttribute(CLIENT_ID);
+        return UserManager.getInstance().getClientById(clientName);
     }
 
     /**
      * @methodtype set
      */
     public void setClient(Client newClient) {
-        httpSession.setAttribute(CLIENT_NAME, newClient.getName());
-    }
-
-    /**
-     * @methodtype set
-     */
-    public void setEmailAddress(EmailAddress emailAddress) {
-        Client client = getClient();
-        if (client != null) {
-            client.setEmailAddress(emailAddress);
-        } else {
-            log.warning(LogBuilder.createSystemMessage().
-                    addMessage("attempted to set email address, but client=null!").toString());
-        }
+        httpSession.setAttribute(CLIENT_ID, newClient.getId());
     }
 
     /**
@@ -427,7 +412,7 @@ public class UserSession extends Session implements Serializable {
         Client client = getClient();
         if ((photo != null) && (client instanceof User)) {
             User user = (User) client;
-            result = photo.getOwnerName().equals(user.getName());
+            result = photo.getOwnerId().equals(user.getId());
         }
         return result;
     }

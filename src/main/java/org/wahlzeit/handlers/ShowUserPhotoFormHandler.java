@@ -92,7 +92,7 @@ public class ShowUserPhotoFormHandler extends AbstractWebFormHandler {
         Photo photo = PhotoManager.getPhoto(id);
 
         UserManager userManager = UserManager.getInstance();
-        User user = userManager.getUserByName(photo.getOwnerName());
+        User user = userManager.getUserById(photo.getOwnerId());
         if (us.isFormType(args, "edit")) {
             us.setPhotoId(photo.getId());
             result = PartUtil.EDIT_USER_PHOTO_PAGE_NAME;

@@ -40,12 +40,6 @@ public class PhotoCase extends Case {
     public static final String CREATED_ON = "createdOn";
     public static final String WAS_DECIDED = "wasDecided";
     public static final String DECIDED_ON = "decidedOn";
-
-    /**
-     *
-     */
-    @Id
-    Long longId;
     protected CaseId id = CaseId.NULL_ID; // case id
     protected int applicationId = 0; // application id (unused on Java level)
     protected Photo photo = null; // photo id -> photo
@@ -55,6 +49,11 @@ public class PhotoCase extends Case {
     protected long createdOn = System.currentTimeMillis();
     protected boolean wasDecided = false;
     protected long decidedOn = 0;
+    /**
+     *
+     */
+    @Id
+    Long longId;
 
     /**
      *
@@ -166,7 +165,7 @@ public class PhotoCase extends Case {
      *
      */
     public String getPhotoOwnerName() {
-        return photo.getOwnerName();
+        return photo.getOwnerId();
     }
 
     /**

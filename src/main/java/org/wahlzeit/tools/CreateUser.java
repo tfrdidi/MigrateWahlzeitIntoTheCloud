@@ -21,7 +21,6 @@
 package org.wahlzeit.tools;
 
 import org.wahlzeit.main.ScriptMain;
-import org.wahlzeit.utils.StringUtil;
 
 /**
  * @author dirkriehle
@@ -31,8 +30,8 @@ public class CreateUser extends ScriptMain {
     /**
      *
      */
-    protected String userName = "testuser";
-    protected String password = "testuser";
+    protected String userId = "testuser";
+    protected String nickName = "testuser";
     protected String emailAddress = "info@wahlzeit.org";
     protected String photoDir = "config/photos";
 
@@ -48,20 +47,16 @@ public class CreateUser extends ScriptMain {
      */
     protected void handleArgv(String argv[]) {
         super.handleArgv(argv);
-
-        if (StringUtil.isNullOrEmptyString(password)) {
-            password = userName;
-        }
     }
 
     /**
      *
      */
     protected int handleArg(String arg, int i, String[] argv) {
-        if (arg.equals("--password")) {
-            password = argv[++i];
-        } else if (arg.equals("--username")) {
-            userName = argv[++i];
+        if (arg.equals("--userid")) {
+            userId = argv[++i];
+        } else if (arg.equals("--nickname")) {
+            nickName = argv[++i];
         } else if (arg.equals("--emailaddress")) {
             emailAddress = argv[++i];
         } else if (arg.equals("--photodir")) {
@@ -75,7 +70,7 @@ public class CreateUser extends ScriptMain {
      *
      */
     protected void execute() throws Exception {
-        createUser(userName, emailAddress, photoDir);
+        createUser(userId, nickName, emailAddress, photoDir);
     }
 
 }

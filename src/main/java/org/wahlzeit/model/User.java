@@ -25,10 +25,8 @@ import com.googlecode.objectify.annotation.Subclass;
 import org.wahlzeit.services.EmailAddress;
 import org.wahlzeit.services.Language;
 import org.wahlzeit.services.LogBuilder;
-import org.wahlzeit.utils.StringUtil;
 
 import javax.servlet.http.HttpSession;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -49,9 +47,6 @@ public class User extends Client {
     /**
      *
      */
-    public static final String NAME = "name";
-    public static final String PASSWORD = "password";
-    public static final String PASSWORD_AGAIN = "passwordAgain";
     public static final String EMAIL_ADDRESS = "emailAddress";
     public static final String TERMS = "termsAndConditions";
 
@@ -59,11 +54,10 @@ public class User extends Client {
      *
      */
     public static final String STATUS = "status";
-    public static final String RIGHTS = "rights";
+    public static final String RIGHTS = "accessRights";
     public static final String GENDER = "gender";
     public static final String LANGUAGE = "language";
     public static final String NOTIFY_ABOUT_PRAISE = "notifyAboutPraise";
-    public static final String HOME_PAGE = "homePage";
     public static final String MEMBER_SINCE = "memberSince";
     public static final String NO_PHOTOS = "noPhotos";
 
@@ -74,13 +68,11 @@ public class User extends Client {
      */
     protected transient int writeCount = 0;
 
-    protected String nameAsTag;
     /**
      *
      */
     protected Language language = Language.ENGLISH;
     protected boolean notifyAboutPraise = true;
-    protected URL homePage = getDefaultHomePage();
     protected Gender gender = Gender.UNDEFINED;
     protected UserStatus status = UserStatus.CREATED;
     protected long confirmationCode = 0; // 0 means doesn't need confirmation
@@ -99,52 +91,31 @@ public class User extends Client {
     /**
      *
      */
-    public User(String myName, String myEmailAddress, long vc) {
-        this(myName, EmailAddress.getFromString(myEmailAddress), vc);
+    public User(String id, String myName, String myEmailAddress, long vc) {
+        this(id, myName, EmailAddress.getFromString(myEmailAddress), vc);
     }
 
     /**
      *
      */
-    public User(String myName, EmailAddress myEmailAddress, long vc) {
-        initialize(AccessRights.USER, myEmailAddress, myName, vc);
+    public User(String id, String nickname, EmailAddress emailAddress, long vc) {
+        initialize(id, nickname, emailAddress, AccessRights.USER, vc);
     }
 
     /**
      * @methodtype initialization
      */
-    protected void initialize(AccessRights r, EmailAddress ea, String name, long vc) {
-        // name should be set before .initialize, because .initialize registers itself with the name
-        // at the UserManager.
-        this.name = name;
-        super.initialize(r, ea);
-
-
-        nameAsTag = Tags.asTag(name);
+    protected void initialize(String id, String nickName, EmailAddress emailAddress, AccessRights accessRights, long vc) {
+        super.initialize(id, nickName, emailAddress, accessRights);
 
         confirmationCode = vc;
 
-        homePage = getDefaultHomePage();
-
         log.config(LogBuilder.createSystemMessage().
                 addAction("initialize user").
-                addParameter("name", this.name).
-                addParameter("E-Mail", ea.asString()).toString());
+                addParameter("id", id).
+                addParameter("name", nickName).
+                addParameter("E-Mail", emailAddress.asString()).toString());
         incWriteCount();
-    }
-
-    /**
-     * @methodtype get
-     */
-    public URL getDefaultHomePage() {
-        return StringUtil.asUrl(getSiteUrlAsString() + "filter?userName=" + name); // @TODO Application
-    }
-
-    /**
-     * @methodtype get
-     */
-    public String getSiteUrlAsString() {
-        return "http://wahlzeit.org/";
     }
 
     /**
@@ -152,19 +123,6 @@ public class User extends Client {
      */
     protected User() {
         // do nothing
-    }
-
-    /**
-     * @methodtype set
-     */
-    public void setEmailAddress(EmailAddress myEmailAddress) {
-        super.setEmailAddress(myEmailAddress);
-        incWriteCount();
-
-        for (Iterator<Photo> i = photos.iterator(); i.hasNext(); ) {
-            Photo photo = i.next();
-            photo.setOwnerEmailAddress(emailAddress);
-        }
     }
 
     /**
@@ -186,13 +144,6 @@ public class User extends Client {
      */
     public void resetWriteCount() {
         writeCount = 0;
-    }
-
-    /**
-     * @methodtype get
-     */
-    public String getNameAsTag() {
-        return nameAsTag;
     }
 
     /**
@@ -245,27 +196,6 @@ public class User extends Client {
         for (Iterator<Photo> i = photos.iterator(); i.hasNext(); ) {
             Photo photo = i.next();
             photo.setOwnerNotifyAboutPraise(notifyAboutPraise);
-        }
-
-        incWriteCount();
-    }
-
-    /**
-     * @methodtype get
-     */
-    public URL getHomePage() {
-        return homePage;
-    }
-
-    /**
-     * @methodtype set
-     */
-    public void setHomePage(URL newHomePage) {
-        homePage = newHomePage;
-
-        for (Iterator<Photo> i = photos.iterator(); i.hasNext(); ) {
-            Photo photo = i.next();
-            photo.setOwnerHomePage(homePage);
         }
 
         incWriteCount();
@@ -352,11 +282,10 @@ public class User extends Client {
     public void addPhoto(Photo newPhoto) {
         photos.add(newPhoto);
 
-        newPhoto.setOwnerName(name);
+        newPhoto.setOwnerId(id);
         newPhoto.setOwnerNotifyAboutPraise(notifyAboutPraise);
         newPhoto.setOwnerEmailAddress(emailAddress);
         newPhoto.setOwnerLanguage(language);
-        newPhoto.setOwnerHomePage(homePage);
 
         incWriteCount();
     }

@@ -40,8 +40,13 @@ import java.io.Serializable;
 @Entity
 public abstract class Client implements Serializable, Persistent {
 
+    public static final String ID = "id";
+    public static final String NICK_NAME = "nickName";
+
     @Id
-    protected String name;
+    protected String id;
+
+    protected String nickName;
 
     @Parent
     protected Key parent = ObjectManager.applicationRootKey;
@@ -55,7 +60,7 @@ public abstract class Client implements Serializable, Persistent {
     /**
      *
      */
-    protected AccessRights rights = AccessRights.NONE;
+    protected AccessRights accessRights = AccessRights.NONE;
 
     protected int writeCount = 0;
 
@@ -69,32 +74,51 @@ public abstract class Client implements Serializable, Persistent {
     /**
      * @methodtype initialization
      */
-    protected void initialize(AccessRights myRights, EmailAddress myEmailAddress) {
-        rights = myRights;
-        setEmailAddress(myEmailAddress);
+    protected void initialize(String id, String nickName, EmailAddress emailAddress, AccessRights accessRights) {
+        this.id = id;
+        this.nickName = nickName;
+        this.accessRights = accessRights;
+        this.emailAddress = emailAddress;
+
         incWriteCount();
+
         UserManager.getInstance().addClient(this);
     }
 
     /**
      * @methodtype get
      */
-    public String getName() {
-        return name;
+    public String getId() {
+        return id;
     }
 
     /**
      * @methodtype get
      */
-    public AccessRights getRights() {
-        return rights;
+    public AccessRights getAccessRights() {
+        return accessRights;
     }
 
     /**
      * @methodtype set
      */
-    public void setRights(AccessRights newRights) {
-        rights = newRights;
+    public void setAccessRights(AccessRights newRights) {
+        accessRights = newRights;
+        incWriteCount();
+    }
+
+    /**
+     * @methodtype get
+     */
+    public String getNickName() {
+        return nickName;
+    }
+
+    /**
+     * @methodtype set
+     */
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
         incWriteCount();
     }
 
@@ -109,7 +133,7 @@ public abstract class Client implements Serializable, Persistent {
      * @methodtype boolean-query
      */
     public boolean hasRights(AccessRights otherRights) {
-        return AccessRights.hasRights(rights, otherRights);
+        return AccessRights.hasRights(accessRights, otherRights);
     }
 
     /**
@@ -138,14 +162,6 @@ public abstract class Client implements Serializable, Persistent {
      */
     public EmailAddress getEmailAddress() {
         return emailAddress;
-    }
-
-    /**
-     * @methodtype set
-     */
-    public void setEmailAddress(EmailAddress newEmailAddress) {
-        emailAddress = newEmailAddress;
-        incWriteCount();
     }
 
     /**

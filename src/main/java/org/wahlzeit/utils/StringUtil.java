@@ -34,6 +34,11 @@ import java.util.regex.Pattern;
 public class StringUtil {
 
     /**
+     * The string, which separates path segments in a URL
+     */
+    private static final String URL_SEPARATOR = "/";
+
+    /**
      *
      */
     public final static boolean isLegalUserName(String s) {
@@ -43,8 +48,29 @@ public class StringUtil {
     /**
      *
      */
-    public final static boolean isLegalPassword(String s) {
-        return isSafeString(s) && !s.equals("");
+    public final static boolean isSafeString(String s) {
+        return isSafeWebString(s); // & isSafeQueryArg(s);
+    }
+
+    /**
+     *
+     */
+    public final static boolean isSafeWebString(String s) {
+        return isSafeExcluding(s, "`'&<>;\"\\");
+    }
+
+    /**
+     *
+     */
+    protected final static boolean isSafeExcluding(String s, String l) {
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (!Character.isLetterOrDigit(c) && (l.indexOf(c) != -1)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -57,26 +83,17 @@ public class StringUtil {
     }
 
     /**
-     *
+     * @methodtype boolean-query
      */
-    public final static boolean isValidLocalEmailAddress(String s) {
-        int a = s.indexOf('@');
-        int d = s.lastIndexOf('@');
-        return isSafeIncluding(s, "_-+@.") && (a > 0) && (a == d);
-    }
+    protected final static boolean isSafeIncluding(String s, String l) {
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (!Character.isLetterOrDigit(c) && (l.indexOf(c) == -1)) {
+                return false;
+            }
+        }
 
-    /**
-     *
-     */
-    public final static boolean isLegalCharacterName(String s) {
-        return isSafeString(s);
-    }
-
-    /**
-     *
-     */
-    public final static boolean isLegalSeriesName(String s) {
-        return isSafeString(s);
+        return true;
     }
 
     /**
@@ -107,81 +124,10 @@ public class StringUtil {
     /**
      *
      */
-    public final static boolean isSafeString(String s) {
-        return isSafeWebString(s); // & isSafeQueryArg(s);
-    }
-
-    /**
-     *
-     */
-    public final static boolean isSafeWebString(String s) {
-        return isSafeExcluding(s, "`'&<>;\"\\");
-    }
-
-    /**
-     *
-     */
-    public final static boolean isSafeQueryArg(String s) {
-        return isSafeWebString(s);
-    }
-
-    /**
-     * @methodtype boolean-query
-     */
-    protected final static boolean isSafeIncluding(String s, String l) {
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if (!Character.isLetterOrDigit(c) && (l.indexOf(c) == -1)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     *
-     */
-    protected final static boolean isSafeExcluding(String s, String l) {
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if (!Character.isLetterOrDigit(c) && (l.indexOf(c) != -1)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     *
-     */
-    public final static String maskChar(String s, char c) {
-        StringBuffer result = new StringBuffer(s.length() + 4);
-        for (int i = 0; i < s.length(); i++) {
-            char v = s.charAt(i);
-            if (v == c) {
-                result.append('\\');
-            }
-            result.append(v);
-        }
-
-        return result.toString();
-    }
-
-    /**
-     *
-     */
-    public static String asFourDigits(long id) {
-        if (id < 10) {
-            return "000" + id;
-        } else if (id < 100) {
-            return "00" + id;
-        } else if (id < 1000) {
-            return "0" + id;
-        } else {
-            return "" + id;
-        }
+    public final static String asStringInSeconds(long duration) {
+        long seconds = duration / 1000;
+        long milliSeconds = duration - (seconds * 1000);
+        return String.valueOf(seconds) + "." + asThreeDigits(milliSeconds);
     }
 
     /**
@@ -196,20 +142,6 @@ public class StringUtil {
             return "" + id;
         }
     }
-
-    /**
-     *
-     */
-    public final static String asStringInSeconds(long duration) {
-        long seconds = duration / 1000;
-        long milliSeconds = duration - (seconds * 1000);
-        return String.valueOf(seconds) + "." + asThreeDigits(milliSeconds);
-    }
-
-    /**
-     * The string, which separates path segments in a URL
-     */
-    private static final String URL_SEPARATOR = "/";
 
     /**
      * Convert separators in a filesystem path to URL separators.
@@ -237,17 +169,6 @@ public class StringUtil {
             return new URL(s);
         } catch (MalformedURLException ex) {
             throw new IllegalArgumentException("invalid URL string");
-        }
-    }
-
-    /**
-     *
-     */
-    public final static URL asUrlOrDefault(String s, URL defval) {
-        try {
-            return new URL(s);
-        } catch (MalformedURLException ex) {
-            return defval;
         }
     }
 

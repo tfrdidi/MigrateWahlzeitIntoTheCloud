@@ -26,7 +26,6 @@ import org.wahlzeit.model.LanguageConfigs;
 import org.wahlzeit.model.Photo;
 import org.wahlzeit.model.User;
 import org.wahlzeit.model.UserSession;
-import org.wahlzeit.services.EmailAddress;
 import org.wahlzeit.services.Language;
 import org.wahlzeit.services.LogBuilder;
 import org.wahlzeit.utils.HtmlUtil;
@@ -58,7 +57,7 @@ public class EditUserProfileFormHandler extends AbstractWebFormHandler {
         part.addStringFromArgs(args, UserSession.MESSAGE);
 
         User user = (User) us.getClient();
-        part.maskAndAddString(User.NAME, user.getName());
+        part.maskAndAddString(User.NICK_NAME, user.getNickName());
 
         Photo photo = user.getUserPhoto();
         part.addString(Photo.THUMB, getPhotoThumb(us, photo));
@@ -68,40 +67,23 @@ public class EditUserProfileFormHandler extends AbstractWebFormHandler {
         part.maskAndAddStringFromArgsWithDefault(args, User.EMAIL_ADDRESS, user.getEmailAddress().asString());
 
         part.addString(User.NOTIFY_ABOUT_PRAISE, HtmlUtil.asCheckboxCheck(user.getNotifyAboutPraise()));
-
-        part.maskAndAddStringFromArgsWithDefault(args, User.HOME_PAGE, user.getHomePage().toString());
     }
 
     /**
      *
      */
     protected String doHandlePost(UserSession us, Map args) {
-        String emailAddress = us.getAndSaveAsString(args, User.EMAIL_ADDRESS);
-        String homePage = us.getAndSaveAsString(args, User.HOME_PAGE);
+        String nickName = us.getAndSaveAsString(args, User.NICK_NAME);
         String gender = us.getAndSaveAsString(args, User.GENDER);
         String language = us.getAndSaveAsString(args, User.LANGUAGE);
 
-        if (!StringUtil.isValidStrictEmailAddress(emailAddress)) {
-            us.setMessage(us.getConfiguration().getEmailAddressIsInvalid());
-            return PartUtil.EDIT_USER_PROFILE_PAGE_NAME;
-        } else if (!StringUtil.isValidURL(homePage)) {
-            us.setMessage(us.getConfiguration().getUrlIsInvalid());
-            return PartUtil.EDIT_USER_PROFILE_PAGE_NAME;
-        }
-
         User user = (User) us.getClient();
-
-        user.setEmailAddress(EmailAddress.getFromString(emailAddress));
-        log.info(LogBuilder.createUserMessage().
-                addParameter("E-Mail address", emailAddress).toString());
 
         String status = us.getAndSaveAsString(args, User.NOTIFY_ABOUT_PRAISE);
         boolean notify = (status != null) && status.equals("on");
         user.setNotifyAboutPraise(notify);
 
-        user.setHomePage(StringUtil.asUrl(homePage));
-        log.info(LogBuilder.createUserMessage().
-                addParameter("Homepage", homePage).toString());
+        user.setNickName(nickName);
 
         if (!StringUtil.isNullOrEmptyString(gender)) {
             user.setGender(Gender.getFromString(gender));

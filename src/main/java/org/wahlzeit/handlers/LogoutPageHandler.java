@@ -48,7 +48,6 @@ public class LogoutPageHandler extends AbstractWebPageHandler {
     protected String doHandleGet(UserSession us, String link, Map args) {
         EmailAddress ea = us.getClient().getEmailAddress();
         us.setClient(new Guest());
-        us.getClient().setEmailAddress(ea);
         us.clearSavedArgs();
         return link;
     }

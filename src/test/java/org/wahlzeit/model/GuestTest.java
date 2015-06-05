@@ -33,7 +33,7 @@ public class GuestTest {
         ObjectifyService.run(new Work<Void>() {
             @Override
             public Void run() {
-                new User("han", "star@wa.rs", 1337L);
+                new User("1337", "han", "star@wa.rs", 1337L);
                 return null;
             }
         });
@@ -53,12 +53,12 @@ public class GuestTest {
                 return new Guest();
             }
         });
-        String userName = testGuest.getName();
+        String userName = testGuest.getId();
         String expectedUserName = Guest.GUEST_PREFIX + id;
         assertEquals(expectedUserName, userName);
     }
 
     protected void testGetGuestFromUserManager(String name) {
-        assertNotNull(UserManager.getInstance().getClientByName(name));
+        assertNotNull(UserManager.getInstance().getClientById(name));
     }
 }

@@ -35,7 +35,7 @@ public class PhotoTagCollector {
      *
      */
     public void collect(Set<String> tags, Photo photo) {
-        String ownerName = photo.getOwnerName();
+        String ownerName = photo.getOwnerId();
         if (!StringUtil.isNullOrEmptyString(ownerName)) {
             String ownerNameAsTag = Tags.asTag(ownerName);
             tags.add("un:" + ownerNameAsTag);

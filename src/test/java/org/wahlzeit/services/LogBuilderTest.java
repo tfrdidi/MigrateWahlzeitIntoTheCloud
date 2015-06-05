@@ -60,7 +60,7 @@ public class LogBuilderTest {
     protected String getExpectedUserMessage() {
         return LEVEL + NAME_VALUE_SEPARATOR + USER_LEVEL + INFO_SEPARATOR +
                 SESSION + NAME_VALUE_SEPARATOR + UserSessionProvider.USER_SESSION_NAME + INFO_SEPARATOR +
-                CLIENT + NAME_VALUE_SEPARATOR + SessionManager.getThreadLocalSession().getClientName();
+                CLIENT + NAME_VALUE_SEPARATOR + SessionManager.getThreadLocalSession().getClientId();
     }
 
     @Test
@@ -73,7 +73,7 @@ public class LogBuilderTest {
     protected String getExpectedSystemMessage() {
         return LEVEL + NAME_VALUE_SEPARATOR + SYSTEM_LEVEL + INFO_SEPARATOR +
                 SESSION + NAME_VALUE_SEPARATOR + UserSessionProvider.USER_SESSION_NAME + INFO_SEPARATOR +
-                CLIENT + NAME_VALUE_SEPARATOR + SessionManager.getThreadLocalSession().getClientName();
+                CLIENT + NAME_VALUE_SEPARATOR + SessionManager.getThreadLocalSession().getClientId();
     }
 
     @Test

@@ -88,7 +88,7 @@ public class SendEmailFormHandler extends AbstractWebFormHandler {
         Photo photo = PhotoManager.getPhoto(id);
         part.addString(Photo.THUMB, getPhotoThumb(us, photo));
 
-        part.maskAndAddString(USER, photo.getOwnerName());
+        part.maskAndAddString(USER, photo.getOwnerId());
 
         User user = (User) us.getClient();
         part.addString(USER_LANGUAGE, us.getConfiguration().asValueString(user.getLanguage()));
@@ -119,7 +119,7 @@ public class SendEmailFormHandler extends AbstractWebFormHandler {
         }
 
         UserManager userManager = UserManager.getInstance();
-        User toUser = userManager.getUserByName(photo.getOwnerName());
+        User toUser = userManager.getUserById(photo.getOwnerId());
         User fromUser = (User) us.getClient();
 
         emailSubject = us.getConfiguration().getSendEmailSubjectPrefix() + emailSubject;
@@ -130,9 +130,9 @@ public class SendEmailFormHandler extends AbstractWebFormHandler {
 
         log.info(LogBuilder.createUserMessage().
                 addAction("Send E-Mail").
-                addParameter("Recipient", toUser.getName()).toString());
+                addParameter("Recipient", toUser.getNickName()).toString());
 
-        us.setMessage(us.getConfiguration().getEmailWasSent() + toUser.getName() + "!");
+        us.setMessage(us.getConfiguration().getEmailWasSent() + toUser.getNickName() + "!");
 
         return PartUtil.SHOW_NOTE_PAGE_NAME;
     }

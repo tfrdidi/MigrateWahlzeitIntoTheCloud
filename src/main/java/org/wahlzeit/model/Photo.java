@@ -33,7 +33,6 @@ import org.wahlzeit.services.EmailAddress;
 import org.wahlzeit.services.Language;
 import org.wahlzeit.services.ObjectManager;
 
-import java.net.URL;
 import java.util.Map;
 
 /**
@@ -57,7 +56,7 @@ public class Photo extends DataObject {
     public static final String KEYWORDS = "keywords";
 
     public static final String TAGS = "tags";
-    public static final String OWNER_NAME = "ownerName";
+    public static final String OWNER_ID = "ownerId";
 
     public static final String STATUS = "status";
     public static final String IS_INVISIBLE = "isInvisible";
@@ -75,7 +74,7 @@ public class Photo extends DataObject {
     /**
      *
      */
-    protected String ownerName;
+    protected String ownerId;
     /**
      * To avoid scaling when accessing a photo, all pictures sizes are stored in an own file.
      * The photo java object is stored in the Google Datastore, the Images are stored in the
@@ -89,7 +88,6 @@ public class Photo extends DataObject {
     protected boolean ownerNotifyAboutPraise = false;
     protected EmailAddress ownerEmailAddress = EmailAddress.EMPTY;
     protected Language ownerLanguage = Language.ENGLISH;
-    protected URL ownerHomePage;
     /**
      *
      */
@@ -174,15 +172,15 @@ public class Photo extends DataObject {
     /**
      * @methodtype get
      */
-    public String getOwnerName() {
-        return ownerName;
+    public String getOwnerId() {
+        return ownerId;
     }
 
     /**
      * @methodtype set
      */
-    public void setOwnerName(String newName) {
-        ownerName = newName;
+    public void setOwnerId(String newName) {
+        ownerId = newName;
         incWriteCount();
     }
 
@@ -190,14 +188,15 @@ public class Photo extends DataObject {
      * @methodtype get
      */
     public String getSummary(ModelConfig cfg) {
-        return cfg.asPhotoSummary(ownerName);
+        return cfg.asPhotoSummary(ownerId);
     }
 
     /**
      * @methodtype get
      */
     public String getCaption(ModelConfig cfg) {
-        return cfg.asPhotoCaption(ownerName, ownerHomePage);
+        String ownerName = UserManager.getInstance().getUserById(ownerId).getNickName();
+        return cfg.asPhotoCaption(ownerName);
     }
 
     /**
@@ -227,21 +226,6 @@ public class Photo extends DataObject {
      */
     public void setOwnerLanguage(Language newLanguage) {
         ownerLanguage = newLanguage;
-        incWriteCount();
-    }
-
-    /**
-     * @methodtype get
-     */
-    public URL getOwnerHomePage() {
-        return ownerHomePage;
-    }
-
-    /**
-     * @methodtype set
-     */
-    public void setOwnerHomePage(URL newHomePage) {
-        ownerHomePage = newHomePage;
         incWriteCount();
     }
 

@@ -1,5 +1,7 @@
 package org.wahlzeit.services;
 
+import org.wahlzeit.model.Client;
+import org.wahlzeit.model.UserManager;
 import org.wahlzeit.model.UserSession;
 
 import java.io.PrintWriter;
@@ -36,6 +38,7 @@ public class LogBuilder {
         logMessage = new StringBuilder();
     }
 
+
     // create-methods --------------------------------------------------------------------------------------------------
 
     /**
@@ -61,7 +64,12 @@ public class LogBuilder {
         String clientName;
         if (session != null) {
             sessionName = session.getName();
-            clientName = session.getClientName();
+            Client client = UserManager.getInstance().getClientById(session.getClientId());
+            if (client != null) {
+                clientName = client.getNickName();
+            } else {
+                clientName = UserSession.ANONYMOUS_CLIENT;
+            }
         } else {
             sessionName = Session.NO_SESSION;
             clientName = UserSession.ANONYMOUS_CLIENT;

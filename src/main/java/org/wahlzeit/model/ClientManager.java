@@ -22,9 +22,9 @@ public abstract class ClientManager extends ObjectManager {
     protected static Long lastClientId = 0L;
 
     /**
-     * Maps names to user
+     * Maps IDs to user
      */
-    protected Map<String, Client> clients = new HashMap<String, Client>();
+    protected Map<String, Client> idClientMap = new HashMap<String, Client>();
 
 
     // add methods -----------------------------------------------------------------------------------------------------
@@ -44,8 +44,8 @@ public abstract class ClientManager extends ObjectManager {
      * @methodtype assertion
      */
     protected void assertIsUnknownClientAsIllegalArgument(Client client) {
-        if (hasClientByName(client.getName())) {
-            throw new IllegalArgumentException(client.getName() + "is already known");
+        if (hasClientById(client.getId())) {
+            throw new IllegalArgumentException(client.getId() + "is already known");
         }
     }
 
@@ -54,9 +54,9 @@ public abstract class ClientManager extends ObjectManager {
      * @methodproperty primitive
      */
     protected void doAddClient(Client client) {
-        clients.put(client.getName(), client);
+        idClientMap.put(client.getId(), client);
         writeObject(client);
-        log.config(LogBuilder.createSystemMessage().addParameter("Added new user", client.getName()).toString());
+        log.config(LogBuilder.createSystemMessage().addParameter("Added new user", client.getId()).toString());
     }
 
 
@@ -65,29 +65,19 @@ public abstract class ClientManager extends ObjectManager {
     /**
      * @methodtype boolean query
      */
-    public boolean hasClientByName(String name) {
-        assertIsNonNullArgument(name, "user-by-name");
-        return getClientByName(name) != null;
+    public boolean hasClientById(String id) {
+        assertIsNonNullArgument(id, "user by Id");
+        return getClientById(id) != null;
     }
 
     /**
      * @methodtype get
      * @methodproperty wrapper
      */
-    public Client getClientByName(String name) {
+    public Client getClientById(String name) {
         assertIsNonNullArgument(name, "user name");
 
-        Client result = doGetClientByName(name);
-
-        if (result == null) {
-            log.config(LogBuilder.createSystemMessage().addParameter("User not in cache", name).toString());
-            result = readObject(Client.class, name);
-            if (result != null) {
-                doAddClient(result);
-            }
-        } else {
-            log.config(LogBuilder.createSystemMessage().addParameter("User loaded from cache", name).toString());
-        }
+        Client result = doGetClientById(name);
 
         return result;
     }
@@ -99,8 +89,8 @@ public abstract class ClientManager extends ObjectManager {
      * @methodtype get
      * @methodproperty primitive
      */
-    protected Client doGetClientByName(String name) {
-        return clients.get(name);
+    protected Client doGetClientById(String name) {
+        return idClientMap.get(name);
     }
 
 
@@ -110,7 +100,7 @@ public abstract class ClientManager extends ObjectManager {
      * @methodtype command
      */
     public void saveClients() {
-        updateObjects(clients.values());
+        updateObjects(idClientMap.values());
     }
 
     /**
@@ -139,6 +129,24 @@ public abstract class ClientManager extends ObjectManager {
 
     /**
      * @methodtype set
+     */
+    public void removeClient(Client client) {
+        saveClient(client);
+        idClientMap.remove(client.getId());
+    }
+
+
+    // delete methods --------------------------------------------------------------------------------------------------
+
+    /**
+     * @methodtype command
+     */
+    public void saveClient(Client client) {
+        updateObject(client);
+    }
+
+    /**
+     * @methodtype set
      * @methodproperty wrapper
      */
     public void deleteClient(Client client) {
@@ -150,38 +158,20 @@ public abstract class ClientManager extends ObjectManager {
         assertIsUnknownUserAsIllegalState(client);
     }
 
-
-    // delete methods --------------------------------------------------------------------------------------------------
-
     /**
      * @methodtype set
      * @methodproperty primtive
      */
     protected void doDeleteClient(Client client) {
-        clients.remove(client.getName());
+        idClientMap.remove(client.getId());
     }
 
     /**
      * @methodtype assertion
      */
     protected void assertIsUnknownUserAsIllegalState(Client client) {
-        if (hasClientByName(client.getName())) {
-            throw new IllegalStateException(client.getName() + "should not be known");
+        if (hasClientById(client.getId())) {
+            throw new IllegalStateException(client.getId() + "should not be known");
         }
-    }
-
-    /**
-     * @methodtype set
-     */
-    public void removeClient(Client client) {
-        saveClient(client);
-        clients.remove(client.getName());
-    }
-
-    /**
-     * @methodtype command
-     */
-    public void saveClient(Client client) {
-        updateObject(client);
     }
 }
