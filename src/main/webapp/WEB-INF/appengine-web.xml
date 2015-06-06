@@ -9,7 +9,6 @@
 
     <system-properties>
         <property name="java.util.logging.config.file" value="WEB-INF/logging.properties"/>
-        <property name="admin.email" value="tfr.didi@gmail.com"/>
     </system-properties>
 
     <static-files>

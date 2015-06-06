@@ -20,6 +20,7 @@
 
 package org.wahlzeit.services.mailing;
 
+import com.google.appengine.api.utils.SystemProperty;
 import org.wahlzeit.services.EmailAddress;
 import org.wahlzeit.services.LogBuilder;
 
@@ -34,6 +35,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -74,12 +76,16 @@ public class SmtpEmailService extends AbstractEmailService {
      *
      */
     @Override
-    protected Message doCreateEmail(EmailAddress to, EmailAddress bcc, String subject, String body) throws MailingException {
+    protected Message doCreateEmail(EmailAddress to, EmailAddress bcc, String subject, String body)
+            throws MailingException {
         Message msg = new MimeMessage(session);
 
+        String appId = SystemProperty.applicationId.get();
+
         try {
-            // admin email is set in appengine-web.xml
-            msg.setFrom(new InternetAddress(System.getProperty("admin.email", "Test")));
+            msg.setFrom(new InternetAddress("admin@" + appId + ".appspotmail.com", "Wahlzeit admin"));
+
+
             msg.addRecipient(Message.RecipientType.TO, to.asInternetAddress());
 
             if (bcc.isValid()) {
@@ -88,10 +94,14 @@ public class SmtpEmailService extends AbstractEmailService {
 
             msg.setSubject(subject);
             msg.setContent(createMultipart(body));
-        } catch (MessagingException ex) {
-            throw new MailingException("Creating email failed", ex);
-        }
 
+        } catch (UnsupportedEncodingException e) {
+            log.warning(LogBuilder.createSystemMessage().addException("failed to create email", e).toString());
+            throw new MailingException(e.getMessage());
+        } catch (MessagingException e) {
+            log.warning(LogBuilder.createSystemMessage().addException("failed to create email", e).toString());
+            throw new MailingException(e.getMessage());
+        }
         return msg;
     }
 
