@@ -409,7 +409,6 @@ public class PhotoManager extends ObjectManager {
         assertIsNewPhoto(id);
         doAddPhoto(photo);
 
-        //AsyncTaskExecutor.savePhotoAsync(id.asString());
         GlobalsManager.getInstance().saveGlobals();
     }
 

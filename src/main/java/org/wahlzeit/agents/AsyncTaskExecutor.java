@@ -28,6 +28,6 @@ public class AsyncTaskExecutor {
         log.info("Calling async push task to persist PhotoId " + photoId);
         Queue queue = QueueFactory.getDefaultQueue();
         RetryOptions retryOptions = withTaskRetryLimit(3);
-        queue.add(TaskOptions.Builder.withUrl("/persistPhoto").param(Photo.ID, photoId).retryOptions(retryOptions));
+        queue.add(TaskOptions.Builder.withUrl("/persistPhoto").param(Photo.ID, photoId).etaMillis(100).retryOptions(retryOptions));
     }
 }
