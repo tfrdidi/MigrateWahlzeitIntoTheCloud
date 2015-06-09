@@ -8,7 +8,7 @@ Wahlzeit is an open source web application that lets users upload photos and rat
 
 Wahlzeit is used to teach agile methods and open source software development at the Professorship of Open Source Software at the University of Erlangen.
 
-It is an easy-to-learn yet complete Java web application that is available under the GNU Affero Public License v3 license, see the LICENSE.txt file.
+It is an easy-to-learn yet complete Java web application that is available under the GNU Affero Public License v3 license, see the [LICENSE.txt](/LICENSE.txt) file.
 
 Wahlzeit is a Google App Engine app, that can be used on your local machine or be deployed to Google App Engine to reach it online.
 
@@ -29,7 +29,7 @@ For more information, see http://github.com/dirkriehle/wahlzeit and http://osr.c
   2. ```./gradlew appengineRun```
   3. wait until gradle and project dependencies are downloaded and the local instance is started
 
-Open [http://localhost:8080] to use Wahlzeit on your local machine.
+Open [http://localhost:8080](http://localhost:8080) to use Wahlzeit on your local machine.
 
 
 ### Upload Wahlzeit to Google App Engine
@@ -50,7 +50,7 @@ Open [http://localhost:8080] to use Wahlzeit on your local machine.
   7. a browser window pops up and asks for permission, accept it
   8. copy the code from the following browser window to your gradle console
 
-Open [https://<project-ID>.appspot.com] to use Wahlzeit on Google App Engine.
+Open https://*project-ID*.appspot.com to use Wahlzeit on Google App Engine.
 
 Done!
 
