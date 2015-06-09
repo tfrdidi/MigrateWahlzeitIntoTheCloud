@@ -29,7 +29,7 @@ For more information, see http://github.com/dirkriehle/wahlzeit and http://osr.c
   2. ```./gradlew appengineRun```
   3. wait until gradle and project dependencies are downloaded and the local instance is started
 
-Open http://localhost:8080 to use Wahlzeit on your local machine.
+Open [http://localhost:8080] to use Wahlzeit on your local machine.
 
 
 ### Upload Wahlzeit to Google App Engine
@@ -38,19 +38,19 @@ Open http://localhost:8080 to use Wahlzeit on your local machine.
   1. if you don't have already one, create a Google account
   2. go to https://console.developers.google.com and login with your Google account
   3. now you are in the developers console, there select "create a project"
-    1. choose a project name, which used later as **<project-ID>**
+    1. choose a project name, which used later as *project-ID*
     2. accept the terms of service
 
 **Configure your repository and upload Wahlzeit**
   5. store your <project-ID> in your repository:
     1. open the file /home/didi/Projekte/MigrateWahlzeitIntoTheCloud/src/main/webapp/WEB-INF/appengine-web.xml
-    2. replace the project name with your <project-ID>: <application><project-ID></application>
+    2. replace the project name with your <project-ID>: \<application\>*project-ID*\</application\>
     3. save and close the appengine-web.xml
-  6. ´´´./gradlew appengineUpdate´´´
+  6. ```./gradlew appengineUpdate```
   7. a browser window pops up and asks for permission, accept it
   8. copy the code from the following browser window to your gradle console
 
-Open https://<project-ID>.appspot.com to use Wahlzeit on Google App Engine.
+Open [https://<project-ID>.appspot.com] to use Wahlzeit on Google App Engine.
 
 Done!
 
