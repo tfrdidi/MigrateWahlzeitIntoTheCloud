@@ -26,7 +26,6 @@ import com.google.appengine.api.images.Image;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Ignore;
-import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Parent;
 import org.wahlzeit.services.DataObject;
 import org.wahlzeit.services.EmailAddress;
@@ -69,7 +68,7 @@ public class Photo extends DataObject {
     public static final int MAX_PHOTO_HEIGHT = 600;
     public static final int MAX_THUMB_PHOTO_WIDTH = 105;
     public static final int MAX_THUMB_PHOTO_HEIGHT = 150;
-    @Index
+
     protected PhotoId id = null;
     /**
      *

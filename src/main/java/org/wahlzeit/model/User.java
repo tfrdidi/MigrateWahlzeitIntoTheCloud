@@ -20,7 +20,6 @@
 
 package org.wahlzeit.model;
 
-import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.Subclass;
 import org.wahlzeit.services.EmailAddress;
 import org.wahlzeit.services.Language;
@@ -65,17 +64,11 @@ public class User extends Client {
     /**
      *
      */
-    @Ignore
-    protected transient int writeCount = 0;
-
-    /**
-     *
-     */
     protected Language language = Language.ENGLISH;
     protected boolean notifyAboutPraise = true;
     protected Gender gender = Gender.UNDEFINED;
     protected UserStatus status = UserStatus.CREATED;
-    protected long confirmationCode = 0; // 0 means doesn't need confirmation
+
     /**
      *
      */
@@ -90,24 +83,22 @@ public class User extends Client {
     /**
      *
      */
-    public User(String id, String myName, String myEmailAddress, long vc) {
-        this(id, myName, EmailAddress.getFromString(myEmailAddress), vc);
+    public User(String id, String myName, String myEmailAddress) {
+        this(id, myName, EmailAddress.getFromString(myEmailAddress));
     }
 
     /**
      *
      */
-    public User(String id, String nickname, EmailAddress emailAddress, long vc) {
-        initialize(id, nickname, emailAddress, AccessRights.USER, vc);
+    public User(String id, String nickname, EmailAddress emailAddress) {
+        initialize(id, nickname, emailAddress, AccessRights.USER);
     }
 
     /**
      * @methodtype initialization
      */
-    protected void initialize(String id, String nickName, EmailAddress emailAddress, AccessRights accessRights, long vc) {
+    protected void initialize(String id, String nickName, EmailAddress emailAddress, AccessRights accessRights) {
         super.initialize(id, nickName, emailAddress, accessRights);
-
-        confirmationCode = vc;
 
         log.config(LogBuilder.createSystemMessage().
                 addAction("initialize user").
@@ -122,27 +113,6 @@ public class User extends Client {
      */
     protected User() {
         // do nothing
-    }
-
-    /**
-     * @methodtype boolean query
-     */
-    public boolean isDirty() {
-        return writeCount != 0;
-    }
-
-    /**
-     * @methodtype set
-     */
-    public final void incWriteCount() {
-        writeCount++;
-    }
-
-    /**
-     * @methodtype set
-     */
-    public void resetWriteCount() {
-        writeCount = 0;
     }
 
     /**
@@ -163,20 +133,6 @@ public class User extends Client {
             Photo photo = i.next();
             photo.setOwnerLanguage(language);
         }
-    }
-
-    /**
-     * @methodtype get
-     */
-    public long getConfirmationCode() {
-        return confirmationCode;
-    }
-
-    /**
-     * @methodtype boolean query
-     */
-    public boolean needsConfirmation() {
-        return confirmationCode != 0;
     }
 
     /**

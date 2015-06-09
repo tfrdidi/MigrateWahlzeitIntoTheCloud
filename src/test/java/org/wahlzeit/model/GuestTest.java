@@ -8,8 +8,6 @@ import org.junit.rules.RuleChain;
 import org.wahlzeit.testEnvironmentProvider.LocalDatastoreServiceTestConfigProvider;
 import org.wahlzeit.testEnvironmentProvider.RegisteredOfyEnvironmentProvider;
 
-import java.util.logging.Logger;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -19,8 +17,6 @@ import static org.junit.Assert.assertNotNull;
  * Created by Lukas Hahmann on 29.05.15.
  */
 public class GuestTest {
-
-    private static final Logger log = Logger.getLogger(GuestTest.class.getName());
 
     @ClassRule
     public static RuleChain ruleChain = RuleChain.
@@ -37,7 +33,7 @@ public class GuestTest {
         ObjectifyService.run(new Work<Void>() {
             @Override
             public Void run() {
-                new User("1337", "han", "star@wa.rs", 1337L);
+                new User("1337", "han", "star@wa.rs");
                 return null;
             }
         });

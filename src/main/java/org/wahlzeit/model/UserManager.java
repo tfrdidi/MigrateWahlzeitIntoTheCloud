@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Random;
 import java.util.logging.Logger;
 
 
@@ -60,11 +59,6 @@ public class UserManager extends ClientManager {
      *
      */
     protected static UserManager instance;
-
-    /**
-     *
-     */
-    protected Random codeGenerator = new Random(System.currentTimeMillis());
 
     /**
      *
@@ -115,13 +109,6 @@ public class UserManager extends ClientManager {
      */
     public boolean isReservedUserName(String userName) {
         return reservedNames.contains(Tags.asTag(userName));
-    }
-
-    /**
-     *
-     */
-    public long createConfirmationCode() {
-        return Math.abs(codeGenerator.nextLong() / 2);
     }
 
     /**

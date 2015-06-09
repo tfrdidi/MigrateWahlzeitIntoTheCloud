@@ -23,7 +23,7 @@ package org.wahlzeit.model;
 import com.google.appengine.api.datastore.Key;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
-import com.googlecode.objectify.annotation.Index;
+import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.Parent;
 import org.wahlzeit.services.EmailAddress;
 import org.wahlzeit.services.ObjectManager;
@@ -54,7 +54,6 @@ public abstract class Client implements Serializable, Persistent {
     /**
      *
      */
-    @Index
     protected EmailAddress emailAddress = EmailAddress.EMPTY;
 
     /**
@@ -62,6 +61,7 @@ public abstract class Client implements Serializable, Persistent {
      */
     protected AccessRights accessRights = AccessRights.NONE;
 
+    @Ignore
     protected int writeCount = 0;
 
     private String httpSessionId;

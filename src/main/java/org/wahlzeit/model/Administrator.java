@@ -35,15 +35,15 @@ public class Administrator extends Moderator {
     /**
      *
      */
-    public Administrator(String userId, String nickName, String myEmailAddress, long vc) {
-        this(userId, nickName, EmailAddress.getFromString(myEmailAddress), vc);
+    public Administrator(String userId, String nickName, String myEmailAddress) {
+        this(userId, nickName, EmailAddress.getFromString(myEmailAddress));
     }
 
     /**
      *
      */
-    public Administrator(String userId, String nickName, EmailAddress emailAddress, long vc) {
-        initialize(userId, nickName, emailAddress, AccessRights.ADMINISTRATOR, vc);
+    public Administrator(String userId, String nickName, EmailAddress emailAddress) {
+        initialize(userId, nickName, emailAddress, AccessRights.ADMINISTRATOR);
     }
 
     /**

@@ -62,12 +62,11 @@ public class LoginHandler extends AbstractWebFormHandler {
                 // create new Wahlzeit user
                 String emailAddress = googleUser.getEmail();
                 String nickName = googleUser.getNickname();
-                long confirmationCode = userManager.createConfirmationCode();
 
                 if (userService.isUserAdmin()) {
-                    user = new Administrator(userId, nickName, emailAddress, confirmationCode);
+                    user = new Administrator(userId, nickName, emailAddress);
                 } else {
-                    user = new User(userId, nickName, emailAddress, confirmationCode);
+                    user = new User(userId, nickName, emailAddress);
                 }
                 userManager.emailWelcomeMessage(us, user);
                 us.setClient(user);
