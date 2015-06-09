@@ -119,7 +119,7 @@ public class UserManager extends ClientManager {
 
         String emailSubject = us.getConfiguration().getWelcomeEmailSubject();
         String emailBody = us.getConfiguration().getWelcomeEmailBody() + "\n\n";
-        emailBody += us.getConfiguration().getWelcomeEmailUserName() + user.getId() + "\n\n";
+        emailBody += us.getConfiguration().getWelcomeEmailUserName() + user.getNickName() + "\n\n";
         emailBody += us.getConfiguration().getGeneralEmailRegards() + "\n\n----\n";
         emailBody += us.getConfiguration().getGeneralEmailFooter() + "\n\n";
 

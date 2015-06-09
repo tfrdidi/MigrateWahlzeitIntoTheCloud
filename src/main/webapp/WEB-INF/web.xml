@@ -92,7 +92,8 @@
 
 	<!--> Session config </!-->
 	<session-config>
-		<session-timeout>1</session-timeout>
+        <!--> make sure to keep it synchronized with schedule of "Cleanup old sessions" cron job in cron.xml </!-->
+        <session-timeout>30</session-timeout>
 	</session-config>
 	<!--> Session config end </!-->
 </web-app>
