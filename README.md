@@ -12,16 +12,16 @@ It is an easy-to-learn yet complete Java web application that is available under
 
 Wahlzeit is a Google App Engine app, that can be used on your local machine or be deployed to Google App Engine to reach it online.
 
-For more information, see http:/github.com/dirkriehle/wahlzeit and http://osr.cs.fau.de.
+For more information, see http://github.com/dirkriehle/wahlzeit and http://osr.cs.fau.de.
 
 
 
 ## PART II: WAHLZEIT SETUP
 
-**First download repository**
-  1. Fulfill prerequisites: install Java JDK, set JAVA_HOME, and install git
+**First download repository:**
+  1. Fulfill prerequisites: install **Java JDK**, set **JAVA_HOME**, and install **git**
   2. open console and change to the directory where the directory ```MigrateWahlzeitIntoTheCloud``` containing the sourcecode should be created
-  3. execute ```git clone https://github.com/tfrdidi/MigrateWahlzeitIntoTheCloud.git```
+  3. ```git clone https://github.com/tfrdidi/MigrateWahlzeitIntoTheCloud.git```
 
 
 ### Run Wahlzeit on your local machine
@@ -29,14 +29,14 @@ For more information, see http:/github.com/dirkriehle/wahlzeit and http://osr.cs
   2. ```./gradlew appengineRun```
   3. wait until gradle and project dependencies are downloaded and the local instance is started
 
-Open **localhost:8080** in your browser to use Wahlzeit on your local machine.
+Open http://localhost:8080 to use Wahlzeit on your local machine.
 
 
 ### Upload Wahlzeit to Google App Engine
 
-**Create an Google App Engine instance**
-  1. create Google account
-  2. go to **https://console.developers.google.com** and login with your Google account
+**Create an Google App Engine instance:**
+  1. if you don't have already one, create a Google account
+  2. go to https://console.developers.google.com and login with your Google account
   3. now you are in the developers console, there select "create a project"
     1. choose a project name, which used later as **<project-ID>**
     2. accept the terms of service
@@ -50,7 +50,7 @@ Open **localhost:8080** in your browser to use Wahlzeit on your local machine.
   7. a browser window pops up and asks for permission, accept it
   8. copy the code from the following browser window to your gradle console
 
-Open **https://<project-ID>.appspot.com** in your browser to use Wahlzeit on Google App Engine.
+Open https://<project-ID>.appspot.com to use Wahlzeit on Google App Engine.
 
 Done!
 
