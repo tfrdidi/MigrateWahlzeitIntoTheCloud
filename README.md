@@ -42,13 +42,16 @@ Open [http://localhost:8080](http://localhost:8080) to use Wahlzeit on your loca
     2. accept the terms of service
 
 **Configure your repository and upload Wahlzeit**
-  5. store your *your-project-ID* in your repository:
+  1. store your *your-project-ID* in your repository:
     1. open the file [/MigrateWahlzeitIntoTheCloud/src/main/webapp/WEB-INF/appengine-web.xml](/src/main/webapp/WEB-INF/appengine-web.xml)
     2. replace the project name with *your-project-ID*: \<application\>*your-project-ID*\</application\>
     3. save and close the appengine-web.xml
-  6. ```./gradlew appengineUpdate```
-  7. a browser window pops up and asks for permission, accept it
-  8. copy the code from the following browser window to your gradle console
+  2. ```./gradlew appengineUpdate```
+  3. a browser window pops up and asks for permission, accept it
+  4. copy the code from the following browser window to your gradle console
+  5. as Wahlzeit uses Google Datastore, enable billing/enter the test phase. It will never use that much quota, but it is necessary for Datastore.
+  6. in the https://console.developers.google.com select *Storage - Cloud Storage - Storage Browser*
+  7. create a new bucket with the name *org-wahlzeit-data*, standard setting and location in EU
 
 Open https://*your-project-ID*.appspot.com to use Wahlzeit on Google App Engine.
 
