@@ -137,14 +137,14 @@ public abstract class ObjectManager {
     }
 
     /**
-     * Updates the given entitiy in the datastore.
+     * Updates the given entity in the datastore.
      */
     protected void updateObject(Persistent object) {
         writeObject(object);
     }
 
     /**
-     * Writes the given Entity to the datastore.
+     * Writes the given entity to the datastore.
      */
     protected void writeObject(Persistent object) {
         assertIsNonNullArgument(object, "object");

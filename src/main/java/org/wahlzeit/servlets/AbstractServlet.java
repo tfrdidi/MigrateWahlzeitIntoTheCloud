@@ -129,8 +129,6 @@ public abstract class AbstractServlet extends HttpServlet {
 
         UserSession result = new UserSession(sessionName, siteUrl, httpSession, request.getLocale().getLanguage());
 
-        httpSession.setMaxInactiveInterval(24 * 60 * 60); // time out after 24h
-
         return result;
     }
 

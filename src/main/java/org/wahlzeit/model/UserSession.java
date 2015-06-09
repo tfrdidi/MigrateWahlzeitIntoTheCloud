@@ -215,7 +215,16 @@ public class UserSession extends Session implements Serializable {
      * @methodtype set
      */
     public void setClient(Client newClient) {
+        String previousClientId = (String) httpSession.getAttribute(CLIENT_ID);
+        if (previousClientId != null) {
+            Client previousClient = UserManager.getInstance().getClientById(previousClientId);
+            if (previousClient instanceof Guest) {
+                UserManager.getInstance().deleteClient(previousClient);
+            }
+        }
+
         httpSession.setAttribute(CLIENT_ID, newClient.getId());
+        UserManager.getInstance().addHttpSessionIdToClientMapping(httpSession.getId(), newClient);
     }
 
     /**
@@ -478,4 +487,5 @@ public class UserSession extends Session implements Serializable {
     public Map<String, Object> getSavedArgs() {
         return (Map<String, Object>) httpSession.getAttribute(SAVED_ARGS);
     }
+
 }

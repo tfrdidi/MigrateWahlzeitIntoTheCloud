@@ -26,7 +26,6 @@ import org.wahlzeit.services.EmailAddress;
 import org.wahlzeit.services.Language;
 import org.wahlzeit.services.LogBuilder;
 
-import javax.servlet.http.HttpSession;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -66,6 +65,7 @@ public class User extends Client {
     /**
      *
      */
+    @Ignore
     protected transient int writeCount = 0;
 
     /**
@@ -85,8 +85,7 @@ public class User extends Client {
      *
      */
     protected long creationTime = System.currentTimeMillis();
-    @Ignore
-    transient protected HttpSession httpSession = null;
+
 
     /**
      *

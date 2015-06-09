@@ -32,8 +32,8 @@ import org.wahlzeit.services.Persistent;
 import java.io.Serializable;
 
 /**
- * A Client uses the system. It is an abstract superclass.
- * This package defines guest, user, moderator, and administrator clients.
+ * A Client uses the system. It is an abstract superclass. This package defines guest, user, moderator, and
+ * administrator clients.
  *
  * @author dirkriehle
  */
@@ -63,6 +63,9 @@ public abstract class Client implements Serializable, Persistent {
     protected AccessRights accessRights = AccessRights.NONE;
 
     protected int writeCount = 0;
+
+    private String httpSessionId;
+
 
     /**
      *
@@ -184,6 +187,26 @@ public abstract class Client implements Serializable, Persistent {
      */
     public void resetWriteCount() {
         writeCount = 0;
+    }
+
+    /**
+     *
+     */
+    public void removeHttpSessionId() {
+        httpSessionId = null;
+        incWriteCount();
+    }
+
+    public String getHttpSessionId() {
+        return httpSessionId;
+    }
+
+    /**
+     *
+     */
+    public void setHttpSessionId(String httpSessionId) {
+        this.httpSessionId = httpSessionId;
+        incWriteCount();
     }
 
 }

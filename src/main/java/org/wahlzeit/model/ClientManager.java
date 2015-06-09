@@ -28,6 +28,8 @@ public abstract class ClientManager extends ObjectManager {
      */
     protected Map<String, Client> idClientMap = new HashMap<String, Client>();
 
+    protected HashMap<String, Client> httpSessionIdToClientMap = new HashMap<String, Client>();
+
     protected List<String> listOfUsedNicknames = new ArrayList<String>();
 
 
@@ -74,9 +76,6 @@ public abstract class ClientManager extends ObjectManager {
         log.config(LogBuilder.createSystemMessage().addParameter("Added new user", client.getId()).toString());
     }
 
-
-    // get client methods ----------------------------------------------------------------------------------------------
-
     /**
      * @methodtype boolean query
      */
@@ -98,7 +97,7 @@ public abstract class ClientManager extends ObjectManager {
     }
 
 
-    // has client method -----------------------------------------------------------------------------------------------
+    // get client methods ----------------------------------------------------------------------------------------------
 
     /**
      * @methodtype get
@@ -108,21 +107,57 @@ public abstract class ClientManager extends ObjectManager {
         return idClientMap.get(name);
     }
 
+    /**
+     * @methodtype set
+     */
+    public void addHttpSessionIdToClientMapping(String httpSessionId, Client client) {
+        assertIsNonNullArgument(httpSessionId);
+        assertIsNonNullArgument(client);
+        assert !httpSessionIdToClientMap.containsKey(httpSessionId);
+
+        doAddHttpSessionIdToClientMapping(httpSessionId, client);
+
+        saveClient(client);
+    }
+
+    /**
+     * @methodtype set
+     */
+    public void doAddHttpSessionIdToClientMapping(String httpSessionId, Client client) {
+        httpSessionIdToClientMap.put(httpSessionId, client);
+        client.setHttpSessionId(httpSessionId);
+        log.config(LogBuilder.createSystemMessage().
+                addParameter("client name", client.getNickName()).
+                addParameter("httpSessionId", httpSessionId).toString());
+    }
+
+
+    // has client method -----------------------------------------------------------------------------------------------
+
+    /**
+     * @methodtype command
+     */
+    public void saveClient(Client client) {
+        updateObject(client);
+    }
+
 
     // save methods ----------------------------------------------------------------------------------------------------
+
+    /**
+     * @methodtype get
+     */
+    public Client getClientByHttpSessionId(String httpSessionId) {
+        assertIsNonNullArgument(httpSessionId);
+
+        return httpSessionIdToClientMap.get(httpSessionId);
+    }
 
     /**
      * @methodtype command
      */
     public void saveClients() {
         updateObjects(idClientMap.values());
-    }
-
-    /**
-     * @methodtype get
-     */
-    public synchronized Long getNextClientId() {
-        return ++lastClientId;
     }
 
 
@@ -143,21 +178,21 @@ public abstract class ClientManager extends ObjectManager {
     }
 
     /**
-     * @methodtype set
+     * @methodtype get
      */
-    public void removeClient(Client client) {
-        saveClient(client);
-        idClientMap.remove(client.getId());
+    public synchronized Long getNextClientId() {
+        return ++lastClientId;
     }
 
 
     // delete methods --------------------------------------------------------------------------------------------------
 
     /**
-     * @methodtype command
+     * @methodtype set
      */
-    public void saveClient(Client client) {
-        updateObject(client);
+    public void removeClient(Client client) {
+        saveClient(client);
+        idClientMap.remove(client.getId());
     }
 
     /**
@@ -166,11 +201,22 @@ public abstract class ClientManager extends ObjectManager {
      */
     public void deleteClient(Client client) {
         assertIsNonNullArgument(client);
+        assert idClientMap.containsValue(client);
+
+        removeHttpSessionIdToClientMapping(client.getHttpSessionId());
         doDeleteClient(client);
 
-        deleteObject(client);
-
         assertIsUnknownUserAsIllegalState(client);
+    }
+
+    /**
+     * @methodtype set
+     */
+    private void removeHttpSessionIdToClientMapping(String httpSessionId) {
+        Client client = httpSessionIdToClientMap.get(httpSessionId);
+        client.removeHttpSessionId();
+
+        httpSessionIdToClientMap.remove(httpSessionId);
     }
 
     /**
@@ -179,6 +225,7 @@ public abstract class ClientManager extends ObjectManager {
      */
     protected void doDeleteClient(Client client) {
         idClientMap.remove(client.getId());
+        deleteObject(client);
     }
 
     /**
@@ -189,7 +236,6 @@ public abstract class ClientManager extends ObjectManager {
             throw new IllegalStateException(client.getId() + "should not be known");
         }
     }
-
 
     // update methods --------------------------------------------------------------------------------------------------
 

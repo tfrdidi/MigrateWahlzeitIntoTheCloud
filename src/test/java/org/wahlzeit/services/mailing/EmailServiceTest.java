@@ -19,7 +19,7 @@
  */
 package org.wahlzeit.services.mailing;
 
-import junit.framework.*;
+import junit.framework.TestCase;
 import org.wahlzeit.services.EmailAddress;
 
 /**
@@ -57,9 +57,9 @@ public class EmailServiceTest extends TestCase {
 	 */
 	public void testSendInvalidEmail() {
 		try	{
-			assertFalse(emailService.sendEmailIgnoreException(null, null, "lol", "hi"));
-			assertFalse(emailService.sendEmailIgnoreException(validAddress, validAddress, null, "body"));	
-			assertFalse(emailService.sendEmailIgnoreException(validAddress, null, "hi", "       "));
+			assertFalse(emailService.sendEmailIgnoreException(null, "lol", "hi"));
+			assertFalse(emailService.sendEmailIgnoreException(validAddress, null, "body"));
+			assertFalse(emailService.sendEmailIgnoreException(null, "hi", "       "));
 		} catch (Exception ex)	{
 			fail("Silent mode does not allow exceptions");
 		}

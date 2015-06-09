@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
-		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.5"
+		 xmlns="http://java.sun.com/xml/ns/javaee"
 		 xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
 
 
@@ -41,17 +41,29 @@
 	<!--> Servlets end </-->
 
 
-	<!--> Security contstraints for cron jobs </!-->
+	<!--> Tidy up servlets </-->
+	<servlet>
+		<servlet-name>_ah_sessioncleanup</servlet-name>
+		<servlet-class>org.wahlzeit.servlets.SessionCleanupServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>_ah_sessioncleanup</servlet-name>
+		<url-pattern>/_ah/sessioncleanup</url-pattern>
+	</servlet-mapping>
+	<!--> Tidy up servlets end </-->
+
+
+	<!--> Security constraints for cron jobs etc.</!-->
 	<security-constraint>
 		<web-resource-collection>
-			<web-resource-name>cron</web-resource-name>
+			<url-pattern>/_ah/sessioncleanup</url-pattern>
 			<url-pattern>/cron/*</url-pattern>
 		</web-resource-collection>
 		<auth-constraint>
 			<role-name>admin</role-name>
 		</auth-constraint>
 	</security-constraint>
-	<!--> Security contstraints for cron jobs end </!-->
+	<!--> Security constraints for cron jobs etc. end </!-->
 
 
 	<!--> Welcome files </-->
@@ -78,4 +90,9 @@
 	<!--> Objectify Filter end </!-->
 
 
+	<!--> Session config </!-->
+	<session-config>
+		<session-timeout>1</session-timeout>
+	</session-config>
+	<!--> Session config end </!-->
 </web-app>

@@ -23,7 +23,6 @@ package org.wahlzeit.handlers;
 import org.wahlzeit.model.AccessRights;
 import org.wahlzeit.model.Guest;
 import org.wahlzeit.model.UserSession;
-import org.wahlzeit.services.EmailAddress;
 import org.wahlzeit.utils.HtmlUtil;
 import org.wahlzeit.webparts.WebPart;
 
@@ -46,7 +45,6 @@ public class LogoutPageHandler extends AbstractWebPageHandler {
      *
      */
     protected String doHandleGet(UserSession us, String link, Map args) {
-        EmailAddress ea = us.getClient().getEmailAddress();
         us.setClient(new Guest());
         us.clearSavedArgs();
         return link;

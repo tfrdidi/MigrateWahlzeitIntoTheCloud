@@ -43,5 +43,4 @@ public class Guest extends Client {
         String userId = GUEST_PREFIX + UserManager.getInstance().getNextClientId();
         initialize(userId, userId, EmailAddress.EMPTY, AccessRights.GUEST);
     }
-
 }
