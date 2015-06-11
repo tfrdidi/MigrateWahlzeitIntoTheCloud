@@ -26,6 +26,8 @@ import org.wahlzeit.model.PhotoFactory;
 import org.wahlzeit.model.PhotoManager;
 import org.wahlzeit.model.User;
 import org.wahlzeit.model.UserManager;
+import org.wahlzeit.model.persistance.GcsAdapter;
+import org.wahlzeit.model.persistance.ImageStorage;
 import org.wahlzeit.services.LogBuilder;
 
 import java.io.File;
@@ -47,6 +49,10 @@ public abstract class ModelMain extends AbstractMain {
     protected void startUp(String rootDir) throws Exception {
         super.startUp(rootDir);
         log.info("AbstractMain.startUp completed");
+
+        log.config(LogBuilder.createSystemMessage().addAction("load image storage").toString());
+        GcsAdapter.Builder gcsAdapterBuilder = new GcsAdapter.Builder();
+        ImageStorage.setInstance(gcsAdapterBuilder.build());
 
         log.config(LogBuilder.createSystemMessage().addAction("load globals").toString());
         GlobalsManager.getInstance().loadGlobals();

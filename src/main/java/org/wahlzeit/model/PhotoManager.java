@@ -23,11 +23,13 @@ package org.wahlzeit.model;
 import com.google.appengine.api.images.Image;
 import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.Work;
+import org.wahlzeit.model.persistance.ImageStorage;
 import org.wahlzeit.services.LogBuilder;
 import org.wahlzeit.services.ObjectManager;
 import org.wahlzeit.services.Persistent;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -206,18 +208,18 @@ public class PhotoManager extends ObjectManager {
      */
     protected void loadScaledImages(Photo photo) {
         String photoIdAsString = photo.getId().asString();
-        GcsAdapter gcsAdapter = GcsAdapter.getInstance();
+        ImageStorage imageStorage = ImageStorage.getInstance();
 
         for (PhotoSize photoSize : PhotoSize.values()) {
             log.config(LogBuilder.createSystemMessage().
                     addAction("loading image").
                     addParameter("image size", photoSize.asString()).
                     addParameter("photo ID", photoIdAsString).toString());
-            if (gcsAdapter.doesImageExist(photoIdAsString, photoSize.asInt())) {
+            if (imageStorage.doesImageExist(photoIdAsString, photoSize.asInt())) {
                 try {
-                    Image image = gcsAdapter.readFromCloudStorage(photoIdAsString, photoSize.asInt());
-                    if (image != null) {
-                        photo.setImage(photoSize, image);
+                    Serializable rawImage = imageStorage.readImage(photoIdAsString, photoSize.asInt());
+                    if (rawImage != null && rawImage instanceof Image) {
+                        photo.setImage(photoSize, (Image) rawImage);
                     }
                 } catch (IOException e) {
                     log.warning(LogBuilder.createSystemMessage().
@@ -255,13 +257,13 @@ public class PhotoManager extends ObjectManager {
      */
     protected void saveScaledImages(Photo photo) {
         String photoIdAsString = photo.getId().asString();
-        GcsAdapter gcsAdapter = GcsAdapter.getInstance();
+        ImageStorage imageStorage = ImageStorage.getInstance();
         for (PhotoSize photoSize : PhotoSize.values()) {
             Image image = photo.getImage(photoSize);
             if (image != null) {
                 try {
-                    if (!gcsAdapter.doesImageExist(photoIdAsString, photoSize.asInt())) {
-                        gcsAdapter.writeToCloudStorage(image, photoIdAsString, photoSize.asInt());
+                    if (!imageStorage.doesImageExist(photoIdAsString, photoSize.asInt())) {
+                        imageStorage.writeImage(image, photoIdAsString, photoSize.asInt());
                     }
                 } catch (IllegalArgumentException e) {
                     log.warning(LogBuilder.createSystemMessage().

@@ -1,15 +1,17 @@
 package org.wahlzeit.servlets;
 
 import com.google.appengine.api.images.Image;
-import org.wahlzeit.model.GcsAdapter;
+import org.apache.http.HttpStatus;
 import org.wahlzeit.model.Photo;
 import org.wahlzeit.model.PhotoManager;
 import org.wahlzeit.model.PhotoSize;
+import org.wahlzeit.model.persistance.ImageStorage;
+import org.wahlzeit.services.LogBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.logging.Level;
+import java.io.Serializable;
 import java.util.logging.Logger;
 
 /**
@@ -27,29 +29,46 @@ public class StaticDataServlet extends AbstractServlet {
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
-            String uri = request.getRequestURI();
-            log.info("Handle URI '" + uri + "'");
+            String type = request.getParameter("type");
+            String photoId = request.getParameter("photoId");
+            String sizeString = request.getParameter("size");
+            int size = Integer.valueOf(sizeString);
+            log.info(LogBuilder.createSystemMessage().
+                    addAction("Provide static resource").
+                    addParameter("type", type).
+                    addParameter("photoId", photoId).
+                    addParameter("size", size).toString());
 
-            if (uri.startsWith(GcsAdapter.PHOTO_FOLDER_PATH_WITH_BUCKET)) {
-                String filename = uri.substring(GcsAdapter.PHOTO_FOLDER_PATH_WITH_BUCKET.length());
-                Photo photo = PhotoManager.getPhoto(filename.substring(0, filename.length() - 5));
+            if ("image".equals(type)) {
+                Photo photo = PhotoManager.getPhoto(photoId);
                 Image image = null;
                 if(photo != null) {
-                    // TODO: think about a better solution
-                    int size = Integer.valueOf(filename.substring(filename.length() - 5, filename.length() - 4));
                     PhotoSize photoSize = PhotoSize.getFromInt(size);
                     image = photo.getImage(photoSize);
                 }
                 // if not in cache load from Google Cloud Storage
                 if (image == null) {
-                    image = GcsAdapter.getInstance().readFromCloudStorage(filename);
+                    Serializable rawImage = ImageStorage.getInstance().readImage(photoId, size);
+                    if (rawImage != null && rawImage instanceof Image) {
+                        image = (Image) rawImage;
+                    }
                 }
-                response.getOutputStream().write(image.getImageData());
-                response.getOutputStream().flush();
+                if (image != null) {
+                    response.getOutputStream().write(image.getImageData());
+                    response.getOutputStream().flush();
+                    response.setStatus(HttpStatus.SC_OK);
+                } else {
+                    log.warning(LogBuilder.createSystemMessage().addMessage("image not found").toString());
+                    response.setStatus(HttpStatus.SC_NOT_FOUND);
+                }
+            } else {
+                log.warning(LogBuilder.createSystemMessage().
+                        addMessage("unimplemented static resource type has been requested").toString());
+                response.setStatus(HttpStatus.SC_NOT_IMPLEMENTED);
             }
 
         } catch (Exception e) {
-            log.log(Level.SEVERE, "Exception geflogen: ", e);
+            log.severe(LogBuilder.createSystemMessage().addException("Problem when loading image", e).toString());
         }
     }
 }

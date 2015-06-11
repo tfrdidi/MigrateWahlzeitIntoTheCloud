@@ -56,7 +56,7 @@
 	<!--> Security constraints for cron jobs etc.</!-->
 	<security-constraint>
 		<web-resource-collection>
-			<url-pattern>/_ah/sessioncleanup</url-pattern>
+			<url-pattern>/_ah/sessioncleanup/*</url-pattern>
 			<url-pattern>/cron/*</url-pattern>
 		</web-resource-collection>
 		<auth-constraint>

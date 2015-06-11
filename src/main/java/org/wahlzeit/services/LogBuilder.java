@@ -125,6 +125,16 @@ public class LogBuilder {
      * <p/>
      * Adds the following to the LogMessage: ", <name>=<value>".
      */
+    public LogBuilder addParameter(String name, boolean value) {
+        add(name + NAME_VALUE_SEPARATOR + String.valueOf(value));
+        return this;
+    }
+
+    /**
+     * @methodtype mutate
+     * <p/>
+     * Adds the following to the LogMessage: ", <name>=<value>".
+     */
     public LogBuilder addParameter(String name, String value) {
         add(name + NAME_VALUE_SEPARATOR + value);
         return this;
