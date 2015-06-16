@@ -4,7 +4,7 @@
 
 ## PART I - INTRODUCTION
 
-Wahlzeit is an open source web application that lets users upload photos and rate photos of other users, usually on a 1..10 scale. Users get to present their best photos and learn what other users thought of their photos. 
+Wahlzeit is an open source web application that lets users upload photos and rate photos of other users, on a 1..10 scale. Users get to present their best photos and learn what other users thought of their photos. 
 
 Wahlzeit is used to teach agile methods and open source software development at the Professorship of Open Source Software at the University of Erlangen.
 
@@ -20,12 +20,12 @@ For more information, see http://github.com/dirkriehle/wahlzeit and http://osr.c
 
 **First download repository:**
   1. Fulfill prerequisites: install **Java JDK**, set **JAVA_HOME**, and install **git**
-  2. open console and change to the directory where the directory ```MigrateWahlzeitIntoTheCloud``` containing the sourcecode should be created
+  2. open console and select the directory where the directory ```MigrateWahlzeitIntoTheCloud``` containing the sourcecode should be created
   3. ```git clone https://github.com/tfrdidi/MigrateWahlzeitIntoTheCloud.git```
 
 
 ### Run Wahlzeit on your local machine
-  1. ```cd <projectsDirectory>/MigrateWahlzeitIntoTheCloud```
+  1. ```cd MigrateWahlzeitIntoTheCloud```
   2. ```./gradlew appengineRun```
   3. wait until gradle and project dependencies are downloaded and the local instance is started
 
